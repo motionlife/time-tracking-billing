@@ -56,7 +56,7 @@
         };
 
         new Chartist.Line('#headline-chart', data, options);
-        
+
         // visits trend charts
         data = {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

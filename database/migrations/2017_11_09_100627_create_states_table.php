@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLastNameToUsersTable extends Migration
+class CreateStatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class AddLastNameToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-            $table->string('last_name')
-                ->after('name');
+        Schema::create('states', function (Blueprint $table) {
+            $table->increments('id');
+            $table->char('code',2);
+            $table->string('name',30);
+            $table->timestamps();
         });
     }
 
@@ -27,9 +28,6 @@ class AddLastNameToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            if (Schema::has('users', 'last_name'))
-                $table->dropColumn('last_name');
-        });
+        Schema::dropIfExists('states');
     }
 }

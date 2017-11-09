@@ -14,7 +14,8 @@ class RenameNameToFirstName extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->renameColumn('name', 'first_name');
+            if (Schema::has('users', 'name'))
+                $table->renameColumn('name', 'first_name');
         });
     }
 
@@ -26,7 +27,8 @@ class RenameNameToFirstName extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->renameColumn('first_name', 'name');
+            if (Schema::has('users', 'first_name'))
+                $table->renameColumn('first_name', 'name');
         });
     }
 }
