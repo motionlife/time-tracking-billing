@@ -19,11 +19,12 @@ class CreateClientsTable extends Migration
             $table->unsignedInteger('contact_id')->nullable();
             $table->unsignedInteger('industry_id');
             //client developed by which consultant
-            $table->unsignedInteger('business_dev_person_id')->nullable();
-            ////client developed by which outside referrer
+            $table->unsignedInteger('business_dev_person_id');
+            //client developed by which outside referrer
             $table->unsignedInteger('out_referrer_id')->nullable();
             //below 1 column should belong to engagements table
-            //$table->date('engagement_start')->nullable();
+            //$table->date('engagement_start_date')->nullable();
+            $table->unsignedInteger('revenue_id')->nullable();
             $table->boolean('complex_structure')->nullable();
             $table->boolean('messy_accounting_at_begin')->nullable();
             $table->timestamps();

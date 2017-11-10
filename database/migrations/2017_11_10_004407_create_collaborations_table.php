@@ -17,7 +17,8 @@ class CreateCollaborationsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('engagement_id');
             $table->unsignedInteger('consultant_id');
-            //the billing rate the consultant charge the client per hour
+            //the billing rate the consultant charge the client per hour, depending on the client paying type,
+            //it could act as consultant's pay_rate
             $table->decimal('billing_rate',15,2);
             //indicate the percentage of share that company should get
             $table->float('firm_share');

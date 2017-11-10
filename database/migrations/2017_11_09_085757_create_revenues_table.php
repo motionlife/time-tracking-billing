@@ -16,8 +16,8 @@ class CreateRevenuesTable extends Migration
         Schema::create('revenues', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('client_id');
-            $table->integer('year', 4)->nullable();
-            $table->decimal('amount',15,2)->nullable();
+            $table->integer('year', 4);
+            $table->decimal('amount',15,2);
             $table->timestamps();
         });
     }

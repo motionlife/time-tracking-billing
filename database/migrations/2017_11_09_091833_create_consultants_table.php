@@ -20,10 +20,10 @@ class CreateConsultantsTable extends Migration
             $table->unsignedInteger('contact_id')->nullable();
             $table->decimal('standard_rate',15,2)->nullable();
             $table->float('standard_percentage')->nullable();
-            $table->boolean('isEmployee')->nullable();
+            $table->boolean('isEmployee');
             //below 1 column should belong to engagements table
             //$table->date('engagement_start_date')->nullable();
-            $table->boolean('inactive')->nullable();
+            //$table->boolean('inactive')->nullable();
             $table->timestamps();
         });
     }
