@@ -20,7 +20,7 @@ class CreateContactsTable extends Migration
             $table->string('address_line1')->nullable();
             $table->string('address_line2')->nullable();
             $table->string('city')->nullable();
-            $table->unsignedTinyInteger('state_id')->nullable();
+            $table->unsignedInteger('state_id')->nullable();
             $table->char('postcode',5)->nullable();
             $table->timestamps();
         });

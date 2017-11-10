@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateIndustriesTable extends Migration
+class CreatePositionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateIndustriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('industries', function (Blueprint $table) {
+        Schema::create('positions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('naics',6);
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ class CreateIndustriesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('industries');
+        Schema::dropIfExists('positions');
     }
 }
