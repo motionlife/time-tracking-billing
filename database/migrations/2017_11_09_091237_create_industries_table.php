@@ -16,7 +16,7 @@ class CreateIndustriesTable extends Migration
         Schema::create('industries', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('naics',6);
+            $table->unsignedInteger('naics');
             $table->timestamps();
         });
     }
