@@ -15,9 +15,9 @@ class CreateConsultantsTable extends Migration
     {
         Schema::create('consultants', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('first_name');
             $table->string('last_name');
-            $table->unsignedInteger('contact_id')->nullable();
             $table->decimal('standard_rate',15,2)->nullable();
             $table->float('standard_percentage')->nullable();
             $table->boolean('isEmployee');

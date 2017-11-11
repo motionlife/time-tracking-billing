@@ -4,6 +4,9 @@ namespace newlifecfo;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use newlifecfo\Models\Client;
+use newlifecfo\Models\Consultant;
+use newlifecfo\Models\Outreferrer;
 
 class User extends Authenticatable
 {
@@ -15,7 +18,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name','last_name', 'email', 'password', 'priority'
+        'first_name', 'last_name', 'email', 'password', 'priority'
     ];
 
     /**
@@ -29,6 +32,32 @@ class User extends Authenticatable
 
     public function fullName()
     {
-        return $this->first_name.' '.$this->last_name;
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    //Get the corresponding client attached to the user (if exists)
+    public function client()
+    {
+        return $this->hasOne(Client::class)->withDefault([
+            'name' => 'Not_A_Client'
+        ]);
+    }
+
+    //Get the corresponding consultant attached to the user (if exists)
+    public function consultant()
+    {
+        return $this->hasOne(Consultant::class)->withDefault([
+            'first_name' => 'Not_A_Consultant',
+            'last_name' => 'Not_A_Consultant'
+        ]);
+    }
+
+    //Get the corresponding client attached to the user (if exists)
+    public function outreferrer()
+    {
+        return $this->hasOne(Outreferrer::class)->withDefault([
+            'first_name' => 'Not_An_Outside_Referrer',
+            'last_name'=>'Not_An_Outside_Referrer'
+        ]);
     }
 }
