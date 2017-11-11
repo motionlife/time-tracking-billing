@@ -20,8 +20,8 @@ class CreateHoursTable extends Migration
             $table->unsignedInteger('consultant_id');
             $table->unsignedInteger('task_id');
             $table->float('billable_hours');
-            $table->float('non_billable_hours');
-            $table->text('description');
+            $table->float('non_billable_hours')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
