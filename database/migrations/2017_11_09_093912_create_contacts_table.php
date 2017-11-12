@@ -17,12 +17,12 @@ class CreateContactsTable extends Migration
             $table->increments('id');
             $table->string('email')->unique();
             $table->string('profile_img_path')->nullable();
-            $table->char('phone',20)->nullable();
+            $table->char('phone',30)->nullable();
             $table->string('address_line1')->nullable();
             $table->string('address_line2')->nullable();
             $table->string('city')->nullable();
             $table->unsignedInteger('state_id')->nullable();
-            $table->char('postcode',10)->nullable();
+            $table->char('postcode',15)->nullable();
             $table->timestamps();
         });
     }

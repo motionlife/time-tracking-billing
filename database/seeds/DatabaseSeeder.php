@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
              TaskSeeder::class,
              OutreferrerSeeder::class,
              ConsultantSeeder::class,
-//             ClientSeeder::class
+             ClientSeeder::class
          ]);
     }
 }
