@@ -17,7 +17,6 @@ class CreateStatesTable extends Migration
             $table->increments('id');
             $table->char('code',2);
             $table->string('name',30);
-            $table->timestamps();
         });
     }
 

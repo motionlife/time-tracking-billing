@@ -24,11 +24,11 @@ class Client extends Model
     //Get the contact info
     public function contact()
     {
-        return $this->hasOne(Contact::class, 'cc_id');
+        return $this->belongsTo(Contact::class);
     }
 
     //Get the consultant who developed this client
-    public function consultant()
+    public function dev_by_consultant()
     {
         return $this->belongsTo(Consultant::class, 'buz_dev_person_id')
             ->withDefault([
@@ -57,5 +57,11 @@ class Client extends Model
     public function industry()
     {
         return $this->belongsTo(Industry::class,'industry_id');
+    }
+
+    //get all the engagements of this client
+    public function engagements()
+    {
+        return $this->hasMany(Engagement::class);
     }
 }

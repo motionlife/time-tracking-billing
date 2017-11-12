@@ -8,6 +8,7 @@ use newlifecfo\Models\Client;
 class Industry extends Model
 {
     protected $guarded = [];
+    public $timestamps = false;
     protected $table = 'industries';
 
     //all the clients in this industry

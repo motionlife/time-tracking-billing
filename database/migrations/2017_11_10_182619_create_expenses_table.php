@@ -15,10 +15,10 @@ class CreateExpensesTable extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('arrangement_id');
             $table->date('report_date');
-            $table->unsignedInteger('engagement_id');
-            $table->unsignedInteger('consultant_id');
-            $table->boolean('company_paid')->default(false);//Indicate whether expense already paid by New Life CFO
+            $table->boolean('company_paid')->default(false)
+            ->comment('whether the expense had already paid by New Life CFO');
             $table->decimal('hotel',15,2)->default(0);
             $table->decimal('flight',15,2)->default(0);
             $table->decimal('meal',15,2)->default(0);
@@ -27,7 +27,6 @@ class CreateExpensesTable extends Migration
             //mileage_cost = mileage * 0.535
             $table->decimal('mileage_cost',15,2)->default(0);
             $table->decimal('other',15,2)->default(0);
-            $table->unsignedInteger('receipt_id')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

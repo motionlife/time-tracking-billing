@@ -4,6 +4,7 @@ namespace newlifecfo;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use newlifecfo\Models\Approval;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Outreferrer;
@@ -18,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'priority'
+        'first_name', 'last_name', 'email', 'password', 'priority','role'
     ];
 
     /**
@@ -30,34 +31,31 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public static $roles = ['Unassigned','Consultant','Client','Outside Referrer','General Admin','Super Admin','root'];
+
     public function fullName()
     {
         return $this->first_name . ' ' . $this->last_name;
     }
 
-    //Get the corresponding client attached to the user (if exists)
-    public function client()
+    //Get the corresponding role entity
+    public function entity()
     {
-        return $this->hasOne(Client::class)->withDefault([
-            'name' => 'Not_A_Client'
-        ]);
+        switch ($this->role){
+            case 1:
+                return $this->hasOne(Consultant::class);
+            case 2:
+                return $this->hasOne(Client::class);
+            case 3:
+                return $this->hasOne(Outreferrer::class);
+            default:
+                return $this;
+        }
     }
 
-    //Get the corresponding consultant attached to the user (if exists)
-    public function consultant()
+    //all the approval this user has been processed
+    public function approvals()
     {
-        return $this->hasOne(Consultant::class)->withDefault([
-            'first_name' => 'Not_A_Consultant',
-            'last_name' => 'Not_A_Consultant'
-        ]);
-    }
-
-    //Get the corresponding client attached to the user (if exists)
-    public function outreferrer()
-    {
-        return $this->hasOne(Outreferrer::class)->withDefault([
-            'first_name' => 'Not_An_Outside_Referrer',
-            'last_name'=>'Not_An_Outside_Referrer'
-        ]);
+        return $this->hasMany(Approval::class);
     }
 }

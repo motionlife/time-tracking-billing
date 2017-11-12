@@ -15,10 +15,9 @@ class CreateHoursTable extends Migration
     {
         Schema::create('hours', function (Blueprint $table) {
             $table->increments('id');
-            $table->date('report_date');
-            $table->unsignedInteger('engagement_id');
-            $table->unsignedInteger('consultant_id');
+            $table->unsignedInteger('arrangement_id');
             $table->unsignedInteger('task_id');
+            $table->date('report_date');
             $table->float('billable_hours');
             $table->float('non_billable_hours')->nullable();
             $table->text('description')->nullable();

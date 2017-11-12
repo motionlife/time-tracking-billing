@@ -20,15 +20,27 @@ class Consultant extends Model
         ]);
     }
 
-    //Get the contact
+    //Get the contact info
     public function contact()
     {
-        return $this->hasOne(Contact::class,'cc_id');
+        return $this->belongsTo(Contact::class);
     }
 
     //all the developed clients
-    public function clients()
+    public function dev_clients()
     {
         return $this->hasMany(Client::class,'buz_dev_person_id');
+    }
+
+    //all the engagements he has ever leaded
+    public function lead_engagements()
+    {
+        return $this->hasMany(Engagement::class);
+    }
+
+    //all the arrangements he's attended
+    public function arrangements()
+    {
+        return $this->hasMany(Arrangement::class);
     }
 }

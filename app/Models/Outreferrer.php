@@ -18,10 +18,10 @@ class Outreferrer extends Model
     //Get the contact info
     public function contact()
     {
-        return $this->hasOne(Contact::class,'cc_id');
+        return $this->belongsTo(Contact::class);
     }
 
-    //Get the corresponding system user of this client
+    //Get the corresponding system user of this outside referrer
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault([

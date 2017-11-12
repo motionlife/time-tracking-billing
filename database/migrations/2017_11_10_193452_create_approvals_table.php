@@ -15,14 +15,13 @@ class CreateApprovalsTable extends Migration
     {
         Schema::create('approvals', function (Blueprint $table) {
             $table->increments('id');
-            //user_id could be either client or consultant
             $table->unsignedInteger('user_id');
-            //0=>billing;1=>payroll_hours;2=>payroll_expense;3=>payroll_biz_dev
-            $table->unsignedTinyInteger('type');
+            $table->unsignedTinyInteger('type')
+                ->comment('0=>billing;1=>payroll_hours;2=>payroll_expense;3=>payroll_biz_dev');
             $table->dateTime('start_from');
             $table->dateTime('end_at');
-            //0=>not read; 1=>read_not_approved;2=>read_approved;3=>not_concur!...
-            $table->unsignedTinyInteger('status')->default(0);
+            $table->unsignedTinyInteger('status')->default(0)
+                ->comment('0=>not read; 1=>read_not_approved;2=>read_approved;3=>not_concur!...');
             $table->text('feedback')->nullable();
             $table->timestamps();
         });

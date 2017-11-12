@@ -18,8 +18,10 @@ class CreateUsersTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
-            $table->unsignedTinyInteger('priority')->default(0);
             $table->string('password');
+            $table->unsignedTinyInteger('priority')->default(0);
+            $table->unsignedTinyInteger('role')->default(0)
+                ->comment('0=>unassigned,1=>consultant,2=>client,3=>outside_referrer,4=>general admin,5=>super admin,6=>root');
             $table->rememberToken();
             $table->timestamps();
         });

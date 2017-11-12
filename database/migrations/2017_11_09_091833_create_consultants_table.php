@@ -16,13 +16,12 @@ class CreateConsultantsTable extends Migration
         Schema::create('consultants', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id')->nullable();
+            $table->unsignedInteger('contact_id');
             $table->string('first_name');
             $table->string('last_name');
             $table->decimal('standard_rate',15,2)->nullable();
             $table->float('standard_percentage')->nullable();
             $table->boolean('isEmployee');
-            //below 1 column should belong to engagements table
-            //$table->date('engagement_start_date')->nullable();
             //$table->boolean('inactive')->nullable();
             $table->timestamps();
         });

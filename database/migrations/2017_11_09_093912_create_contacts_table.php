@@ -15,8 +15,6 @@ class CreateContactsTable extends Migration
     {
         Schema::create('contacts', function (Blueprint $table) {
             $table->increments('id');
-            //The corresponding client or consultant id or outreferrer id
-            $table->unsignedInteger('cc_id')->nullable();
             $table->string('email')->unique();
             $table->string('profile_img_path')->nullable();
             $table->char('phone',15)->nullable();

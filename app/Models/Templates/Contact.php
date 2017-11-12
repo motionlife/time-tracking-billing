@@ -11,29 +11,14 @@ class Contact extends Model
 {
     protected $guarded = [];
 
-    //Get the owner of this contact if it's a client
-    public function client()
+    //Get the owner of this contact
+    public function owner()
     {
-        return $this->belongsTo(Client::class, 'cc_id')->withDefault([
-            'name' => 'Not_A_Client'
-        ]);
+        return $this->hasOne(Consultant::class) ?: $this->hasOne(Client::class) ?: $this->hasOne(Outreferrer::class);
     }
 
-    //Get the owner of this contact if it's a consultant
-    public function consultant()
+    public function state()
     {
-        return $this->belongsTo(Consultant::class, 'cc_id')->withDefault([
-            'first_name' => 'Not_A_Consultant',
-            'last_name' => 'Not_A_Consultant'
-        ]);
-    }
-
-    //Get the owner of this contact if it's a outsider referrer
-    public function outreferrer()
-    {
-        return $this->belongsTo(Outreferrer::class, 'cc_id')->withDefault([
-            'first_name' => 'Not_A_Outside_Referrer',
-            'last_name' => 'Not_A_Outside_Referrer'
-        ]);
+        return $this->belongsTo(State::class);
     }
 }

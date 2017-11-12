@@ -17,7 +17,6 @@ class CreateTaskgroupsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->boolean('isNLCFO')->default(true);
-            $table->timestamps();
         });
     }
 
