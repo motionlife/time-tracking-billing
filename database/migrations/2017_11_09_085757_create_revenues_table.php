@@ -17,7 +17,8 @@ class CreateRevenuesTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('client_id');
             $table->unsignedInteger('year');
-            $table->decimal('amount',15,2);
+            $table->decimal('revenue',15,2)->nullable();
+            $table->decimal('ebit',15,2)->nullable();
             $table->timestamps();
         });
     }

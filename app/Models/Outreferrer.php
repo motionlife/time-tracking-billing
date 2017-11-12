@@ -4,11 +4,15 @@ namespace newlifecfo\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use newlifecfo\Models\Templates\Contact;
+use newlifecfo\User;
 
 class Outreferrer extends Model
 {
     protected $guarded = [];
-
+    public function fullname()
+    {
+        return $this->first_name.' '.$this->last_name;
+    }
     //all the developed clients
     public function clients()
     {

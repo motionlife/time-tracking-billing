@@ -10,6 +10,10 @@ class Consultant extends Model
 {
     protected $guarded = [];
 
+    public function fullname()
+    {
+        return $this->first_name.' '.$this->last_name;
+    }
     //Get the corresponding system user of this consultant
     public function user()
     {
