@@ -1,4 +1,1 @@
-*.sqlite
-seeds/*.php
-seeds/*.sql
-seeds/*~
+seeds/*
