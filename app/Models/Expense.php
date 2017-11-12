@@ -14,6 +14,7 @@ class Expense extends Model
         return $this->belongsTo(Arrangement::class);
     }
 
+    //get the attached receipt
     public function receipt()
     {
         return $this->hasOne(Receipt::class)->withDefault([

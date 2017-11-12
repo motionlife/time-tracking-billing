@@ -28,6 +28,9 @@ class CreateExpensesTable extends Migration
             $table->decimal('mileage_cost',15,2)->default(0);
             $table->decimal('other',15,2)->default(0);
             $table->text('description')->nullable();
+            $table->unsignedTinyInteger('review_state')->default(0)
+                ->comment('0=>not-reviewed,1=>review_approved,2=>review_changed,3=>concurred');
+            $table->text('feedback')->nullable();
             $table->timestamps();
         });
     }
