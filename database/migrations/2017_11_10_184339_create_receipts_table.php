@@ -17,7 +17,7 @@ class CreateReceiptsTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('expense_id');
             $table->string('filename');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

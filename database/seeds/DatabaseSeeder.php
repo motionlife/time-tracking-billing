@@ -19,7 +19,10 @@ class DatabaseSeeder extends Seeder
              TaskSeeder::class,
              OutreferrerSeeder::class,
              ConsultantSeeder::class,
-             ClientSeeder::class
+             ClientSeeder::class,
+             EngagementSeeder::class,
+             HourSeeder::class,
+             ExpenseSeeder::class
          ]);
     }
 }
