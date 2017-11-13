@@ -1,3 +1,2 @@
 *.sqlite
-seeds/
-!seeds/DatabaseSeeder.php
+seeds/data
