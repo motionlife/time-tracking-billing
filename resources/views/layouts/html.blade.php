@@ -9,27 +9,27 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'New Life CFO') }}</title>
     <!-- VENDOR CSS -->
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/linearicons/style.css">
-    <link rel="stylesheet" href="/assets/chartist/css/chartist-custom.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/chartist-custom.css">
     <!-- MAIN CSS -->
-    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/css/main.css">
     <!-- GOOGLE FONTS -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700" rel="stylesheet">
     <!-- ICONS -->
-    <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/apple-icon.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicon.png">
 </head>
 <body>
 @yield('wrapper')
 <!-- Javascript -->
-<script src="/assets/jquery/jquery.min.js"></script>
-<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-<script src="/assets/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-<script src="/assets/jquery.easy-pie-chart/jquery.easypiechart.min.js"></script>
-<script src="/assets/chartist/js/chartist.min.js"></script>
-<script src="/assets/scripts/klorofil-common.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.slimscroll.min.js"></script>
+<script src="/js/jquery.easypiechart.min.js"></script>
+<script src="/js/chartist.min.js"></script>
+<script src="/js/klorofil-common.js"></script>
 <script>
     $(function () {
         var data, options;
