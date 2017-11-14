@@ -51,7 +51,7 @@ class ExpenseSeeder extends Seeder
                         ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30")]);
                     //fetch first or create
                     $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $this->get_consultant_id($con_name), 'position_id' => $this->get_pos_id($position)],
-                        ['billing_rate' => 0, 'firm_share' => 1.0]);
+                        ['billing_rate' => 0, 'firm_share' => 1.0]);//temporarily assign firm_share to 0, updated by another file
                 } else if ($line[4]) {
                     if (count($line) > 22 && $this->number($line[22])) {
                         $exp = Expense::create([
@@ -85,7 +85,56 @@ class ExpenseSeeder extends Seeder
                     }
                 }
             }
+            $this->update_firm_share();
         }
+    }
+
+    //fetch the firm_share info for each newly created arrangement from another data file
+    private function update_firm_share()
+    {
+        if (($handle = fopen(__DIR__ . '\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+            $client_name = '';
+            $eng_name = '';
+            $position = '';
+            $con_name = '';
+            $arr = null;
+            $need_updated = true;
+            fgetcsv($handle, 0, ",");//move the cursor one step because of header
+            while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
+                $skip = false;
+                foreach ($line as $j => $entry) {
+                    if ($j > 4) continue;
+                    if (stripos($entry, 'Total')) {
+                        $skip = true;
+                        break;
+                    }
+                }
+                if ($skip) continue;
+
+                if ($line[0]) {
+                    $con_name = $line[0];
+                } else if ($line[1]) {
+                    $client_name = $line[1];
+                } else if ($line[2]) {
+                    $eng_name = $line[2];
+                } else if ($line[3]) {
+                    $position = $line[3];
+                    $need_updated = true;
+                } else if ($line[5] && $line[9]) {
+                    if ($need_updated) {
+                        //check if is an un-enrolled arrangement
+                        $con_id = $this->get_consultant_id($con_name);
+                        $eng = Engagement::where(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name])->first();
+                        //fetch first or create
+                        Arrangement::where(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)])
+                            ->first()->update(['firm_share' => $this->number($line[11])]);
+                        $need_updated = false;
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
     }
 
     public function get_task_id($group, $desc)
