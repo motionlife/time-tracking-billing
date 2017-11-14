@@ -69,15 +69,19 @@ class ExpenseSeeder extends Seeder
                             Receipt::Create(['expense_id' => $exp->id, 'filename' => $line[20]]);
                         }
                     } else {
-                        $arr->update(['billing_rate' => $this->number($line[9])]);
-                        Hour::Create([
-                            'arrangement_id' => $arr->id,
-                            'task_id' => $this->get_task_id($line[5], $line[6]),
-                            'report_date' => $line[4],
-                            'billable_hours' => $this->number($line[7]),
-                            'non_billable_hours' => $this->number($line[8]),
-                            'description' => $line[10]
-                        ]);
+                        $bh = $this->number($line[7]);
+                        $nbh = $this->number($line[8]);
+                        if ($bh || $nbh) {
+                            Hour::Create([
+                                'arrangement_id' => $arr->id,
+                                'task_id' => $this->get_task_id($line[5], $line[6]),
+                                'report_date' => $line[4],
+                                'billable_hours' => $bh,
+                                'non_billable_hours' => $nbh,
+                                'description' => $line[10]
+                            ]);
+                            $arr->update(['billing_rate' => $this->number($line[9])]);
+                        }
                     }
                 }
             }
