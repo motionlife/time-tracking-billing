@@ -91,7 +91,7 @@ class ExpenseSeeder extends Seeder
     public function get_task_id($group, $desc)
     {
         $g = Taskgroup::firstOrCreate(['name' => $group]);
-        return Task::firstOrCreate(['taskgroup_id' => $g->id], ['description' => $desc])->id;
+        return Task::firstOrCreate(['taskgroup_id' => $g->id, 'description' => $desc])->id;
     }
 
     public function get_client_id($name)
