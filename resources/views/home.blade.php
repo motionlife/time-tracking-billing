@@ -14,20 +14,7 @@
                             </div>
                         @endif
 
-                        <?php
-                        $client = Auth::user()->entity;
-                        echo '<ul>';
-                        foreach ($client->arrangements as $arr) {
-                             echo '<li>'.json_encode($arr).'</li>';
-                            echo '<ul>';
-                                foreach ($arr->hourReports as $report)
-                                    {
-                                        echo '<li> Your made:$'.json_encode($report->billable_hours*$arr->billing_rate).'</li>';
-                                    }
-                            echo '</ul>';
-                        }
-                        echo '</ul>';
-                        ?>
+                        Welcome, {{ Auth::user()->fullname() }}
 
                     </div>
                 </div>

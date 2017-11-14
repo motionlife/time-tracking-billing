@@ -50,8 +50,8 @@ class ExpenseSeeder extends Seeder
                     $eng = Engagement::firstOrCreate(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name],
                         ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30")]);
                     //fetch first or create
-                    $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $this->get_consultant_id($con_name)],
-                        ['position_id' => $this->get_pos_id($position), 'billing_rate' => 0, 'firm_share' => 1.0]);
+                    $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $this->get_consultant_id($con_name), 'position_id' => $this->get_pos_id($position)],
+                        ['billing_rate' => 0, 'firm_share' => 1.0]);
                 } else if ($line[4]) {
                     if (count($line) > 22 && $this->number($line[22])) {
                         $exp = Expense::create([
