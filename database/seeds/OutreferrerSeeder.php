@@ -16,7 +16,7 @@ class OutreferrerSeeder extends Seeder
     public function run()
     {
         $faker = Faker\Factory::create('en_US');
-        $names = ['Michael Hall', 'Mark Connelly', 'Jason Kos', 'Jason Williford', 'Ken Stiles', 'Dennis Howard', 'David Boyette'];
+        $names = require __DIR__.'/data/outsiders.php';
         static $password;
         foreach ($names as $name) {
             $user = User::create(['first_name' => explode(" ",$name)[0],

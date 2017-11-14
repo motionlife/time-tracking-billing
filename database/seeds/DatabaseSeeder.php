@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
              ConsultantSeeder::class,
              ClientSeeder::class,
              EngagementSeeder::class,
-             HourSeeder::class,
+             //HourSeeder::class,
              ExpenseSeeder::class
          ]);
     }
