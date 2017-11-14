@@ -8,7 +8,7 @@
                 <ur>
                     <li>Total Billable Hours:{{$result[$i]['totalbh']}}</li>
                     <li>Total Nob-billable Hours:{{$result[$i]['totalnbh']}}</li>
-                    <li>Total Paid:<strong>{{$result[$i]['totalpay']}}</strong></li>
+                    <li>Total Paid:<strong>${{number_format($result[$i]['totalpay'],2)}}</strong></li>
                 </ur>
             </div>
             <hr>
