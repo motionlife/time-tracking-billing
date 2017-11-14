@@ -9,10 +9,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'New Life CFO') }}</title>
     <!-- VENDOR CSS -->
-    <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/assets/vendor/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/vendor/linearicons/style.css">
-    <link rel="stylesheet" href="/assets/vendor/chartist/css/chartist-custom.css">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/linearicons/style.css">
+    <link rel="stylesheet" href="/assets/chartist/css/chartist-custom.css">
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <!-- GOOGLE FONTS -->
@@ -24,11 +24,11 @@
 <body>
 @yield('wrapper')
 <!-- Javascript -->
-<script src="/assets/vendor/jquery/jquery.min.js"></script>
-<script src="/assets/vendor/bootstrap/js/bootstrap.min.js"></script>
-<script src="/assets/vendor/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-<script src="/assets/vendor/jquery.easy-pie-chart/jquery.easypiechart.min.js"></script>
-<script src="/assets/vendor/chartist/js/chartist.min.js"></script>
+<script src="/assets/jquery/jquery.min.js"></script>
+<script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="/assets/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/assets/jquery.easy-pie-chart/jquery.easypiechart.min.js"></script>
+<script src="/assets/chartist/js/chartist.min.js"></script>
 <script src="/assets/scripts/klorofil-common.js"></script>
 <script>
     $(function () {
