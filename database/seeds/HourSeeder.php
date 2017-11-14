@@ -56,7 +56,7 @@ class HourSeeder extends Seeder
                     $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $con_id],
                         ['position_id' => $this->get_pos_id($position),'billing_rate' => 0,'firm_share' => 0]);
                 } else if ($line[5]) {
-                    $arr->update(['billing_rate' => $this->number($line[9]), 'firm_share' => $this->number($line[11])]);
+                    $arr->update(['billing_rate' => $this->number($line[9]), 'firm_share' => $this->number($line[11])/100]);
                     Hour::firstOrCreate([
                         'arrangement_id' => $arr->id, 'report_date' => $line[5], 'task_id' => $this->get_task_id($group, $line[6])],
                         ['billable_hours' => $this->number($line[7]), 'non_billable_hours' => $this->number($line[8]),

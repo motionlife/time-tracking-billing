@@ -127,7 +127,7 @@ class ExpenseSeeder extends Seeder
                         $eng = Engagement::where(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name])->first();
                         //fetch first or create
                         Arrangement::where(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)])
-                            ->first()->update(['firm_share' => $this->number($line[11])]);
+                            ->first()->update(['firm_share' => $this->number($line[11])/100]);
                         $need_updated = false;
                     }
                 }
