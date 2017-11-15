@@ -71,6 +71,7 @@ class ExpenseSeeder extends Seeder
                     } else {
                         $bh = $this->number($line[7]);
                         $nbh = $this->number($line[8]);
+                        $arr->update(['billing_rate' => $this->number($line[9])]);
                         if ($bh || $nbh||$line[10]) {
                             Hour::Create([
                                 'arrangement_id' => $arr->id,
@@ -80,7 +81,6 @@ class ExpenseSeeder extends Seeder
                                 'non_billable_hours' => $nbh,
                                 'description' => $line[10]
                             ]);
-                            $arr->update(['billing_rate' => $this->number($line[9])]);
                         }
                     }
                 }

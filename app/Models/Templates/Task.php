@@ -11,7 +11,7 @@ class Task extends Model
     public $timestamps = false;
 
     //all the hour-reports related to this task
-    public function hourReports()
+    public function hours()
     {
         return $this->hasMany(Hour::class);
     }

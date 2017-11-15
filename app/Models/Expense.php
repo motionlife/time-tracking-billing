@@ -18,8 +18,14 @@ class Expense extends Model
     public function receipt()
     {
         return $this->hasOne(Receipt::class)->withDefault([
-            'filename'=>'null',
-            'description'=>'null'
+            'filename' => 'null',
+            'description' => 'null'
         ]);
+    }
+
+    public function total()
+    {
+        return $this->company_paid ? 0 : $this->hotel + $this->flight + $this->meal + $this->office_supply
+            + $this->car_rental + $this->mileage_cost + $this->other;
     }
 }

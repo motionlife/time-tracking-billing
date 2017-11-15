@@ -28,13 +28,13 @@ class Arrangement extends Model
     }
 
     //all the hour reports for this arrangement
-    public function hourReports()
+    public function hours()
     {
         return $this->hasMany(Hour::class);
     }
 
     //all the expense reports for this arrangement
-    public function expenseReports()
+    public function expenses()
     {
         return $this->hasMany(Expense::class);
     }

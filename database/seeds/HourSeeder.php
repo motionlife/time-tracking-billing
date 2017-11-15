@@ -121,7 +121,7 @@ class HourSeeder extends Seeder
                     } else if ($line[5]) {
 
                         if ($arr->billing_rate != $this->number($line[9]) ||
-                            !$arr->hourReports->where('report_date', $line[5])
+                            !$arr->hours->where('report_date', $line[5])
                                 ->where('billable_hours', $this->number($line[7]))
                                 ->where('non_billable_hours', $this->number($line[8]))
                                 ->first()) {

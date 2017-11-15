@@ -43,27 +43,59 @@ class HomeController extends Controller
 
         $consultants = Consultant::all();
         $output = [];
+        //verify hourly payroll and expense payroll
         foreach ($consultants as $consultant) {
             $totalpay = 0;
             $totalbillablehour = 0;
             $totalnonbillablehour = 0;
+            $totalexpense = 0;
             foreach ($consultant->arrangements as $arrangement) {
                 $billing_rate = $arrangement->billing_rate;
                 $firm_share = $arrangement->firm_share;
                 $hourlypay = $billing_rate * (1 - $firm_share);
-                foreach ($arrangement->hourReports as $hour) {
+                foreach ($arrangement->hours as $hour) {
                     $totalpay += $hour->billable_hours * $hourlypay;
                     $totalbillablehour += $hour->billable_hours;
                     $totalnonbillablehour += $hour->non_billable_hours;
                 }
+
+                foreach ($arrangement->expenses as $expense) {
+                    $totalexpense += $expense->total();
+                }
             }
-            array_push($output, array('name' => $consultant->fullname(),
+            array_push($output, ['name' => $consultant->fullname(),
                 'totalbh' => $totalbillablehour,
                 'totalnbh' => $totalnonbillablehour,
-                'totalpay' => $totalpay));
+                'totalpay' => $totalpay,
+                'totalexpense' => $totalexpense,
+            ]);
         }
 
-        return view('test', ['consultants' => $consultants, 'result' => $output,'csv'=>$this->getTotalFromCSV()]);
+        //verify billing and buz_dev payroll
+        $clients= Client::all();
+        $bills=[];
+        foreach ( $clients as $client) {
+            $hoursbill = 0;
+            $expensesbill =0;
+            foreach ($client->engagements as $eage) {
+                foreach ($eage->arrangements as $arr) {
+                    foreach ($arr->hours as $hour) {
+                        $hoursbill += $hour->billable_hours * $arr->billing_rate;
+                    }
+                    foreach ($arr->expenses as $expense)
+                    {
+                        $expensesbill += $expense->total();
+                    }
+                }
+            }
+            array_push($bills, ['hoursBill'=>$hoursbill,'expensesBill'=>$expensesbill]);
+        }
+
+
+        return view('test', ['consultants' => $consultants,
+            'result' => $output, 'csv' => $this->getTotalFromCSV(),'clients'=>$clients,
+                'bills'=>$bills
+        ]);
     }
 
     private function getTotalFromCSV()
@@ -136,7 +168,7 @@ class HomeController extends Controller
                     $bh = $this->number($line[7]);
                     $nbh = $this->number($line[8]);
                     if ($bh || $nbh)
-                        if (!$arr->hourReports->where('report_date', date('Y-m-d', strtotime($line[5])))
+                        if (!$arr->hours->where('report_date', date('Y-m-d', strtotime($line[5])))
                             ->where('billable_hours', $bh)
                             ->where('non_billable_hours', $nbh)
                             ->first()) {
