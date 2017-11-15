@@ -18,8 +18,8 @@ class CreateHoursTable extends Migration
             $table->unsignedInteger('arrangement_id');
             $table->unsignedInteger('task_id');
             $table->date('report_date');
-            $table->float('billable_hours');
-            $table->float('non_billable_hours')->nullable();
+            $table->double('billable_hours');
+            $table->double('non_billable_hours')->nullable();
             $table->text('description')->nullable();
             $table->unsignedTinyInteger('review_state')->default(0)
                 ->comment('0=>not-reviewed,1=>review_approved,2=>review_changed,3=>concurred');

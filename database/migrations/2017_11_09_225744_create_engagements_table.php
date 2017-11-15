@@ -20,7 +20,7 @@ class CreateEngagementsTable extends Migration
             $table->string('name');
             $table->date('start_date');
             $table->date('close_date')->nullable();
-            $table->float('buz_dev_share')->default(0);
+            $table->double('buz_dev_share')->default(0);
             //indicate whether the engagement has closed or sth
             $table->unsignedTinyInteger('status')->default(0)
                 ->comment('0=>open,1=>closed');

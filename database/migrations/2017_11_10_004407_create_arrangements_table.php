@@ -20,7 +20,7 @@ class CreateArrangementsTable extends Migration
             $table->unsignedInteger('position_id')->comment('job position of the consultant');
             $table->decimal('billing_rate', 15, 2)
                 ->comment('used as pay_rate when client\'s pay_cycle is not hourly');
-            $table->float('firm_share')->comment('the percentage of share that company should get');
+            $table->double('firm_share')->comment('the percentage of share that company should get');
             $table->timestamps();
         });
     }

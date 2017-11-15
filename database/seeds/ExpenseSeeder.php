@@ -120,7 +120,7 @@ class ExpenseSeeder extends Seeder
                 } else if ($line[3]) {
                     $position = $line[3];
                     $need_updated = true;
-                } else if ($line[5] && $line[9]) {
+                } else if ($line[5]) {
                     if ($need_updated) {
                         //check if is an un-enrolled arrangement
                         $con_id = $this->get_consultant_id($con_name);

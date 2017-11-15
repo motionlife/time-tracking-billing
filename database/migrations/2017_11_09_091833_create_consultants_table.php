@@ -20,7 +20,7 @@ class CreateConsultantsTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->decimal('standard_rate', 15, 2)->nullable();
-            $table->float('standard_percentage')->nullable();
+            $table->double('standard_percentage')->nullable();
             $table->boolean('isEmployee')->default(0);
             $table->boolean('inactive')->default(0)
                 ->comment('default 1=yes');
