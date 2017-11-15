@@ -21,7 +21,7 @@ class ExpenseSeeder extends Seeder
      */
     public function run()
     {
-        if (($handle = fopen(__DIR__ . '\data\Billing\Billing2017-11-13.csv', "r")) !== FALSE) {
+        if (($handle = fopen(__DIR__ . '\data\Billing\billing.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
             $position = '';
@@ -92,7 +92,7 @@ class ExpenseSeeder extends Seeder
     //fetch the firm_share info for each newly created arrangement from another data file
     private function update_firm_share()
     {
-        if (($handle = fopen(__DIR__ . '\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+        if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
             $position = '';

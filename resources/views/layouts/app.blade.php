@@ -6,7 +6,7 @@
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="brand">
                 <a href="/"><img src="/img/logo-dark.png" alt="Klorofil Logo"
-                                          class="img-responsive logo"></a>
+                                 class="img-responsive logo"></a>
             </div>
             <div class="container-fluid">
                 <div class="navbar-btn">
@@ -19,12 +19,16 @@
                         <span class="input-group-btn"><button type="button" class="btn btn-primary">Go</button></span>
                     </div>
                 </form>
+                <div class="navbar-btn navbar-btn-right">
+                    <a class="btn btn-success update-pro" href="javascript:void(0);" title="Report Your Time"
+                       target="_blank"><i class="fa fa-calendar" aria-hidden="true"></i> <span>REPORT TIME</span></a>
+                </div>
                 <div id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
                                 <i class="lnr lnr-alarm"></i>
-                                <span class="badge bg-danger">5</span>
+                                <span class="badge bg-danger">7</span>
                             </a>
                             <ul class="dropdown-menu notifications">
                                 <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>System
@@ -76,9 +80,6 @@
                                 </li>
                             </ul>
                         </li>
-                        <!-- <li>
-                            <a class="update-pro" href="#downloads/klorofil-pro-bootstrap-admin-dashboard-template/?utm_source=klorofil&utm_medium=template&utm_campaign=KlorofilPro" title="Upgrade to Pro" target="_blank"><i class="fa fa-rocket"></i> <span>UPGRADE TO PRO</span></a>
-                        </li> -->
                     </ul>
                 </div>
             </div>

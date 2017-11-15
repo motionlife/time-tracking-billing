@@ -19,7 +19,7 @@ class ClientSeeder extends Seeder
     {
         $faker = Faker\Factory::create('en_US');
         $clients = array_map('str_getcsv',
-            file(__DIR__.'\data\AllClients2017-11-13.csv',FILE_SKIP_EMPTY_LINES));
+            file(__DIR__ . '\data\clients.csv',FILE_SKIP_EMPTY_LINES));
         $keys = array_shift($clients);
         foreach ($clients as $client) {
             $client = array_combine($keys, $client);

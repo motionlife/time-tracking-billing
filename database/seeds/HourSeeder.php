@@ -21,7 +21,7 @@ class HourSeeder extends Seeder
     {
         dump($this->verify('Alex Liu'));
         return;
-        if (($handle = fopen(__DIR__ . '\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+        if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
             $position = '';
@@ -73,7 +73,7 @@ class HourSeeder extends Seeder
     private function verify($consultant)
     {
         $log = [];
-        if (($handle = fopen(__DIR__ . '\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+        if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
             $con_id = 0;
