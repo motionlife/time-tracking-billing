@@ -62,7 +62,21 @@ class HomeController extends Controller
                 'totalnbh' => $totalnonbillablehour,
                 'totalpay' => $totalpay));
         }
-        return view('test', ['consultants' => $consultants, 'result' => $output]);
+
+        return view('test', ['consultants' => $consultants, 'result' => $output,'csv'=>$this->getTotalFromCSV()]);
+    }
+
+    private function getTotalFromCSV()
+    {
+        $out = [];
+        if (($handle = fopen('C:\Users\HaoXiong\PhpstormProjects\NewLifeCFO\database\seeds\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+            while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
+                if (str_contains($line[0], 'Total')) {
+                    array_push($out, $this->number($line[12]));
+                }
+            }
+        }
+        return $out;
     }
 
     private function verify($consultant)
@@ -118,47 +132,52 @@ class HomeController extends Controller
                             'client' => $client_name . '(' . $client_id . ')',
                             'consultant' => $con_name . '(' . $con_id . ')']);
                     }
-
-                } else if ($line[4]) {
-                    $group = $line[4];
                 } else if ($line[5] && $in) {
-                    //$tid = $this->get_task_id($group, $line[6]);
-                    if ($arr->firm_share != $this->number($line[11]) / 100) {
-                        array_push($log, ['firm_share'=>$arr->firm_share,'read'=>$line[11],'converted'=> $this->number($line[11]) / 100]);
-                        //array_push($log, ['r#' => $row, 'date' => $line[5], 'bh' => $line[7], 'task' => $line[6]]);
-                    }
+                    $bh = $this->number($line[7]);
+                    $nbh = $this->number($line[8]);
+                    if ($bh || $nbh)
+                        if (!$arr->hourReports->where('report_date', date('Y-m-d', strtotime($line[5])))
+                            ->where('billable_hours', $bh)
+                            ->where('non_billable_hours', $nbh)
+                            ->first()) {
+                            array_push($log, ['r#' => $row, 'bh' => $line[7], 'nbh' => $line[8], 'task' => $line[6]]);
+                        }
                 }
-
             }
             fclose($handle);
         }
         return $log;
     }
 
-    public function get_task_id($group, $desc)
+    public
+    function get_task_id($group, $desc)
     {
         $g = Taskgroup::firstOrCreate(['name' => $group]);
         return Task::firstOrCreate(['taskgroup_id' => $g->id], ['description' => $desc])->id;
     }
 
-    public function get_client_id($name)
+    public
+    function get_client_id($name)
     {
         return Client::where('name', $name)->first()->id;
     }
 
-    public function get_consultant_id($name)
+    public
+    function get_consultant_id($name)
     {
         return Consultant::all()->first(function ($con) use ($name) {
             return $con->fullname() == $name;
         })->id;
     }
 
-    public function get_pos_id($pos)
+    public
+    function get_pos_id($pos)
     {
         return Position::firstOrCreate(['name' => $pos])->id;
     }
 
-    public function number($str)
+    public
+    function number($str)
     {
         return (float)filter_var($str, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     }
