@@ -71,7 +71,7 @@ class ExpenseSeeder extends Seeder
                     } else {
                         $bh = $this->number($line[7]);
                         $nbh = $this->number($line[8]);
-                        if ($bh || $nbh) {
+                        if ($bh || $nbh||$line[10]) {
                             Hour::Create([
                                 'arrangement_id' => $arr->id,
                                 'task_id' => $this->get_task_id($line[5], $line[6]),
