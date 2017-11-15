@@ -114,7 +114,7 @@ class HomeController extends Controller
     private function verify($consultant)
     {
         $log = [];
-        if (($handle = fopen('C:\Users\HaoXiong\PhpstormProjects\NewLifeCFO\database\seeds\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
+        if (($handle = fopen(__DIR__.'\..\..\..\database\seeds\data\payroll\Payroll_Hours2017-11-13.csv', "r")) !== FALSE) {
             $client_name = '';
             $con_name = '';
             $eng_name = '';
