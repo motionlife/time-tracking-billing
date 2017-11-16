@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'first_name', 'last_name', 'email', 'password', 'priority','role'
+        'first_name', 'last_name', 'email', 'password', 'priority', 'role'
     ];
 
     /**
@@ -31,7 +31,12 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    public static $roles = ['Unassigned','Consultant','Client','Outside Referrer','General Admin','Super Admin','root'];
+    const ROLES = ['Unassigned', 'Client', 'Outside Referrer', 'Consultant', 'General Admin', 'Super Admin', 'root'];
+
+    public function hasIncome()
+    {
+        return $this->role > 1;
+    }
 
     public function fullName()
     {
@@ -41,12 +46,12 @@ class User extends Authenticatable
     //Get the corresponding role entity
     public function entity()
     {
-        switch ($this->role){
-            case 1:
+        switch (self::ROLES[$this->role]) {
+            case 'Consultant':
                 return $this->hasOne(Consultant::class);
-            case 2:
+            case 'Client':
                 return $this->hasOne(Client::class);
-            case 3:
+            case 'Outside Referrer':
                 return $this->hasOne(Outreferrer::class);
             default:
                 return $this;

@@ -23,7 +23,7 @@ class OutreferrerSeeder extends Seeder
                 'last_name' => explode(" ",$name)[1],
                 'email' => $faker->unique()->safeEmail,
                 'password' => $password ?: $password = bcrypt('secret'),
-                'role' => 3,
+                'role' => array_search('Outside Referrer',User::ROLES),
                 'remember_token' => str_random(20)]);
 
             $contact = Contact::create(['email' => $user->email,

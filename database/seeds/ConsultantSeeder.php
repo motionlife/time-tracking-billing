@@ -21,7 +21,7 @@ class ConsultantSeeder extends Seeder
                 'last_name' => explode(" ", $consultant['name'])[1],
                 'email' => $consultant['email'],
                 'password' => bcrypt($consultant['password']),
-                'role' => 1,
+                'role' => array_search('Consultant',User::ROLES),
                 'remember_token' => str_random(20)]);
             $contact = Contact::create(['email' => $user->email,
                 'profile_img_path' => str_random(10) . '.jpg',
