@@ -34,7 +34,7 @@
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-users"></i></span>
                                 <p>
-                                    <span class="number"><strong>{{count($data['eids'])}}</strong></span>
+                                    <span class="number">{{count($data['eids'])}}</span>
                                     <span class="title">Engagement(s)</span>
                                 </p>
                             </div>
