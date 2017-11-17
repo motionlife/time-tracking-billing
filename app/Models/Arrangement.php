@@ -39,7 +39,7 @@ class Arrangement extends Model
         return $this->hasMany(Expense::class);
     }
 
-    public function reportedExpenses($start = '1970-01-01', $end = '2038-01-19', $billable = true)
+    public function reportedExpenses($start = '1970-01-01', $end = '2038-01-19')
     {
         return $this->expenses()->whereBetween('report_date', [$start, $end])->get()
             ->sum(function ($exp) {
