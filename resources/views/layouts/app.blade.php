@@ -90,9 +90,9 @@
             <div class="sidebar-scroll">
                 <nav>
                     <ul class="nav">
-                        <li><a href="index.html" class="active"><i class="lnr lnr-home"></i> <span>Dashboard</span></a>
+                        <li><a href="/home" class="active"><i class="lnr lnr-home"></i> <span>Dashboard</span></a>
                         </li>
-                        <li><a href="elements.html" class=""><i class="lnr lnr-code"></i> <span>Elements</span></a></li>
+                        <li><a href="/test" class=""><i class="lnr lnr-code"></i> <span>Model Test</span></a></li>
                         <li><a href="charts.html" class=""><i class="lnr lnr-chart-bars"></i> <span>Charts</span></a>
                         </li>
                         <li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>
