@@ -443,7 +443,7 @@
                 }, {
                     name: 'series-hours',
                     data: [@foreach($data['dates']['m-hours'] as $hour)
-                        '{{$hour*20}}',
+                        '{{$hour*15}}',
                         @endforeach],
                 }]
             };

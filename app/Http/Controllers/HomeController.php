@@ -40,11 +40,20 @@ class HomeController extends Controller
                 foreach ($arr->expenses as $expense) {
                     $expense->summary($data);
                 }
+                foreach ($data['dates']['months'] as $i => $month) {
+                    $data['dates']['m-income'][$i] += $arr->hoursIncomeForConsultant($month, $month->copy()->endOfMonth()->endOfDay())
+                        + $arr->reportedExpenses($month, $month->copy()->endOfMonth()->endOfDay());
+                    $data['dates']['m-hours'][$i] += $arr->reportedHours($month, $month->copy()->endOfMonth()->endOfDay());
+                }
+
             }
             foreach ($consultant->dev_clients as $dev_client) {
                 foreach ($dev_client->engagements as $engagement) {
                     $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast']);
                     $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
+                    foreach ($data['dates']['months'] as $i => $month) {
+                        $data['dates']['m-income'][$i] += $engagement->incomeForBuzDev($month, $month->copy()->endOfMonth()->endOfDay());
+                    }
                 }
             }
 
@@ -81,6 +90,10 @@ class HomeController extends Controller
             $dates['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
             $dates['startOfLast2'] = Carbon::parse('first day of last month')->startOfDay();
             $dates['endOfLast2'] = Carbon::parse('first day of last month')->addDays(14)->endOfDay();
+        }
+        for ($i = 12; $i > 0; $i--) {
+            $dates['months'][] = Carbon::now()->subMonth($i)->startOfMonth()->startOfDay();
+            $dates['m-income'][] = $dates['m-hours'][] = 0;
         }
         return $dates;
     }
