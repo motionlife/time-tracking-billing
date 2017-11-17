@@ -51,7 +51,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-9">
-                            <div id="headline-chart" class="ct-chart"></div>
+                            <div id="semi-month-char" class="ct-chart"></div>
                         </div>
                         <div class="col-md-3">
                             <div class="weekly-summary text-right">
@@ -162,7 +162,7 @@
                     <!-- MULTI CHARTS -->
                     <div class="panel">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Projection vs. Realization</h3>
+                            <h3 class="panel-title">Total Income vs. Hours</h3>
                             <div class="right">
                                 <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i>
                                 </button>
@@ -170,7 +170,7 @@
                             </div>
                         </div>
                         <div class="panel-body">
-                            <div id="visits-trends-chart" class="ct-chart"></div>
+                            <div id="income-hours-chart" class="ct-chart"></div>
                         </div>
                     </div>
                     <!-- END MULTI CHARTS -->
@@ -428,17 +428,23 @@
                 },
                 lineSmooth: true,
             };
-            new Chartist.Line('#headline-chart', data, options);
+            new Chartist.Line('#semi-month-char', data, options);
 
-            // visits trend charts
+            //Monthly income charts
             data = {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                labels: [ @foreach($data['dates']['months'] as $month)
+                    '{{$month->format('y-M')}}',
+                    @endforeach],
                 series: [{
-                    name: 'series-real',
-                    data: [200, 380, 350, 320, 410, 450, 570, 400, 555, 620, 750, 900],
+                    name: 'series-income',
+                    data: [@foreach($data['dates']['m-income'] as $earn)
+                        '{{$earn}}',
+                        @endforeach],
                 }, {
-                    name: 'series-projection',
-                    data: [240, 350, 360, 380, 400, 450, 480, 523, 555, 600, 700, 800],
+                    name: 'series-hours',
+                    data: [@foreach($data['dates']['m-hours'] as $hour)
+                        '{{$hour*20}}',
+                        @endforeach],
                 }]
             };
             options = {
@@ -448,7 +454,7 @@
                 low: 0,
                 high: 'auto',
                 series: {
-                    'series-projection': {
+                    'series-income': {
                         showArea: true,
                         showPoint: false,
                         showLine: false
@@ -468,7 +474,7 @@
                     right: 20
                 }
             };
-            new Chartist.Line('#visits-trends-chart', data, options);
+            new Chartist.Line('#income-hours-chart', data, options);
 
             // visits chart
             data = {
