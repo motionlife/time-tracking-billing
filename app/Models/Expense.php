@@ -36,6 +36,8 @@ class Expense extends Model
         //$key = $day->toDateString();//used if need return the expense of each single date
         if ($day->between($data['dates']['startOfLast'], $data['dates']['endOfLast'])) {
             $data['expense'] += $this->total();
+        } else if ($day->between($data['dates']['startOfLast2'], $data['dates']['endOfLast2'])) {
+            $data['last2_expense'] += $this->total();
         }
     }
 }

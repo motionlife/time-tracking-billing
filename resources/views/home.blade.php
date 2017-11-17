@@ -43,7 +43,7 @@
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-taxi"></i></span>
                                 <p>
-                                    <span class="number">${{number_format($data['expense'],2)}}</span>
+                                    <span class="number">${{number_format($data['last_expense'],2)}}</span>
                                     <span class="title">Expense</span>
                                 </p>
                             </div>
@@ -55,22 +55,29 @@
                         </div>
                         <div class="col-md-3">
                             <div class="weekly-summary text-right">
-                                <span class="number">${{number_format($data['buz_dev'],2)}}</span> <span
+                                <span class="number">${{number_format($data['last_buz_dev'],2)}}</span> <span
                                         class="percentage"><i
-                                            class="fa fa-caret-up text-success"></i> 12%</span>
+                                            class="fa fa-caret-{{$data['last_buz_dev']>$data['last2_buz_dev']?'up text-success':'down text-danger'}}"></i> {{$data['last2_buz_dev']?number_format(abs($data['last_buz_dev']/$data['last2_buz_dev']-1)*100,0):'-'}}
+                                    %</span>
                                 <span class="info-label">Business Developing Income</span>
                             </div>
                             <div class="weekly-summary text-right">
                                 <span class="number">${{number_format($data['total_last_earn'],2)}}</span> <span
                                         class="percentage"><i
-                                            class="fa fa-caret-up text-success"></i> {{$data['total_last2_earn']?number_format(($data['total_last_earn']/$data['total_last2_earn']-1)*100,0):0}}
+                                            class="fa fa-caret-{{$data['total_last_earn']>$data['total_last2_earn']?'up text-success':'down text-danger'}}"></i>
+                                    {{$data['total_last2_earn']?number_format(abs($data['total_last_earn']/$data['total_last2_earn']-1)*100,0):'-'}}
                                     %</span>
                                 <span class="info-label">Billable Hours Income</span>
                             </div>
                             <div class="weekly-summary text-right">
-                                <span class="number">${{number_format($data['total_last_earn']+$data['expense']+$data['buz_dev'],2)}}</span>
+                                <?php
+                                $last = $data['total_last_earn'] + $data['last_expense'] + $data['last_buz_dev'];
+                                $last2 = $data['total_last2_earn'] + $data['last2_expense'] + $data['last2_buz_dev'];
+                                ?>
+                                <span class="number">${{number_format($last,2)}}</span>
                                 <span class="percentage"><i
-                                            class="fa fa-caret-down text-danger"></i> 8%</span>
+                                            class="fa fa-caret-{{$last>$last2?'up text-success':'down text-danger'}}"></i> {{$last2?number_format(abs($last/$last2-1)*100,0):'-'}}
+                                    %</span>
                                 <span class="info-label">Total Income</span>
                             </div>
                         </div>

@@ -5,7 +5,6 @@ namespace newlifecfo\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use newlifecfo\User;
 
 class HomeController extends Controller
 {
@@ -28,10 +27,10 @@ class HomeController extends Controller
     {
 
         if (Auth::user()->hasIncome()) {
-            $dates = $this->getDays();
-            $data['dates'] = $dates;
-            $data['last_b'] = $data['last_nb'] = $data['last_earn'] = $data['eids'] = [];
-            $data['total_last2_earn'] = $data['expense'] = $data['buz_dev'] = 0;
+            $data = ['dates' => $this->getDays(),
+                'last_b' => [], 'last_nb' => [], 'last_earn' => [], 'eids' => [],
+                'total_last2_earn' => 0, 'last_expense' => 0, 'last2_expense' => 0,
+                'last_buz_dev' => 0, 'last2_buz_dev' => 0,];
             $consultant = Auth::user()->entity;
             foreach ($consultant->arrangements as $arr) {
                 $data['net_rate'] = $arr->billing_rate * (1 - $arr->firm_share);
@@ -42,10 +41,17 @@ class HomeController extends Controller
                     $expense->summary($data);
                 }
             }
+            foreach ($consultant->dev_clients as $dev_client) {
+                foreach ($dev_client->engagements as $engagement) {
+                    $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast']);
+                    $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
+                }
+            }
+
             $this->monthly_sum($data);
             ksort($data['last_earn']);
-            ksort($data['last_b']);
-            //return json_encode($data);
+            ksort($data['last_b']);//data used for plotting the chart
+//            return json_encode($data);
             return view('home', ['data' => $data]);
         } else {
             return abort(403, 'Unauthorized action.');

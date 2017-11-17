@@ -25,4 +25,29 @@ class Engagement extends Model
     {
         return $this->belongsTo(Consultant::class);
     }
+
+    public function clientLaborBills($start = '1970-01-01', $end = '2038-01-19')
+    {
+        //For monthly labor billing, detail not implemented yet...
+        if ($this->paying_cycle != 0) return $this->cycle_billing;
+        $total = 0;
+        foreach ($this->arrangements as $arr) {
+            $total += $arr->hoursBillToClient($start, $end);
+        }
+        return $total;
+    }
+
+    public function clientExpenseBills($start = '1970-01-01', $end = '2038-01-19')
+    {
+        $total = 0;
+        foreach ($this->arrangements as $arr) {
+            $total += $arr->reportedExpenses($start, $end);
+        }
+        return $total;
+    }
+
+    public function incomeForBuzDev($start = '1970-01-01', $end = '2038-01-19')
+    {
+        return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
+    }
 }
