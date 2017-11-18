@@ -406,7 +406,7 @@
             data = {
                 labels: [
                     @foreach($data['last_earn'] as $day=>$earn)
-                        '{{date('M d', strtotime($day))}}',
+                        '{{$day}}',
                     @endforeach
                 ],
                 series: [[
