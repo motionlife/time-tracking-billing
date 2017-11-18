@@ -21,9 +21,10 @@ class HoursController extends Controller
     public function index()
     {
         $consultant = Auth::user()->entity;
-        $hours = $consultant->recentHourReports(300);
+        $hours = $this->paginate($consultant->recentHourReports(PHP_INT_MAX),25)
+            ->withPath('hour');
 
-        return view('hours',['hours'=>$hours]);
+        return view('hours', ['hours' => $hours]);
     }
 
     /**
@@ -39,7 +40,7 @@ class HoursController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -50,7 +51,7 @@ class HoursController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -61,7 +62,7 @@ class HoursController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -72,8 +73,8 @@ class HoursController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -84,7 +85,7 @@ class HoursController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

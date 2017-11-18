@@ -127,7 +127,7 @@
                         <div class="panel-footer">
                             <div class="row">
                                 <div class="col-md-6"><span class="panel-note"><i
-                                                class="fa fa-clock-o"></i>{{$data['recent_hours']->count()?Carbon\Carbon::parse($data['recent_hours']->last()->report_date)->diffForHumans():''}}</span>
+                                                class="fa fa-clock-o"></i>{{$data['recent_hours']->count()?Carbon\Carbon::parse($data['recent_hours']->first()->report_date)->diffForHumans():''}}</span>
                                 </div>
                                 <div class="col-md-6 text-right"><a href="/hour" class="btn btn-primary">View All
                                         Reported</a></div>
