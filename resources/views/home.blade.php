@@ -101,8 +101,8 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th>Client</th>
                                     <th>Engagement</th>
+                                    <th>Client</th>
                                     <th>Billable Hours</th>
                                     <th>Report Date</th>
                                     <th>Status</th>
@@ -111,11 +111,11 @@
                                 <tbody>
                                 @foreach($data['recent_hours'] as $hour)
                                     <tr>
+                                        <td>{{str_limit($hour->arrangement->engagement->name,15)}}</td>
                                         <td>
                                             <a href="#">{{str_limit($hour->arrangement->engagement->client->name,15)}}</a>
                                         </td>
-                                        <td>{{str_limit($hour->arrangement->engagement->name,15)}}</td>
-                                        <td>{{number_format($hour->billable_hours,1)}}</td>
+                                        <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                         <td>{{Carbon\Carbon::parse($hour->report_date)->format('M d, Y')}}</td>
                                         <td><span class="label label-{{$hour->review_state==0?'success':'warning'}}">
                                                 {{$hour->review_state==0?'APPROVED':'PENDING'}}</span></td>

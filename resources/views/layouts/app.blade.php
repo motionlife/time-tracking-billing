@@ -20,8 +20,7 @@
                     </div>
                 </form>
                 <div class="navbar-btn navbar-btn-right">
-                    <a class="btn btn-success update-pro" href="javascript:void(0);" title="Report Your Time"
-                       target="_blank"><i class="fa fa-calendar" aria-hidden="true"></i> <span>REPORT TIME</span></a>
+                    <a class="btn btn-success update-pro" href="{{route('hour.create')}}" title="Report Your Time"><i class="fa fa-calendar" aria-hidden="true"></i> <span>REPORT TIME</span></a>
                 </div>
                 <div id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right">
@@ -100,8 +99,8 @@
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages" class="{{Request::is('hour') ?'in':''}}" >
                                 <ul class="nav">
-                                    <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">History</a></li>
                                     <li><a href="{{route('hour.create')}}" class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
+                                    <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Manage</a></li>
                                     <li><a href="{{route('hour.show',1)}}" class="{{Request::is('hour/{h}') ?'active':''}}">Statistic</a></li>
                                 </ul>
                             </div>

@@ -18,6 +18,13 @@ class Task extends Model
 
     public function taskGroup()
     {
-        return $this->belongsTo(Taskgroup::class);
+        return $this->belongsTo(Taskgroup::class,'taskgroup_id');
+    }
+
+    public function getDesc()
+    {
+        $desc = $this->description;
+        if (!$desc||$desc=='Other') $desc = $this->taskGroup->name.'-Other';
+        return $desc;
     }
 }

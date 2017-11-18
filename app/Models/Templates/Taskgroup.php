@@ -12,6 +12,6 @@ class Taskgroup extends Model
     //all the tasks belong to this group
     public function tasks()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class,'taskgroup_id');
     }
 }
