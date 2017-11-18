@@ -57,7 +57,13 @@ class HomeController extends Controller
                 foreach ($dev_client->engagements as $engagement) {
                     $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast']);
                     $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
-                    $engagement->monthlyIncomeForBuzDev(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), $data['dates']['mon']);
+                    //$engagement->monthlyIncomeForBuzDev(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), $data['dates']['mon']);
+                    foreach ($engagement->arrangements as $arr) {
+                        foreach ($arr->monthlyHoursAndIncome(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay())
+                                 as $mon => $amounts) {
+                            $data['dates']['mon'][$mon][1] += $amounts[1];
+                        };
+                    }
                 }
             }
 
