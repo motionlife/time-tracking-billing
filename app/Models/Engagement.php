@@ -50,4 +50,13 @@ class Engagement extends Model
     {
         return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
     }
+
+    public function monthlyIncomeForBuzDev($start = '1970-01-01', $end = '2038-01-19', array &$months)
+    {
+        foreach ($this->arrangements() as $arrangement) {
+            foreach ($arrangement->monthlyHoursAndIncome($start, $end, false, false) as $mon => $amount) {
+                $months[$mon][1] += $amount;
+            }
+        }
+    }
 }

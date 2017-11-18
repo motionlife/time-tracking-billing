@@ -432,18 +432,18 @@
 
             //Monthly income charts
             data = {
-                labels: [ @foreach($data['dates']['months'] as $month)
-                    '{{$month->format('y-M')}}',
+                labels: [@foreach($data['dates']['mon'] as $key=>$month)
+                    '{{$key}}',
                     @endforeach],
                 series: [{
                     name: 'series-income',
-                    data: [@foreach($data['dates']['m-income'] as $earn)
-                        '{{$earn}}',
+                    data: [@foreach($data['dates']['mon'] as $amount)
+                        '{{$amount[1]}}',
                         @endforeach],
                 }, {
                     name: 'series-hours',
-                    data: [@foreach($data['dates']['m-hours'] as $hour)
-                        '{{$hour*15}}',
+                    data: [@foreach($data['dates']['mon'] as $amount)
+                        '{{$amount[0]*15}}',
                         @endforeach],
                 }]
             };
