@@ -59,6 +59,19 @@ class Arrangement extends Model
             });
     }
 
+    public function dailyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19')
+    {
+        $net_rate = (1 - $this->firm_share) * $this->billing_rate;
+        $eid = $this->engagement->id;
+        return $this->hours()->whereBetween('report_date', [$start, $end])->get()
+            ->mapToGroups(function ($hour) use ($net_rate) {
+                return [Carbon::parse($hour->report_date)->format('M d') =>
+                    [$hour->billable_hours, $hour->non_billable_hours, $hour->billable_hours * $net_rate]];
+            })->transform(function ($day) use ($eid) {
+                return [$day->sum(0), $day->sum(1), $day->sum(2),$eid];
+            });
+    }
+
     public function reportedHours($start = '1970-01-01', $end = '2038-01-19', $billable = true)
     {
         return $this->hours()->whereBetween('report_date', [$start, $end])->sum($billable ? 'billable_hours' : 'non_billable_hours');
