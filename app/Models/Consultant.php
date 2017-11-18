@@ -12,8 +12,9 @@ class Consultant extends Model
 
     public function fullname()
     {
-        return $this->first_name.' '.$this->last_name;
+        return $this->first_name . ' ' . $this->last_name;
     }
+
     //Get the corresponding system user of this consultant
     public function user()
     {
@@ -33,7 +34,7 @@ class Consultant extends Model
     //all the developed clients
     public function dev_clients()
     {
-        return $this->hasMany(Client::class,'buz_dev_person_id');
+        return $this->hasMany(Client::class, 'buz_dev_person_id');
     }
 
     //all the engagements he has ever leaded
@@ -46,5 +47,11 @@ class Consultant extends Model
     public function arrangements()
     {
         return $this->hasMany(Arrangement::class);
+    }
+
+    public function recentHourReports($num)
+    {
+        $aids = $this->arrangements->pluck('id');
+        return Hour::all()->whereIn('arrangement_id', $aids)->sortByDesc('report_date')->take($num);
     }
 }

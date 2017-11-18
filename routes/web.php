@@ -18,5 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::resource('hour', 'HoursController');
+Route::resource('expense', 'ExpenseController');
 Route::get('/test', 'TestController@index')->name('test');
 

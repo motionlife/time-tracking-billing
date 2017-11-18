@@ -77,6 +77,9 @@ class HomeController extends Controller
             $data['total_last_earn'] = array_sum($data['last_earn']);
             ksort($data['last_earn']);
             ksort($data['last_b']);//data used for plotting the chart
+
+            //data for latest hour report
+            $data['recent_hours']= $consultant->recentHourReports(5);
 //            return json_encode($data);
             return view('home', ['data' => $data]);
         } else {
