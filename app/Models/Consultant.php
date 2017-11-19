@@ -54,4 +54,14 @@ class Consultant extends Model
         $aids = $this->arrangements->pluck('id');
         return Hour::all()->whereIn('arrangement_id', $aids)->sortByDesc('report_date')->take($num);
     }
+
+    public function EngagementByClient()
+    {
+        return $this->arrangements->groupBy('engagement_id')
+            ->mapToGroups(function ($item, $key) {
+                $eng = Engagement::find($key);
+                $cid = $eng->client->id;
+                return [$cid => $eng->name];
+            });
+    }
 }
