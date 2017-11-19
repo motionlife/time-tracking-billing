@@ -8,17 +8,17 @@
                     <div class="col-md-3">
                         <div class="panel-heading">
                             <h3 class="panel-title">Time Reporting History</h3>
-                            <p class="panel-subtitle">{{$hours->total()}}</p>
+                            <p class="panel-subtitle">{{$hours->total()}} results</p>
                         </div>
                     </div>
                     <div class="col-md-9">
                         <div class="panel-body">
                             <div class="col-md-5">
                                 <label for="client-engagements">Client & Engagement</label>
-                                <select class="selectpicker" id="client-engagements">
+                                <select class="selectpicker" data-width="auto" id="client-engagements" data-live-search="true">
                                     <option value="" selected>All</option>
                                     @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name}}">
+                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                                             @foreach($engagements as $eng)
                                                 <option id="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
                                             @endforeach
@@ -28,9 +28,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="start-date">From</label>
-                                <input type="date" id="start-date" value="{{Request('start')}}">
+                                <input class="date-picker" id="start-date" placeholder="mm/dd/yyyy"
+                                       value="{{Request('start')}}"
+                                       type="text"/>
                                 <label for="end-date">to</label>
-                                <input type="date" id="end-date" value="{{Request('end')}}">
+                                <input class="date-picker" id="end-date" placeholder="mm/dd/yyyy"
+                                       value="{{Request('end')}}" type="text"/>
                             </div>
                             <div class="col-md-1">
                                 <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
@@ -64,8 +67,9 @@
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                 <td>{{$hour->report_date}}</td>
                                 <td>{{str_limit($hour->description,29)}}</td>
-                                <td><span class="label label-{!!$hour->review_state?'sucess">Approved':'warning">Pending'!!}</span></td>
-                                        <td><a href=" #">Edit</a></td>
+                                <td><span class="label label-{!!$hour->review_state==0?'success">Approved':'warning">Pending'!!}</span></td>
+                                <td><a href=" #"><i class="fa fa-pencil-square-o"></i></a><a href="#"><i
+                                                class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -85,7 +89,20 @@
                 var eid = $('#client-engagements').find(":selected").attr('id');
                 window.location.href = '/hour?eid=' + (eid ? eid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
-            })
+            });
+            $('.date-picker').datepicker(
+                {
+                    format: 'mm/dd/yyyy',
+                    todayHighlight: true,
+                    autoclose: true,
+                }
+            );
         });
     </script>
+    <style>
+        td a:nth-child(2) {
+            padding-left: 1.5em;
+            color: red;
+        }
+    </style>
 @endsection()

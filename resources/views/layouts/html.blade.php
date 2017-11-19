@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/chartist-custom.css">
+    <link rel="stylesheet" href="/css/date-picker.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-select.min.css">
+    @yield('special-css')
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="/css/main.css">
     <!-- GOOGLE FONTS -->
@@ -27,9 +30,11 @@
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/jquery.slimscroll.min.js"></script>
-<script src="/js/jquery.easypiechart.min.js"></script>
+{{--<script src="/js/jquery.easypiechart.min.js"></script>--}}
 <script src="/js/chartist.min.js"></script>
 <script src="/js/klorofil-common.js"></script>
+<script src="/js/date-picker.min.js"></script>
+<script src="/js/bootstrap-select.min.js"></script>
 @yield('my-js')
 </body>
 </html>

@@ -33,7 +33,10 @@ class HoursController extends Controller
      */
     public function create()
     {
-        //
+        //today's report
+
+
+
         return view('new-hour');
     }
 
