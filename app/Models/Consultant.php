@@ -53,7 +53,7 @@ class Consultant extends Model
     {
         $aids = $eid ? Engagement::find($eid)->arrangements->pluck('id') : $this->arrangements->pluck('id');
         if ($start || $end)
-            return Hour::whereBetween('report_date', [$start, $end])
+            return Hour::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
                 ->whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
         else
             return Hour::whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
