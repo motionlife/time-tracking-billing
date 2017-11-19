@@ -8,18 +8,19 @@
                     <div class="col-md-3">
                         <div class="panel-heading">
                             <h3 class="panel-title">Time Reporting History</h3>
-                            <p class="panel-subtitle">subtitle</p>
+                            <p class="panel-subtitle">{{$hours->total()}}</p>
                         </div>
                     </div>
                     <div class="col-md-9">
                         <div class="panel-body">
                             <div class="col-md-5">
-                                <label>Client & Engagement</label>
-                                <select class="selectpicker">
+                                <label for="client-engagements">Client & Engagement</label>
+                                <select class="selectpicker" id="client-engagements">
+                                    <option value="" selected>All</option>
                                     @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{\newlifecfo\Models\Client::find($cid)->name}}">
+                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name}}">
                                             @foreach($engagements as $eng)
-                                                <option>{{$eng}}</option>
+                                                <option id="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
                                             @endforeach
                                         </optgroup>
                                     @endforeach
@@ -27,12 +28,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="start-date">From</label>
-                                <input type="date" id="start-date">
+                                <input type="date" id="start-date" value="{{Request('start')}}">
                                 <label for="end-date">to</label>
-                                <input type="date" id="end-date">
+                                <input type="date" id="end-date" value="{{Request('end')}}">
                             </div>
                             <div class="col-md-1">
-                                <a href="hour/?p=3&q=4" type="button" class="btn btn-info">Filter</a>
+                                <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
                             </div>
                         </div>
                     </div>
@@ -64,17 +65,27 @@
                                 <td>{{$hour->report_date}}</td>
                                 <td>{{str_limit($hour->description,29)}}</td>
                                 <td><span class="label label-{!!$hour->review_state?'sucess">Approved':'warning">Pending'!!}</span></td>
-                                        <td><a href=" javascript:void(0);">Manage</a></td>
+                                        <td><a href=" #">Edit</a></td>
                             </tr>
                         @endforeach
                         </tbody>
                     </table>
                 </div>
                 <div class="pull-right pagination">
-                    {{ $hours->links()}}
+                    {{ $hours->appends(Request::except('page'))->withPath('hour')->links() }}
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
+@section('my-js')
+    <script>
+        $(function () {
+            $('#filter-button').on('click', function () {
+                var eid = $('#client-engagements').find(":selected").attr('id');
+                window.location.href = '/hour?eid=' + (eid ? eid : '') +
+                    '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
+            })
+        });
+    </script>
+@endsection()

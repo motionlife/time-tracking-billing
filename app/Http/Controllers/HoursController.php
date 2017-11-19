@@ -18,11 +18,11 @@ class HoursController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
         $consultant = Auth::user()->entity;
-        $hours = $this->paginate($consultant->recentHourReports(PHP_INT_MAX), 25)
-            ->withPath('hour');
+        $hours = $this->paginate($consultant->recentHourReports($request->get('start'),
+            $request->get('end'), $request->get('eid')), 25);
         return view('hours', ['hours' => $hours, 'clientIds' => $consultant->EngagementByClient()]);
     }
 

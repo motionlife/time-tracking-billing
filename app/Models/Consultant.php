@@ -49,10 +49,14 @@ class Consultant extends Model
         return $this->hasMany(Arrangement::class);
     }
 
-    public function recentHourReports($num)
+    public function recentHourReports($start = null, $end = null, $eid = null)
     {
-        $aids = $this->arrangements->pluck('id');
-        return Hour::all()->whereIn('arrangement_id', $aids)->sortByDesc('report_date')->take($num);
+        $aids = $eid ? Engagement::find($eid)->arrangements->pluck('id') : $this->arrangements->pluck('id');
+        if ($start || $end)
+            return Hour::whereBetween('report_date', [$start, $end])
+                ->whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
+        else
+            return Hour::whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
     }
 
     public function EngagementByClient()
@@ -61,7 +65,7 @@ class Consultant extends Model
             ->mapToGroups(function ($item, $key) {
                 $eng = Engagement::find($key);
                 $cid = $eng->client->id;
-                return [$cid => $eng->name];
+                return [$cid => [$eng->id, $eng->name]];
             });
     }
 }

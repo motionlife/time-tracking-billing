@@ -157,7 +157,7 @@
         </div>
     </div>
 @endsection
-@section('chart-js')
+@section('my-js')
     <script>
         $(function () {
             var data, options;

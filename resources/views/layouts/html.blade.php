@@ -30,6 +30,6 @@
 <script src="/js/jquery.easypiechart.min.js"></script>
 <script src="/js/chartist.min.js"></script>
 <script src="/js/klorofil-common.js"></script>
-@yield('chart-js')
+@yield('my-js')
 </body>
 </html>
