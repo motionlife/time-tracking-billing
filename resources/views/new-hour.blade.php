@@ -69,7 +69,7 @@
                             </div>
                             <br>
                             <textarea id="description" class="form-control" name="description" placeholder="description"
-                                      rows="4"></textarea>
+                                      rows="5"></textarea>
                             <br>
                         </div>
                         <div class="panel-footer">

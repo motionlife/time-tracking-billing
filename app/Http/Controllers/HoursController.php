@@ -101,9 +101,23 @@ class HoursController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         //
+        $consultant = Auth::user()->entity;
+        if ($request->ajax()) {
+
+            $hour = Hour::find($id);
+            //must check if this hour record belong to the consultant!!!
+            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
+                $arr= $hour->arrangement;
+                $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
+                return json_encode(['eid' => $arr->engagement->id, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
+                    'billable_hours' => $hour->billable_hours, 'non_billable_hours' => $hour->non_billable_hours,
+                    'description' => $hour->description, 'review_state' => $hour->review_state,'position'=>$arr->position->name
+                ]);
+            }
+        }
     }
 
     /**
@@ -126,7 +140,31 @@ class HoursController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $consultant = Auth::user()->entity;
+        //same reported hours
+        $feedback = [];
+        if ($request->ajax()) {
+            //business logic validation is important
+            //1. check the if the reported engagement is his valid engagement
+            $hour = Hour::find($id);
+            if (!$hour || $hour->arrangement->consultant_id != $consultant->id) {
+
+                $feedback['code'] = 0;
+                $feedback['message'] = 'Record not found or no authorization';
+            } else if ($hour->getStatus()[0] != 'Pending') {
+                $feedback['code'] = 1;
+                $feedback['message'] = 'Record Cannot be updated now';
+            } else {
+                if ($hour->update($request->all())) {
+                    $feedback['code'] = 7;
+                    $feedback['message'] = 'Record Update Success';
+                } else {
+                    $feedback['code'] = 4;
+                    $feedback['message'] = 'Record update fail, unknown error';
+                }
+            }
+            return json_encode($feedback);
+        }
     }
 
     /**
@@ -135,9 +173,22 @@ class HoursController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         //
+        $consultant = Auth::user()->entity;
+
+        if ($request->ajax()) {
+
+            $hour = Hour::find($id);
+            //must check if this hour record belong to the consultant!!!
+            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
+                if ($hour->getStatus()[0] == 'Pending') {
+                    if ($hour->delete()) return json_encode(['message' => 'succeed']);
+                }
+            }
+            return json_encode(['message' => 'delete_failed']);
+        }
     }
 
     private function createTodaysBoard($hour)

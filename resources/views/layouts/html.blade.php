@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="/css/date-picker.min.css">
     <link rel="stylesheet" href="/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="/css/toastr.min.css">
+    <link rel="stylesheet" href="/css/sweet-alert.min.css">
     @yield('special-css')
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="/css/main.css">
@@ -37,6 +38,7 @@
 <script src="/js/date-picker.min.js"></script>
 <script src="/js/bootstrap-select.min.js"></script>
 <script src="/js/toastr.min.js"></script>
+<script src="/js/sweet-alert.min.js"></script>
 @yield('my-js')
 </body>
 </html>
