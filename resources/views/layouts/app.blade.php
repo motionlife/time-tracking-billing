@@ -100,7 +100,7 @@
                             <div id="subPages" class="{{Request::is('hour') ?'in':''}}" >
                                 <ul class="nav">
                                     <li><a href="{{route('hour.create')}}" class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
-                                    <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Manage</a></li>
+                                    <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Overview</a></li>
                                     <li><a href="{{route('hour.show',1)}}" class="{{Request::is('hour/{h}') ?'active':''}}">Statistic</a></li>
                                 </ul>
                             </div>

@@ -15,12 +15,12 @@
                         <div class="panel-body">
                             <div class="col-md-5">
                                 <label for="client-engagements">Client & Engagement</label>
-                                <select class="selectpicker" data-width="auto" id="client-engagements" data-live-search="true">
+                                <select class="selectpicker show-tick" data-width="auto" id="client-engagements" data-live-search="true">
                                     <option value="" selected>All</option>
                                     @foreach($clientIds as $cid=>$engagements)
                                         <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                                             @foreach($engagements as $eng)
-                                                <option id="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
+                                                <option data-eid="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
                                             @endforeach
                                         </optgroup>
                                     @endforeach
@@ -86,7 +86,7 @@
     <script>
         $(function () {
             $('#filter-button').on('click', function () {
-                var eid = $('#client-engagements').find(":selected").attr('id');
+                var eid = $('#client-engagements').find(":selected").attr('data-eid');
                 window.location.href = '/hour?eid=' + (eid ? eid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });

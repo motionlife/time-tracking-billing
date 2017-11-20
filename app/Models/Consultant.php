@@ -68,4 +68,11 @@ class Consultant extends Model
                 return [$cid => [$eng->id, $eng->name]];
             });
     }
+
+    public function getPositionsByEid($eid)
+    {
+        return $this->arrangements()->where('engagement_id', $eid)->get()->map(function($item){
+            return $item->position;
+        });
+    }
 }

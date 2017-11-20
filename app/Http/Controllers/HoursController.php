@@ -21,9 +21,13 @@ class HoursController extends Controller
     public function index(Request $request)
     {
         $consultant = Auth::user()->entity;
+        if($request->ajax()&&$request->get('fetch')=='position')
+            return $consultant->getPositionsByEid($request->get('eid'));
+
         $hours = $this->paginate($consultant->recentHourReports($request->get('start'),
             $request->get('end'), $request->get('eid')), 25);
-        return view('hours', ['hours' => $hours, 'clientIds' => $consultant->EngagementByClient()]);
+        return view('hours', ['hours' => $hours,
+            'clientIds' => $consultant->EngagementByClient()]);
     }
 
     /**
@@ -34,10 +38,8 @@ class HoursController extends Controller
     public function create()
     {
         //today's report
-
-
-
-        return view('new-hour');
+        $consultant = Auth::user()->entity;
+        return view('new-hour', ['clientIds' => $consultant->EngagementByClient()]);
     }
 
     /**
@@ -48,7 +50,15 @@ class HoursController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //same reported hours
+
+        if ($request->ajax()) {
+            sleep(1.2);
+        return $request->all();
+        } else {
+
+        }
+
     }
 
     /**
