@@ -29,7 +29,8 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i
                                             class="fa fa-handshake-o">&nbsp;Job Position:</i></span>
-                                <select class="selectpicker" id="position" name="pid" data-width="auto" required></select>
+                                <select class="selectpicker" id="position" name="pid" data-width="auto"
+                                        required></select>
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i>&nbsp; Report Date</span>
                                 <input class="date-picker form-control" id="report-date" placeholder="mm/dd/yyyy"
                                        name="report_date" type="text" required/>
@@ -54,13 +55,15 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i
                                             class="fa fa-usd"></i>&nbsp;<strong>Billable Hours:</strong></span>
-                                <input class="form-control" id="billable-hours" name="billable_hours" type="number" placeholder="numbers only"
+                                <input class="form-control" id="billable-hours" name="billable_hours" type="number"
+                                       placeholder="numbers only"
                                        step="0.1" min="0"
                                        max="24" required>
 
                                 <span class="input-group-addon"><i
                                             class="fa fa-hourglass-start">&nbsp;Non-billable Hours:</i></span>
-                                <input class="form-control" id="non-billable-hours" name="non_billable_hours" type="number" step="0.1" min="0"
+                                <input class="form-control" id="non-billable-hours" name="non_billable_hours"
+                                       type="number" step="0.1" min="0"
                                        placeholder="numbers only">
 
                             </div>
@@ -127,6 +130,15 @@
 @section('my-js')
     <script>
         $(function () {
+            toastr.options= {
+                "positionClass": "toast-top-full-width",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "4000",
+                "extendedTimeOut": "900"
+            };
             $('#client-engagements').on('change', function () {
                 $.ajax({
                     //fetch the corresponding position for him and add option to position option
@@ -159,13 +171,22 @@
                         non_billable_hours: $('#non-billable-hours').val(),
                         description: $('#description').val()
                     },
-                    success: function (success) {
-                        //notify the user
-                        console.log(success);
+                    dataType: 'json',
+                    success: function (feedback) {
+                        //notify the user and update today's board
+                        if (feedback.code == 7) {
+                            toastr.success('Success! Report has been saved!');
+                            //clear some data for the user
+                            $('#billable-hours').val('');
+                            $('#non-billable-hours').val('');
+                        } else {
+                            toastr.error('Error! An error happened during this operation, code: ' + feedback.code +
+                                ', message: ' + feedback.message)
+                        }
                     },
-                    error: function (error) {
+                    error: function (feedback) {
                         //notify the user
-                        console.log(error);
+                        toastr.error('Oh Noooooooo..' + feedback.message);
                     },
                     beforeSend: function () {
                         //spinner begin to spin
@@ -182,7 +203,7 @@
             $('#report-date').datepicker({
                 format: 'mm/dd/yyyy',
                 todayHighlight: true,
-                autoclose: true,
+                autoclose: true
             });
         });
     </script>

@@ -5,6 +5,7 @@ namespace newlifecfo\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use newlifecfo\Models\Templates\Task;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class Hour extends Model
 {
@@ -42,5 +43,31 @@ class Hour extends Model
         } else if ($day->between($data['dates']['startOfLast2'], $data['dates']['endOfLast2'])) {
             $data['total_last2_earn'] += $this->billable_hours * $data['net_rate'];
         }
+    }
+
+    public function getStatus()
+    {
+        $status = [];
+        switch ($this->status) {
+            case 0:
+                $status = ['Pending', 'warning'];
+                break;
+            case 1:
+                $status = ['Approved', 'success'];
+                break;
+            case 2:
+                $status = ['Modified', 'info'];
+                break;
+            case 3:
+                $status = ['Closed', 'default'];
+                break;
+            case 4:
+                $status = ['Rejected', 'danger'];
+                break;
+            case 5:
+                $status = ['Archived', 'primary'];
+                break;
+        }
+        return $status;
     }
 }

@@ -50,4 +50,9 @@ class Engagement extends Model
     {
         return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
     }
+
+    public function isClosed()
+    {
+        return $this->status == 1;
+    }
 }

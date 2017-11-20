@@ -51,7 +51,9 @@ class Consultant extends Model
 
     public function recentHourReports($start = null, $end = null, $eid = null)
     {
-        $aids = $eid ? Engagement::find($eid)->arrangements->pluck('id') : $this->arrangements->pluck('id');
+        $aids = $eid ? $this->arrangements()->where('engagement_id', $eid)->pluck('id') :
+            $this->arrangements()->pluck('id');
+        //$eid ? Engagement::find($eid)->arrangements->pluck('id') :
         if ($start || $end)
             return Hour::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
                 ->whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
@@ -71,8 +73,13 @@ class Consultant extends Model
 
     public function getPositionsByEid($eid)
     {
-        return $this->arrangements()->where('engagement_id', $eid)->get()->map(function($item){
+        return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($item) {
             return $item->position;
         });
+    }
+
+    public function getArrangementByEidPid($eid, $pid)
+    {
+        return $this->arrangements()->where([['engagement_id', '=', $eid], ['position_id', '=', $pid]])->first();
     }
 }

@@ -67,8 +67,8 @@
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                 <td>{{$hour->report_date}}</td>
                                 <td>{{str_limit($hour->description,29)}}</td>
-                                <td><span class="label label-{!!$hour->review_state==0?'success">Approved':'warning">Pending'!!}</span></td>
-                                <td><a href=" #"><i class="fa fa-pencil-square-o"></i></a><a href="#"><i
+                                <td><span class="label label-{!!$hour->getStatus()[1].'">'.$hour->getStatus()[0]!!}</span></td>
+                                <td><a href="#"><i class="fa fa-pencil-square-o"></i></a><a href="#"><i
                                                 class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach

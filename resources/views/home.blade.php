@@ -117,8 +117,7 @@
                                         </td>
                                         <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                         <td>{{Carbon\Carbon::parse($hour->report_date)->format('M d, Y')}}</td>
-                                        <td><span class="label label-{{$hour->review_state==0?'success':'warning'}}">
-                                                {{$hour->review_state==0?'APPROVED':'PENDING'}}</span></td>
+                                        <td><span class="label label-{!!$hour->getStatus()[1].'">'.$hour->getStatus()[0]!!}</span></td>
                                     </tr>
                                 @endforeach
                                 </tbody>
