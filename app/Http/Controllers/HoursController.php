@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Engagement;
@@ -23,9 +24,6 @@ class HoursController extends Controller
     public function index(Request $request)
     {
         $consultant = Auth::user()->entity;
-        if ($request->ajax() && $request->get('fetch') == 'position')
-            return $consultant->getPositionsByEid($request->get('eid'));
-
         $hours = $this->paginate($consultant->recentHourReports($request->get('start'),
             $request->get('end'), $request->get('eid')), 25);
         return view('hours', ['hours' => $hours,
@@ -37,11 +35,21 @@ class HoursController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //today's report
         $consultant = Auth::user()->entity;
-        return view('new-hour', ['clientIds' => $consultant->EngagementByClient()]);
+        $hours = $consultant->justCreatedHourReports(Carbon::today()->startOfDay(), Carbon::today()->endOfDay());
+
+        if ($request->ajax()) {
+            if ($request->get('fetch') == 'position') return $consultant->getPositionsByEid($request->get('eid'));
+            return $this->createTodaysBoard($hours->first());
+        }
+
+        return view('new-hour', [
+            'hours' => $hours,
+            'clientIds' => $consultant->EngagementByClient()
+        ]);
     }
 
     /**
@@ -73,13 +81,13 @@ class HoursController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid','pid']));
-                    if($hour->save()){
-                        $feedback['code']=7;
-                        $feedback['message']='success';
-                    }else{
-                        $feedback['code']=3;
-                        $feedback['message']='unknown error happened while saving';
+                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid']));
+                    if ($hour->save()) {
+                        $feedback['code'] = 7;
+                        $feedback['message'] = 'success';
+                    } else {
+                        $feedback['code'] = 3;
+                        $feedback['message'] = 'unknown error happened while saving';
                     }
                 }
             }
@@ -130,5 +138,17 @@ class HoursController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    private function createTodaysBoard($hour)
+    {
+        $html = '';
+        $eng = $hour->arrangement->engagement;
+
+        $html .= '<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' . number_format($hour->billable_hours, 1) . '</strong></a></div>
+                    <p> billable hours reported for the work of
+                        <strong>' . $eng->name . '</strong> (' . $eng->client->name . ')<span class="timestamp">' . Carbon::parse($hour->created_at)->diffForHumans() . '</span>
+                    </p></li>';
+        return $html;
     }
 }

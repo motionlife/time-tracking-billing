@@ -736,7 +736,10 @@ ul.activity-list > li {
   ul.activity-list > li:not(:last-child) {
     border-bottom: 1px solid #F0F0F0; }
   ul.activity-list > li .avatar {
-    width: 40px; }
+    width: 40px;}
+  ul.activity-list >li >div{
+    font-size:1.5em;
+  }
   ul.activity-list > li > p {
     margin-bottom: 0;
     padding-left: 3.5em; }

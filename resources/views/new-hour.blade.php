@@ -85,6 +85,7 @@
                 <div class="panel panel-scrolling">
                     <div class="panel-heading">
                         <h3 class="panel-title">Today's Reports</h3>
+                        <p class="panel-subtitle">{{$hours->count()?$hours->count()." reports":"No report today"}}</p>
                         <div class="right">
                             <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i>
                             </button>
@@ -92,34 +93,21 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <ul class="list-unstyled activity-list">
-                            <li>
-                                <img src="/img/user1.png" alt="Avatar" class="img-circle pull-left avatar">
-                                <p><a href="#">Michael</a> has achieved 80% of his completed tasks <span
-                                            class="timestamp">20 minutes ago</span></p>
-                            </li>
-                            <li>
-                                <img src="/img/user2.png" alt="Avatar" class="img-circle pull-left avatar">
-                                <p><a href="#">Daniel</a> has been added as a team member to project <a href="#">System
-                                        Update</a> <span class="timestamp">Yesterday</span></p>
-                            </li>
-                            <li>
-                                <img src="/img/user3.png" alt="Avatar" class="img-circle pull-left avatar">
-                                <p><a href="#">Martha</a> created a new heatmap view <a href="#">Landing Page</a> <span
-                                            class="timestamp">2 days ago</span></p>
-                            </li>
-                            <li>
-                                <img src="/img/user4.png" alt="Avatar" class="img-circle pull-left avatar">
-                                <p><a href="#">Jane</a> has completed all of the tasks <span class="timestamp">2 days ago</span>
-                                </p>
-                            </li>
-                            <li>
-                                <img src="/img/user5.png" alt="Avatar" class="img-circle pull-left avatar">
-                                <p><a href="#">Jason</a> started a discussion about <a href="#">Weekly Meeting</a> <span
-                                            class="timestamp">3 days ago</span></p>
-                            </li>
+                        <ul class="list-unstyled activity-list" id="today-board">
+                            @foreach($hours as $hour)
+                                <li>
+                                    <?php $eng = $hour->arrangement->engagement ?>
+                                    <div class="pull-left avatar">
+                                        <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours,1)}}</strong></a>
+                                    </div>
+                                    <p> billable hours reported for the work of
+                                        <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span
+                                                class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}</span>
+                                    </p>
+                                </li>
+                            @endforeach
                         </ul>
-                        <button type="button" class="btn btn-primary btn-bottom center-block">Load More</button>
+                        <a type="button" href="/hour" class="btn btn-primary btn-bottom center-block">See All</a>
                     </div>
                 </div>
                 <!-- END TIMELINE -->
@@ -130,8 +118,8 @@
 @section('my-js')
     <script>
         $(function () {
-            toastr.options= {
-                "positionClass": "toast-top-full-width",
+            toastr.options = {
+                "positionClass": "toast-bottom-full-width",
                 "preventDuplicates": false,
                 "onclick": null,
                 "showDuration": "300",
@@ -143,7 +131,7 @@
                 $.ajax({
                     //fetch the corresponding position for him and add option to position option
                     type: "get",
-                    url: "/hour",
+                    url: "/hour/create",
                     data: {eid: $('#client-engagements').find(":selected").attr('data-eid'), fetch: 'position'},
                     success: function (data) {
                         $('#position').empty();
@@ -173,12 +161,18 @@
                     },
                     dataType: 'json',
                     success: function (feedback) {
-                        //notify the user and update today's board
+                        //notify the user
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been saved!');
                             //clear some data for the user
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
+                            //update today's board
+                            $.get({
+                                url: "/hour/create", success: function (data) {
+                                    $('#today-board').prepend(data);
+                                }
+                            });
                         } else {
                             toastr.error('Error! An error happened during this operation, code: ' + feedback.code +
                                 ', message: ' + feedback.message)
@@ -204,7 +198,7 @@
                 format: 'mm/dd/yyyy',
                 todayHighlight: true,
                 autoclose: true
-            });
+            }).datepicker('setDate', new Date());
         });
     </script>
 @endsection

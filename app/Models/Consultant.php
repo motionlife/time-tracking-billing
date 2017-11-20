@@ -61,6 +61,12 @@ class Consultant extends Model
             return Hour::whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
     }
 
+    public function justCreatedHourReports($start = null, $end = null)
+    {
+        return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+            ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'desc')->get();
+    }
+
     public function EngagementByClient()
     {
         return $this->arrangements->groupBy('engagement_id')
