@@ -43,7 +43,6 @@ class HoursController extends Controller
 
         if ($request->ajax()) {
             if ($request->get('fetch') == 'position') return $consultant->getPositionsByEid($request->get('eid'));
-            return $this->createTodaysBoard($hours->first());
         }
 
         return view('new-hour', [
@@ -85,6 +84,9 @@ class HoursController extends Controller
                     if ($hour->save()) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'success';
+                        $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
+                            'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
+                            'ename' => $eng->name, 'cname' => $eng->client->name];
                     } else {
                         $feedback['code'] = 3;
                         $feedback['message'] = 'unknown error happened while saving';
@@ -207,17 +209,5 @@ class HoursController extends Controller
             }
             return json_encode(['message' => 'delete_failed']);
         }
-    }
-
-    private function createTodaysBoard($hour)
-    {
-        $html = '';
-        $eng = $hour->arrangement->engagement;
-
-        $html .= '<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' . number_format($hour->billable_hours, 1) . '</strong></a></div>
-                    <p> billable hours reported for the work of
-                        <strong>' . $eng->name . '</strong> (' . $eng->client->name . ')<span class="timestamp">' . Carbon::parse($hour->created_at)->diffForHumans() . '</span>
-                    </p></li>';
-        return $html;
     }
 }

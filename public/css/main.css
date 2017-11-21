@@ -732,7 +732,7 @@ fieldset[disabled] .btn {
     font-size: 16px; }
 
 ul.activity-list > li {
-  padding: 25px 0; }
+  padding: .7em 0; }
   ul.activity-list > li:not(:last-child) {
     border-bottom: 1px solid #F0F0F0; }
   ul.activity-list > li .avatar {

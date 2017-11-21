@@ -168,13 +168,10 @@
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
                             //update today's board
-                            $.get({
-                                url: "/hour/create", success: function (data) {
-                                    $('#today-board').prepend(data);
-                                }
-                            });
+                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>' + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">' + feedback.data.created_at + '</span></p></li>')
+                                .prependTo('#today-board').hide().fadeIn(1500);
                         } else {
-                            toastr.error('Error! An error happened during this operation, code: ' + feedback.code +
+                            toastr.error('Error! Saving record failed, code: ' + feedback.code +
                                 ', message: ' + feedback.message)
                         }
                     },
