@@ -94,20 +94,20 @@
                         </li>
                         <li>
                             <a href="#subPages" data-toggle="collapse"
-                               class="{{Request::is('hour') ? 'active':'collapsed '}}"><i
+                               class="{{str_contains(Request::path(),'hour') ? 'active':'collapsed '}}"><i
                                         class="lnr lnr-calendar-full"></i> <span>Time</span> <i
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
-                            <div id="subPages" class="{{Request::is('hour') ?'in':''}}" >
+                            <div id="subPages" class="collapse {{str_contains(Request::path(),'hour') ?'in':''}}" >
                                 <ul class="nav">
                                     <li><a href="{{route('hour.create')}}" class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
                                     <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Overview</a></li>
-                                    <li><a href="{{route('hour.show',1)}}" class="{{Request::is('hour/{h}') ?'active':''}}">Statistic</a></li>
+                                    <li><a href="{{route('hour.show','wage')}}" class="{{Request::is('hour/wage') ?'active':''}}">Payroll</a></li>
                                 </ul>
                             </div>
                         </li>
                         <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i>
                                 <span>Model Test</span></a></li>
-                        <li><a href="charts.html" class="{{Request::is('chart') ?'active':''}}"><i
+                        <li><a href="charts.html" class="{{Request::is('chart') ?'active':'collapsed'}}"><i
                                         class="lnr lnr-chart-bars"></i> <span>Charts</span></a>
                         </li>
                         <li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>

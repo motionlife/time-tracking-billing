@@ -92,10 +92,9 @@
                     <div class="col-md-9">
                         <div class="panel-body">
                             <div class="col-md-5">
-                                <label for="client-engagements">Client & Engagement</label>
                                 <select class="selectpicker show-tick" data-width="auto" id="client-engagements"
                                         data-live-search="true">
-                                    <option value="" selected>All</option>
+                                    <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement</option>
                                     @foreach($clientIds as $cid=>$engagements)
                                         <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                                             @foreach($engagements as $eng)
@@ -105,14 +104,17 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label for="start-date">From</label>
-                                <input class="date-picker" id="start-date" placeholder="mm/dd/yyyy"
-                                       value="{{Request('start')}}"
-                                       type="text"/>
-                                <label for="end-date">to</label>
-                                <input class="date-picker" id="end-date" placeholder="mm/dd/yyyy"
-                                       value="{{Request('end')}}" type="text"/>
+                            <div class="col-md-6 form-inline" style="font-family:FontAwesome;">
+                                <div class="form-group">
+                                    <input class="date-picker form-control" id="start-date" placeholder="&#xf073; Start Day"
+                                           value="{{Request('start')}}"
+                                           type="text"/>
+                                </div>
+                                <span>-</span>
+                                <div class="form-group">
+                                    <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
+                                           value="{{Request('end')}}" type="text"/>
+                                </div>
                             </div>
                             <div class="col-md-1">
                                 <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>

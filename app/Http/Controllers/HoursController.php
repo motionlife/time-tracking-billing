@@ -114,6 +114,7 @@ class HoursController extends Controller
             }
             //else illegal request!
         }
+        return view('wage');
     }
 
     /**
