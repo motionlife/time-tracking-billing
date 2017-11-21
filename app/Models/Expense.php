@@ -16,12 +16,9 @@ class Expense extends Model
     }
 
     //get the attached receipt
-    public function receipt()
+    public function receipts()
     {
-        return $this->hasOne(Receipt::class)->withDefault([
-            'filename' => 'null',
-            'description' => 'null'
-        ]);
+        return $this->hasMany(Receipt::class);
     }
 
     public function total()
@@ -39,5 +36,30 @@ class Expense extends Model
         } else if ($day->between($data['dates']['startOfLast2'], $data['dates']['endOfLast2'])) {
             $data['last2_expense'] += $this->total();
         }
+    }
+    public function getStatus()
+    {
+        $status = [];
+        switch ($this->review_state) {
+            case 0:
+                $status = ['Pending', 'warning'];
+                break;
+            case 1:
+                $status = ['Approved', 'success'];
+                break;
+            case 2:
+                $status = ['Modified', 'info'];
+                break;
+            case 3:
+                $status = ['BossReplied', 'default'];
+                break;
+            case 4:
+                $status = ['Rejected', 'danger'];
+                break;
+            case 5:
+                $status = ['Archived', 'primary'];
+                break;
+        }
+        return $status;
     }
 }

@@ -49,22 +49,23 @@ class Consultant extends Model
         return $this->hasMany(Arrangement::class);
     }
 
-    public function recentHourReports($start = null, $end = null, $eid = null)
+    public function recentHourOrExpenseReports($start = null, $end = null, $eid = null, $hour = true)
     {
+        $resource = $hour ? Hour::class : Expense::class;
         $aids = $eid ? $this->arrangements()->where('engagement_id', $eid)->pluck('id') :
             $this->arrangements()->pluck('id');
         //$eid ? Engagement::find($eid)->arrangements->pluck('id') :
         if ($start || $end)
-            return Hour::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+            return $resource::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
                 ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
         else
-            return Hour::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
+            return $resource::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
     }
 
     public function justCreatedHourReports($start = null, $end = null)
     {
         return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-            ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at','DESC')->get();
+            ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'DESC')->get();
     }
 
     public function EngagementByClient()

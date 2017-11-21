@@ -17,13 +17,13 @@
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-users">&nbsp; Client and Engagement:</i></span>
+                            <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
                                         <select id="client-engagement" class="selectpicker" data-width="auto" name="eid">
                                         </select>
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-handshake-o">&nbsp;Job Position:</i></span>
+                                <span class="input-group-addon"><i class="fa fa-handshake-o"></i>&nbsp;Job Position:</span>
                                         <select class="selectpicker" id="position" name="pid" data-width="auto"></select>
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar"></i>&nbsp; Report Date</span>
@@ -33,7 +33,7 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-tasks">&nbsp;Task:</i></span>
+                                        <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
                                         <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
                                                 data-width="auto" name="task_id"
                                                 title="Please select one of the tasks your did">
@@ -57,7 +57,7 @@
                                                max="24" required>
 
                                         <span class="input-group-addon"><i
-                                                    class="fa fa-hourglass-start">&nbsp;Non-billable Hours:</i></span>
+                                                    class="fa fa-hourglass-start"></i>&nbsp;Non-billable Hours:</span>
                                         <input class="form-control" id="non-billable-hours" name="non_billable_hours"
                                                type="number" step="0.1" min="0"
                                                placeholder="numbers only">
@@ -140,10 +140,11 @@
                         <tbody>
                         <?php $offset = ($hours->currentPage() - 1) * $hours->perPage() + 1;?>
                         @foreach($hours as $hour)
+                            <?php $eng = $hour->arrangement->engagement ?>
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td>{{str_limit($hour->arrangement->engagement->name,19)}}</td>
-                                <td>{{str_limit($hour->arrangement->engagement->client->name,19)}}</td>
+                                <td>{{str_limit($eng->name,19)}}</td>
+                                <td>{{str_limit($eng->client->name,19)}}</td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                 <td>{{$hour->report_date}}</td>
