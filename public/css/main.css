@@ -745,8 +745,11 @@ ul.activity-list > li {
     padding-left: 3.5em; }
   ul.activity-list > li .timestamp {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     color: #a3a3a3; }
+ul.activity-list > li i{
+  color:red;font-size: 15px;
+}
 
 /* task list */
 .task-list > li {

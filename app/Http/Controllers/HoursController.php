@@ -86,7 +86,7 @@ class HoursController extends Controller
                         $feedback['message'] = 'success';
                         $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
                             'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
-                            'ename' => $eng->name, 'cname' => $eng->client->name];
+                            'ename' => $eng->name, 'cname' => $eng->client->name,'hid'=>$hour->id];
                     } else {
                         $feedback['code'] = 3;
                         $feedback['message'] = 'unknown error happened while saving';

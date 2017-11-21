@@ -101,9 +101,12 @@
                                         <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours,1)}}</strong></a>
                                     </div>
                                     <p> billable hours reported for the work of
-                                        <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span
-                                                class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}</span>
+                                        <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}
+                                            <a href="javascript:deleteTodaysReport({{$hour->id}});"><i
+                                                        class="fa fa-times pull-right"></i></a></span>
+
                                     </p>
+
                                 </li>
                             @endforeach
                         </ul>
@@ -168,7 +171,7 @@
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
                             //update today's board
-                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>' + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">' + feedback.data.created_at + '</span></p></li>')
+                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>' + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">' + feedback.data.created_at + '<a href="javascript:deleteTodaysReport(' + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
                                 .prependTo('#today-board').hide().fadeIn(1500);
                         } else {
                             toastr.error('Error! Saving record failed, code: ' + feedback.code +
@@ -197,6 +200,36 @@
                 autoclose: true
             }).datepicker('setDate', new Date());
         });
+
+        function deleteTodaysReport(hid) {
+            var li = $('a[href*=' + hid + ']').parent().parent().parent();
+            swal({
+                    title: "Are you sure?",
+                    text: "This record shall be deleted, please make sure!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, delete it!",
+                    closeOnConfirm: false
+                },
+                function () {
+                    $.post({
+                        url: "/hour/" + hid,
+                        data: {_token: "{{csrf_token()}}", _method: 'delete'},
+                        success: function (data) {
+                            if (data.message == 'succeed') {//remove item from the list
+                                li.fadeOut(1000, function () {
+                                    $(this).remove();
+                                });
+                                swal("Deleted!", "The record has been deleted.", "success");
+                            } else {
+                                toastr.warning('Failed! Fail to delete the record!' + data.message);
+                            }
+                        },
+                        dataType: 'json'
+                    });
+                });
+        }
     </script>
 @endsection
 
