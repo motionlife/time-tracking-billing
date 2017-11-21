@@ -1759,3 +1759,25 @@ ul.activity-timeline > li {
     border: 1px solid #CCC; }
 
 /*# sourceMappingURL=main.css.map */
+@-webkit-keyframes update-highlight {
+  from { background-color: #2dff94; }
+  to { background-color: inherit; }
+}
+@-moz-keyframes update-highlight {
+  from { background-color: #2dff94; }
+  to { background-color: inherit; }
+}
+@-o-keyframes update-highlight {
+  from { background-color: #2dff94; }
+  to { background-color: inherit; }
+}
+@keyframes update-highlight {
+  from { background-color: #2dff94; }
+  to { background-color: inherit; }
+}
+tr.update-highlight {
+  -webkit-animation: update-highlight 0.7s infinite; /* Safari 4+ */
+  -moz-animation:    update-highlight 0.7s infinite; /* Fx 5+ */
+  -o-animation:      update-highlight 0.7s infinite; /* Opera 12+ */
+  animation:         update-highlight 0.7s infinite; /* IE 10+ */
+}

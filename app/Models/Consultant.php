@@ -56,15 +56,15 @@ class Consultant extends Model
         //$eid ? Engagement::find($eid)->arrangements->pluck('id') :
         if ($start || $end)
             return Hour::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-                ->whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
+                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
         else
-            return Hour::whereIn('arrangement_id', $aids)->orderBy('report_date', 'desc')->get();
+            return Hour::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
     }
 
     public function justCreatedHourReports($start = null, $end = null)
     {
         return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-            ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'desc')->get();
+            ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at','DESC')->get();
     }
 
     public function EngagementByClient()

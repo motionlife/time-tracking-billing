@@ -103,20 +103,14 @@ class HoursController extends Controller
      */
     public function show($id, Request $request)
     {
-        //
         $consultant = Auth::user()->entity;
         if ($request->ajax()) {
-
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
             if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
-                $arr= $hour->arrangement;
-                $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
-                return json_encode(['eid' => $arr->engagement->id, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
-                    'billable_hours' => $hour->billable_hours, 'non_billable_hours' => $hour->non_billable_hours,
-                    'description' => $hour->description, 'review_state' => $hour->review_state,'position'=>$arr->position->name
-                ]);
+                return json_encode($hour);
             }
+            //else illegal request!
         }
     }
 
@@ -126,9 +120,23 @@ class HoursController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         //
+        $consultant = Auth::user()->entity;
+        if ($request->ajax()) {
+            $hour = Hour::find($id);
+            //must check if this hour record belong to the consultant!!!
+            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
+                $arr = $hour->arrangement;
+                $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
+                return json_encode(['ename' => $arr->engagement->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
+                    'billable_hours' => number_format($hour->billable_hours, 1), 'non_billable_hours' => number_format($hour->non_billable_hours, 1),
+                    'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name
+                ]);
+            }
+            //else illegal request!
+        }
     }
 
     /**
@@ -151,17 +159,27 @@ class HoursController extends Controller
 
                 $feedback['code'] = 0;
                 $feedback['message'] = 'Record not found or no authorization';
-            } else if ($hour->getStatus()[0] != 'Pending') {
-                $feedback['code'] = 1;
-                $feedback['message'] = 'Record Cannot be updated now';
-            } else {
+            } else if ($hour->couldBeUpdated()) {
                 if ($hour->update($request->all())) {
                     $feedback['code'] = 7;
                     $feedback['message'] = 'Record Update Success';
+                    $feedback['record'] = ['ename' => str_limit($hour->arrangement->engagement->name, 19),
+                        'cname' => str_limit($hour->arrangement->engagement->client->name, 19),
+                        'report_date' => $hour->report_date,
+                        'task' => str_limit($hour->task->getDesc(), 23),
+                        'billable_hours' => number_format($hour->billable_hours, 1),
+                        'id' => $hour->id,
+                        'description' => $hour->description,
+                        'status' => $hour->getStatus()
+                    ];
                 } else {
                     $feedback['code'] = 4;
-                    $feedback['message'] = 'Record update fail, unknown error';
+                    $feedback['message'] = 'unknown error during updating';
                 }
+
+            } else {
+                $feedback['code'] = 1;
+                $feedback['message'] = 'Record Cannot be updated now';
             }
             return json_encode($feedback);
         }
@@ -183,7 +201,7 @@ class HoursController extends Controller
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
             if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
-                if ($hour->getStatus()[0] == 'Pending') {
+                if ($hour->couldBeDeleted()) {
                     if ($hour->delete()) return json_encode(['message' => 'succeed']);
                 }
             }

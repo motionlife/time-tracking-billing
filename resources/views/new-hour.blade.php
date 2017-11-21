@@ -41,7 +41,7 @@
                                 <span class="input-group-addon"><i class="fa fa-tasks">&nbsp;Task:</i></span>
                                 <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
                                         data-width="auto" name="task_id"
-                                        title="Please select one of the tasks your did">
+                                        title="Please select one of the tasks your did" required>
                                     @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
                                         <?php $gname = $tgroup->name?>
                                         @foreach($tgroup->tasks as $task)
@@ -134,11 +134,11 @@
                     url: "/hour/create",
                     data: {eid: $('#client-engagements').find(":selected").attr('data-eid'), fetch: 'position'},
                     success: function (data) {
-                        $('#position').empty();
+                        var p = $('#position').empty();
                         $(data).each(function (i, e) {
-                            $('#position').append("<option data-pid=" + e.id + ">" + e.name + "</option>");
+                            p.append("<option data-pid=" + e.id + ">" + e.name + "</option>");
                         });
-                        $('#position').selectpicker('refresh');
+                        p.selectpicker('refresh');
                     }
                 });
             });

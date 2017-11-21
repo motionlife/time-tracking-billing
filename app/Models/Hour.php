@@ -45,10 +45,22 @@ class Hour extends Model
         }
     }
 
+    public function couldBeDeleted()
+    {
+        return $this->getStatus()[0]=='Pending';
+    }
+
+    public function couldBeUpdated()
+    {
+        $status = $this->getStatus();
+        return ($status[0]=='Pending'||$status[0]=='Modified');
+    }
+
+
     public function getStatus()
     {
         $status = [];
-        switch ($this->status) {
+        switch ($this->review_state) {
             case 0:
                 $status = ['Pending', 'warning'];
                 break;
@@ -59,7 +71,7 @@ class Hour extends Model
                 $status = ['Modified', 'info'];
                 break;
             case 3:
-                $status = ['Closed', 'default'];
+                $status = ['BossReplied', 'default'];
                 break;
             case 4:
                 $status = ['Rejected', 'danger'];

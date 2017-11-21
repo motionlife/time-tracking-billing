@@ -17,32 +17,19 @@
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
-                            <span class="input-group-addon"><i
-                                        class="fa fa-users">&nbsp; Client and Engagement:</i></span>
-                                        <select id="client-engagement" class="selectpicker show-tick" data-width="auto"
-                                                data-live-search="true" name="eid"
-                                                title="Select from the engagements your're currently in" required>
-                                            @foreach($clientIds as $cid=>$engagements)
-                                                <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                                                    @foreach($engagements as $eng)
-                                                        <option data-eid="{{$eng[0]}}">{{$eng[1]}}</option>
-                                                    @endforeach
-                                                </optgroup>
-                                            @endforeach
+                            <span class="input-group-addon"><i class="fa fa-users">&nbsp; Client and Engagement:</i></span>
+                                        <select id="client-engagement" class="selectpicker" data-width="auto" name="eid">
                                         </select>
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-handshake-o">&nbsp;Job Position:</i></span>
-                                        <select class="selectpicker" id="position" name="pid" data-width="auto"
-                                                required></select>
+                                <span class="input-group-addon"><i class="fa fa-handshake-o">&nbsp;Job Position:</i></span>
+                                        <select class="selectpicker" id="position" name="pid" data-width="auto"></select>
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar"></i>&nbsp; Report Date</span>
                                         <input class="date-picker form-control" id="report-date"
                                                placeholder="mm/dd/yyyy"
                                                name="report_date" type="text" required/>
-
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -153,7 +140,7 @@
                         @foreach($hours as $hour)
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td class="e-name">{{str_limit($hour->arrangement->engagement->name,19)}}</td>
+                                <td>{{str_limit($hour->arrangement->engagement->name,19)}}</td>
                                 <td>{{str_limit($hour->arrangement->engagement->client->name,19)}}</td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
@@ -178,9 +165,10 @@
 @section('my-js')
     <script>
         $(function () {
+            var tr;
             var hid;
             toastr.options = {
-                "positionClass": "toast-top-center",
+                "positionClass": "toast-top-right",
                 "timeOut": "2000"
             };
             $('#filter-button').on('click', function () {
@@ -197,22 +185,22 @@
             );
 
             $('td a:nth-child(1)').on('click', function () {
+                tr = $(this).parent().parent();
                 hid = $(this).parent().attr('data-id');
                 $.get({
-                    url: '/hour/' + hid,
+                    url: '/hour/' + hid + '/edit',
                     success: function (data) {
                         //update modal
-                        $('#client-engagement').find('option[data-eid="' + data.eid + '"]').attr('selected', true);
-                        $('#client-engagement').selectpicker('refresh');
-                        $('#position').empty().append('<option>'+data.position+'</option>');
-                        $('#position').selectpicker('refresh');
-                        $('#task-id').find('option[data-tid="' + data.task_id + '"]').attr('selected', true);
-                        $('#task-id').selectpicker('refresh');
+                        $('#client-engagement').attr('disabled', true)
+                            .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
+                        $('#position').attr('disabled', true)
+                            .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
+                        $('#task-id').find('option[data-tid="' + data.task_id + '"]').attr('selected', true).parent().selectpicker('refresh');
                         $('#report-date').datepicker('setDate', data.report_date);
                         $('#billable-hours').val(data.billable_hours);
                         $('#non-billable-hours').val(data.non_billable_hours);
                         $('#description').val(data.description);
-                        //if(data.review_state=="0") $('#report-date').attr('disabled',true);
+                        $('#report-update').attr('disabled', data.review_state != "0");
                     },
                     dataType: 'json'
                 });
@@ -234,10 +222,10 @@
                             data: {_token: "{{csrf_token()}}", _method: 'delete'},
                             success: function (data) {
                                 if (data.message == 'succeed') {//remove item from the list
-                                    td.parent().remove();
+                                    td.parent().fadeOut(777, function(){ $(this).remove();});
                                     toastr.success('Success! Report has been deleted!');
                                 } else {
-                                    toastr.warning('Failed! Fail to delete the record!');
+                                    toastr.warning('Failed! Fail to delete the record!'+data.message);
                                 }
                             },
                             dataType: 'json'
@@ -245,29 +233,13 @@
                     });
             });
 
-            $('#client-engagement').on('change', function () {
-                $.ajax({
-                    //fetch the corresponding position for him and add option to position option
-                    type: "get",
-                    url: "/hour/create",
-                    data: {eid: $('#client-engagement').find(":selected").attr('data-eid'), fetch: 'position'},
-                    success: function (data) {
-                        $('#position').empty();
-                        $(data).each(function (i, e) {
-                            $('#position').append("<option data-pid=" + e.id + ">" + e.name + "</option>");
-                        });
-                        $('#position').selectpicker('refresh');
-                    }
-                });
-            });
-
             $('#hour-form').on('submit', function (e) {
-                var eid = $('#client-engagement').find(":selected").attr('data-eid');
                 var token = "{{ csrf_token() }}";
                 $.ajax({
                     type: "POST",
                     url: "/hour/" + hid,
                     data: {
+                        //currently engagement and client are not allowed to be updated!!!
                         _token: token,
                         _method: 'put',
                         report_date: $('#report-date').val(),
@@ -281,12 +253,22 @@
                         //notify the user
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been updated!');
-                            $('#hourModal').modal('toggle');
-                            //update some data for the user
-                            //$('#billable-hours').val('new data');
-                            //$('#non-billable-hours').val('new data');
+                            //no need to update engagement and client
+//                            tr.find('td:nth-child(2)').html(feedback.record.ename);
+//                            tr.find('td:nth-child(3)').html(feedback.record.cname);
+                            tr.find('td:nth-child(4)').html(feedback.record.task);
+                            tr.find('td:nth-child(5) strong').html(feedback.record.billable_hours);
+                            tr.find('td:nth-child(6)').html(feedback.record.report_date);
+                            tr.find('td:nth-child(7)').html(feedback.record.description);
+                            tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
+                            tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
+                            var flash = tr;
+                            flash.addClass('update-highlight');
+                            setTimeout(function () {
+                                flash.removeClass('update-highlight');
+                            }, 2100);
                         } else {
-                            toastr.error('Error! An error happened during this operation, code: ' + feedback.code +
+                            toastr.error('Error! Updating failed, code: ' + feedback.code +
                                 ', message: ' + feedback.message)
                         }
                     },
@@ -301,6 +283,7 @@
                     complete: function () {
                         //button spinner stop
                         $("#report-update").button('reset');
+                        $('#hourModal').modal('toggle');
                     }
                 });
                 e.preventDefault();
