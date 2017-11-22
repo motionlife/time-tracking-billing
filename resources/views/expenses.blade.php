@@ -234,6 +234,7 @@
                 $('#expenseModal').modal('toggle');
                 $('#client-engagement').html($('#client-engagements').html()).selectpicker('refresh');
                 $('form .input-group input').val('');
+                $('#description').val('');
                 $('#input-report-date').datepicker('setDate', new Date());
                 $('#report-update').html('Report').attr('disabled', false);
                 update = false;
@@ -270,7 +271,6 @@
                         description: $('#description').val()
                     },
                     success: function (feedback) {
-                        //notify the user
                         if (feedback.code == 7) {
                             if (update) {
                                 toastr.success('Success! Expense has been updated!');
@@ -280,7 +280,7 @@
                                 tr.find('td:nth-child(7)').html(feedback.record.receipts);
                                 tr.find('td:nth-child(8)').html(feedback.record.description);
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
-                                tr.addClass('update-highlight');
+                                tr.addClass('update-highlight');//flash to show user that data already been updated
                                 setTimeout(function () {
                                     tr.removeClass('update-highlight');
                                 }, 2100);
@@ -296,7 +296,6 @@
                         }
                     },
                     error: function (feedback) {
-                        //notify the user
                         toastr.error('Oh NOooooooo...' + feedback.message);
                     },
                     beforeSend: function () {
@@ -330,7 +329,7 @@
                     $('#input-car-rental').val(data.car_rental);
                     $('#input-mileage-cost').val(data.mileage_cost);
                     $('#input-other').val(data.other);
-                    $('#input-receipts').val(data.receipts);
+//                    $('#input-receipts').val(data.receipts);
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state != "0");
