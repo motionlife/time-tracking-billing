@@ -37,6 +37,18 @@ class Expense extends Model
             $data['last2_expense'] += $this->total();
         }
     }
+
+    public function couldBeDeleted()
+    {
+        return $this->getStatus()[0]=='Pending';
+    }
+
+    public function couldBeUpdated()
+    {
+        $status = $this->getStatus();
+        return ($status[0]=='Pending'||$status[0]=='Modified');
+    }
+
     public function getStatus()
     {
         $status = [];

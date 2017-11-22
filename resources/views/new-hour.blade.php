@@ -15,11 +15,11 @@
                                         class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
                                 <select id="client-engagements" class="selectpicker show-tick" data-width="auto"
                                         data-live-search="true" name="eid"
-                                        title="Select from the engagements your're currently in" required>
+                                        title="Select the engagements your want report to" required>
                                     @foreach($clientIds as $cid=>$engagements)
                                         <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                                             @foreach($engagements as $eng)
-                                                <option data-eid="{{$eng[0]}}">{{$eng[1]}}</option>
+                                                <option value="{{$eng[0]}}">{{$eng[1]}}</option>
                                             @endforeach
                                         </optgroup>
                                     @endforeach
@@ -45,7 +45,7 @@
                                     @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
                                         <?php $gname = $tgroup->name?>
                                         @foreach($tgroup->tasks as $task)
-                                            <option data-tid="{{$task->id}}"
+                                            <option value="{{$task->id}}"
                                                     data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
                                         @endforeach
                                     @endforeach
@@ -135,11 +135,11 @@
                     //fetch the corresponding position for him and add option to position option
                     type: "get",
                     url: "/hour/create",
-                    data: {eid: $('#client-engagements').find(":selected").attr('data-eid'), fetch: 'position'},
+                    data: {eid: $('#client-engagements').selectpicker('val'), fetch: 'position'},
                     success: function (data) {
                         var p = $('#position').empty();
                         $(data).each(function (i, e) {
-                            p.append("<option data-pid=" + e.id + ">" + e.name + "</option>");
+                            p.append("<option value=" + e.id + ">" + e.name + "</option>");
                         });
                         p.selectpicker('refresh');
                     }
@@ -147,7 +147,7 @@
             });
 
             $('#hour-form').on('submit', function (e) {
-                var eid = $('#client-engagements').find(":selected").attr('data-eid');
+                var eid = $('#client-engagements').selectpicker('val');
                 var token = "{{ csrf_token() }}";
                 $.ajax({
                     type: "POST",
@@ -155,9 +155,9 @@
                     data: {
                         _token: token,
                         eid: eid ? eid : '',
-                        pid: $('#position').find(":selected").attr('data-pid'),
+                        pid: $('#position').selectpicker('val'),
                         report_date: $('#report-date').val(),
-                        task_id: $('#task-id').find(":selected").attr('data-tid'),
+                        task_id: $('#task-id').selectpicker('val'),
                         billable_hours: $('#billable-hours').val(),
                         non_billable_hours: $('#non-billable-hours').val(),
                         description: $('#description').val()
@@ -171,7 +171,11 @@
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
                             //update today's board
-                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>' + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>' + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">' + feedback.data.created_at + '<a href="javascript:deleteTodaysReport(' + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
+                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>'
+                                + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>'
+                                + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">'
+                                + feedback.data.created_at + '<a href="javascript:deleteTodaysReport('
+                                + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
                                 .prependTo('#today-board').hide().fadeIn(1500);
                         } else {
                             toastr.error('Error! Saving record failed, code: ' + feedback.code +
@@ -202,7 +206,7 @@
         });
 
         function deleteTodaysReport(hid) {
-            var li = $('a[href*=' + hid + ']').parent().parent().parent();
+            var li = $('a[href*="deleteTodaysReport(' + hid + ')"]').parent().parent().parent();
             swal({
                     title: "Are you sure?",
                     text: "This record shall be deleted, please make sure!",

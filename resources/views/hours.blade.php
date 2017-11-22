@@ -17,14 +17,16 @@
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-                                        <select id="client-engagement" class="selectpicker" data-width="auto" name="eid">
+                                        <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
+                                        <select id="client-engagement" class="selectpicker" data-width="auto"
+                                                name="eid">
                                         </select>
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-handshake-o"></i>&nbsp;Job Position:</span>
-                                        <select class="selectpicker" id="position" name="pid" data-width="auto"></select>
+                                        <span class="input-group-addon"><i class="fa fa-handshake-o"></i>&nbsp;Job Position:</span>
+                                        <select class="selectpicker" id="position" name="pid"
+                                                data-width="auto"></select>
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar"></i>&nbsp; Report Date</span>
                                         <input class="date-picker form-control" id="report-date"
@@ -40,7 +42,7 @@
                                             @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
                                                 <?php $gname = $tgroup->name?>
                                                 @foreach($tgroup->tasks as $task)
-                                                    <option data-tid="{{$task->id}}"
+                                                    <option value="{{$task->id}}"
                                                             data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
                                                 @endforeach
                                             @endforeach
@@ -83,40 +85,40 @@
             {{--END OF MODAL--}}
             <div class="panel panel-headline">
                 <div class="row">
-                    <div class="col-md-3">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Time Reporting History</h3>
-                            <p class="panel-subtitle">{{$hours->total()}} results</p>
-                        </div>
+                    <div class="panel-heading col-md-3">
+                        <h3 class="panel-title">Time Reporting History</h3>
+                        <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
-                    <div class="col-md-9">
-                        <div class="panel-body">
-                            <div class="col-md-5">
+
+                    <div class="panel-body col-md-9">
+                        <div class="form-inline pull-right" style="font-family:FontAwesome;">
+                            <div class="form-group">
                                 <select class="selectpicker show-tick" data-width="auto" id="client-engagements"
                                         data-live-search="true">
-                                    <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement</option>
+                                    <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
+                                    </option>
                                     @foreach($clientIds as $cid=>$engagements)
                                         <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                                             @foreach($engagements as $eng)
-                                                <option data-eid="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
+                                                <option value="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
                                             @endforeach
                                         </optgroup>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-6 form-inline" style="font-family:FontAwesome;">
-                                <div class="form-group">
-                                    <input class="date-picker form-control" id="start-date" placeholder="&#xf073; Start Day"
-                                           value="{{Request('start')}}"
-                                           type="text"/>
-                                </div>
-                                <span>-</span>
-                                <div class="form-group">
-                                    <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
-                                           value="{{Request('end')}}" type="text"/>
-                                </div>
+
+                            <div class="form-group">
+                                <input class="date-picker form-control" id="start-date"
+                                       placeholder="&#xf073; Start Day"
+                                       value="{{Request('start')}}"
+                                       type="text"/>
                             </div>
-                            <div class="col-md-1">
+                            <span>-</span>
+                            <div class="form-group">
+                                <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
+                                       value="{{Request('end')}}" type="text"/>
+                            </div>
+                            <div class="form-group">
                                 <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
                             </div>
                         </div>
@@ -175,7 +177,7 @@
                 "timeOut": "2000"
             };
             $('#filter-button').on('click', function () {
-                var eid = $('#client-engagements').find(":selected").attr('data-eid');
+                var eid = $('#client-engagements').selectpicker('val');
                 window.location.href = '/hour?eid=' + (eid ? eid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });
@@ -198,7 +200,7 @@
                             .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
-                        $('#task-id').find('option[data-tid="' + data.task_id + '"]').attr('selected', true).parent().selectpicker('refresh');
+                        $('#task-id').selectpicker('val',data.task_id).selectpicker('refresh');
                         $('#report-date').datepicker('setDate', data.report_date);
                         $('#billable-hours').val(data.billable_hours);
                         $('#non-billable-hours').val(data.non_billable_hours);
@@ -225,10 +227,12 @@
                             data: {_token: "{{csrf_token()}}", _method: 'delete'},
                             success: function (data) {
                                 if (data.message == 'succeed') {//remove item from the list
-                                    td.parent().fadeOut(777, function(){ $(this).remove();});
+                                    td.parent().fadeOut(1000, function () {
+                                        $(this).remove();
+                                    });
                                     toastr.success('Success! Report has been deleted!');
                                 } else {
-                                    toastr.warning('Failed! Fail to delete the record!'+data.message);
+                                    toastr.warning('Failed! Fail to delete the record!' + data.message);
                                 }
                             },
                             dataType: 'json'
@@ -246,7 +250,7 @@
                         _token: token,
                         _method: 'put',
                         report_date: $('#report-date').val(),
-                        task_id: $('#task-id').find(":selected").attr('data-tid'),
+                        task_id: $('#task-id').selectpicker('val'),
                         billable_hours: $('#billable-hours').val(),
                         non_billable_hours: $('#non-billable-hours').val(),
                         description: $('#description').val()
