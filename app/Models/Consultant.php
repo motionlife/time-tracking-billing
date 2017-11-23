@@ -78,6 +78,12 @@ class Consultant extends Model
             });
     }
 
+    public function myEngagements()
+    {
+        $eids = $this->arrangements()->pluck('engagement_id');
+        return Engagement::whereIn('id', $eids)->get();
+    }
+
     public function getPositionsByEid($eid)
     {
         return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($item) {

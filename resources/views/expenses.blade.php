@@ -156,7 +156,7 @@
                     </div>
                 </div>
                 <div class="panel-body no-padding">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-responsive">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -279,7 +279,7 @@
                             } else {
                                 //prepend it at the top of the list
                                 toastr.success('Success! Expense has been created!');
-                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
+                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
                                     .prependTo('#main-table').hide().fadeIn(1500);
                             }
                         } else {
@@ -322,7 +322,7 @@
                     $('#input-car-rental').val(data.car_rental);
                     $('#input-mileage-cost').val(data.mileage_cost);
                     $('#input-other').val(data.other);
-//                    $('#input-receipts').val(data.receipts);//Current didn't want them to modify already uploaded receipts
+                    $('#input-receipts').val('');//Current didn't want them to modify already uploaded receipts
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state != "0");

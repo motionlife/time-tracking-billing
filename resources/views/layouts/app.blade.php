@@ -106,9 +106,9 @@
                             </div>
                         </li>
                         <li><a href="{{route('expense.index')}}" class="{{Request::is('expense') ?'active':'collapsed'}}"><i class="fa fa-taxi" aria-hidden="true"></i><span>Expenses</span></a></li>
+                        <li><a href="{{route('engagement.index')}}" class="{{Request::is('engagement') ?'active':'collapsed'}}"><i class="fa fa-cubes" aria-hidden="true"></i><span>Engagements</span></a></li>
                         <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i>
-                                <span>Model Test</span></a></li>
-                        <li><a href="panels.html" class=""><i class="lnr lnr-cog"></i> <span>Panels</span></a></li>
+                        <span>Model Test</span></a></li>
                         <li><a href="notifications.html" class=""><i class="lnr lnr-alarm"></i>
                                 <span>Notifications</span></a></li>
 

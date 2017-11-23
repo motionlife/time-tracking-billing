@@ -22,6 +22,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('hour', 'HoursController');
 Route::resource('expense', 'ExpenseController');
+Route::resource('engagement', 'EngagementController');
 Route::get('/test', 'TestController@index')->name('test');
 Route::get('/receipts/{name}', function ($name) {
     header("Content-type: image/jpeg");

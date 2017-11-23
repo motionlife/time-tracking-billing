@@ -125,7 +125,7 @@
                     </div>
                 </div>
                 <div class="panel-body no-padding">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-responsive">
                         <thead>
                         <tr>
                             <th>#</th>
