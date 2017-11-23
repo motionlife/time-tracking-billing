@@ -23,7 +23,7 @@ class Engagement extends Model
     //get the leader(consultant) of the engagement
     public function leader()
     {
-        return $this->belongsTo(Consultant::class);
+        return $this->belongsTo(Consultant::class,'leader_id');
     }
 
     //'0=/hourly,1=/15-day,2=/month,3=/year,4=engagement fixed,..'

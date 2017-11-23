@@ -95,7 +95,7 @@
                         <li>
                             <a href="#subPages" data-toggle="collapse"
                                class="{{str_contains(Request::path(),'hour') ? 'active':'collapsed '}}"><i
-                                        class="lnr lnr-calendar-full"></i> <span>Time</span> <i
+                                        class="lnr lnr-clock"></i> <span>Time</span> <i
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages" class="collapse {{str_contains(Request::path(),'hour') ?'in':''}}" >
                                 <ul class="nav">
@@ -105,8 +105,20 @@
                                 </ul>
                             </div>
                         </li>
-                        <li><a href="{{route('expense.index')}}" class="{{Request::is('expense') ?'active':'collapsed'}}"><i class="fa fa-taxi" aria-hidden="true"></i><span>Expenses</span></a></li>
-                        <li><a href="{{route('engagement.index')}}" class="{{Request::is('engagement') ?'active':'collapsed'}}"><i class="fa fa-cubes" aria-hidden="true"></i><span>Engagements</span></a></li>
+                        <li><a href="{{route('expense.index')}}" class="{{Request::is('expense') ?'active':'collapsed'}}"><i class="lnr lnr-bus" aria-hidden="true"></i><span>Expenses</span></a></li>
+                        <li>
+                            <a href="#subPages2" data-toggle="collapse"
+                               class="{{str_contains(Request::path(),'engagement') ? 'active':'collapsed '}}"><i
+                                        class="lnr lnr-briefcase"></i> <span>Engagements</span> <i
+                                        class="icon-submenu lnr lnr-chevron-left"></i></a>
+                            <div id="subPages2" class="collapse {{str_contains(Request::path(),'engagement') ?'in':''}}" >
+                                <ul class="nav">
+                                    <li><a href="{{route('engagement.index')}}" class="{{Request::is('engagement') ?'active':''}}">Overview</a></li>
+                                    <li><a href="{{route('engagement.create')}}" class="{{Request::is('engagement/create') ?'active':''}}">My Teams</a></li>
+                                </ul>
+                            </div>
+                        </li>
+
                         <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i>
                         <span>Model Test</span></a></li>
                         <li><a href="notifications.html" class=""><i class="lnr lnr-alarm"></i>

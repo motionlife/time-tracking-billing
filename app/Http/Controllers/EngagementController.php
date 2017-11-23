@@ -33,6 +33,8 @@ class EngagementController extends Controller
     public function create()
     {
         //
+        $consultant = Auth::user()->entity;
+        return view('engagement', ['engagements' => $consultant->lead_engagements]);
     }
 
     /**

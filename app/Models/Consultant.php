@@ -40,7 +40,7 @@ class Consultant extends Model
     //all the engagements he has ever leaded
     public function lead_engagements()
     {
-        return $this->hasMany(Engagement::class);
+        return $this->hasMany(Engagement::class,'leader_id');
     }
 
     //all the arrangements he's attended

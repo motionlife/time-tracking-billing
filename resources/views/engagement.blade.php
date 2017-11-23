@@ -37,7 +37,7 @@
                                 </div>
                                 <div class="panel-body slim-scroll">
                                     <div id="demo-line-chart" class="">
-                                        <?php $hourly = $engagement->clientBilledType() == 'Hourly'; ?>
+                                        @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
                                         <table class="table table-sm">
                                             <thead>
                                             <tr>
@@ -87,7 +87,6 @@
         .table td, .table th {
             text-align: center;
         }
-
         .panel-subtitle strong {
             color: #27b2ff;
         }
