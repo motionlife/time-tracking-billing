@@ -379,7 +379,7 @@
         function outputLink(receipts) {
             var result = '';
             $(receipts).each(function (i, name) {
-                result += '<a href="' + name + '">File ' + i + '<a/>';
+                result += '<a href="#" data-featherlight="' + name + '">File ' + i + '<a/>';
             });
             return result;
         }
