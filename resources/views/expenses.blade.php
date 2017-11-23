@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="main-content">
+    <div class="main-content" xmlns:javascript="http://www.w3.org/1999/xhtml">
         <div class="container-fluid">
             {{--Begin of Modal--}}
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
@@ -14,12 +14,13 @@
                             </button>
                         </div>
                         <form action="" id="expense-form">
+                            {{ csrf_field() }}
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
                                         <select id="client-engagement" class="selectpicker" data-width="auto"
-                                                name="engagement"
+                                                name="eid"
                                                 data-live-search="true"
                                                 title="The engagements your expense related to" required>
                                         </select>
@@ -89,7 +90,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-file-text"
                                                                            aria-hidden="true"></i>&nbsp;Receipts:</span>
-                                        <input class="form-control" id="input-receipts" name="receipts" type="file"
+                                        <input class="form-control" id="input-receipts" name="receipts[]" type="file"
                                                multiple>
                                     </div>
                                     <br>
@@ -183,7 +184,7 @@
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
-                                        <img src="{{$receipt->filename}}" alt="NTD">
+                                        <a href="{{$receipt->filename}}">Files{{$loop->index}}</a>
                                     @endforeach
                                 </td>
                                 <td>{{str_limit($expense->description,37)}}</td>
@@ -215,7 +216,7 @@
                 "timeOut": "2000"
             };
             $('.input-numbers').on('change', function () {
-               updateTotal();
+                updateTotal();
             });
             $('#filter-button').on('click', function () {
                 var eid = $('#client-engagements').selectpicker('val');
@@ -251,33 +252,23 @@
                     return;
                 }
                 if (update) tr = $('a[href*="editExpense(' + expid + ')"]').parent().parent();
+                var formdata = new FormData($(this)[0]);
+                formdata.append('_method', update ? 'put' : 'post');
                 $.ajax({
                     type: "POST",
                     url: update ? "/expense/" + expid : "/expense",
                     dataType: 'json',
-                    data: {
-                        _token: "{{csrf_token()}}",
-                        _method: update ? 'put' : 'post',
-                        eid: $('#client-engagement').selectpicker('val'),
-                        report_date: $('#input-report-date').val() || 0,
-                        company_paid: $('#input-company-paid').val() || 0,
-                        flight: $('#input-flight').val() || 0,
-                        meal: $('#input-meal').val() || 0,
-                        office_supply: $('#input-office-supply').val() || 0,
-                        car_rental: $('#input-car-rental').val() || 0,
-                        mileage_cost: $('#input-mileage-cost').val() || 0,
-                        other: $('#input-other').val() || 0,
-                        receipts: $('#input-receipts').val(),
-                        description: $('#description').val()
-                    },
+                    processData: false,
+                    contentType: false,
+                    data: formdata,
                     success: function (feedback) {
                         if (feedback.code == 7) {
                             if (update) {
                                 toastr.success('Success! Expense has been updated!');
                                 tr.find('td:nth-child(4)').html(feedback.record.company_paid);
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
-                                tr.find('td:nth-child(6) strong').html('$'+feedback.record.total);
-                                tr.find('td:nth-child(7)').html(feedback.record.receipts);
+                                tr.find('td:nth-child(6) strong').html('$' + feedback.record.total);
+                                tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
                                 tr.find('td:nth-child(8)').html(feedback.record.description);
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                                 tr.addClass('update-highlight');//flash to show user that data already been updated
@@ -287,7 +278,7 @@
                             } else {
                                 //prepend it at the top of the list
                                 toastr.success('Success! Expense has been created!');
-                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>' + feedback.data.total + '</strong></td><td>' + feedback.data.receipts + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
+                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
                                     .prependTo('#main-table').hide().fadeIn(1500);
                             }
                         } else {
@@ -329,7 +320,7 @@
                     $('#input-car-rental').val(data.car_rental);
                     $('#input-mileage-cost').val(data.mileage_cost);
                     $('#input-other').val(data.other);
-//                    $('#input-receipts').val(data.receipts);
+//                    $('#input-receipts').val(data.receipts);//Current didn't want them to modify already uploaded receipts
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state != "0");
@@ -382,6 +373,15 @@
             });
             $('#expense-total').val(total);
         }
+
+        function outputLink(receipts) {
+            var result = '';
+            $(receipts).each(function (i, name) {
+                result += '<a href="' + name + '">File ' + i + '<a/>';
+            });
+            return result;
+        }
+
     </script>
     <style>
         td a:nth-child(2) {

@@ -46,7 +46,7 @@ class Expense extends Model
     public function couldBeUpdated()
     {
         $status = $this->getStatus();
-        return ($status[0]=='Pending'||$status[0]=='Modified');
+        return ($status[0]=='Checking'||$status[0]=='Modified');
     }
 
     public function getStatus()
@@ -54,7 +54,7 @@ class Expense extends Model
         $status = [];
         switch ($this->review_state) {
             case 0:
-                $status = ['Pending', 'warning'];
+                $status = ['Checking', 'warning'];
                 break;
             case 1:
                 $status = ['Approved', 'success'];

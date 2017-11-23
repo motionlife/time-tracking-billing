@@ -54,7 +54,6 @@ class ExpenseController extends Controller
         //same reported hours
         $feedback = [];
         $eid = $request->get('eid');
-        $filename = $request->get('receipts');
         if ($request->ajax()) {
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
@@ -71,18 +70,18 @@ class ExpenseController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts']));
+                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts','review_status']));
                     if ($exp->save()) {
-                        if (!$filename || (new Receipt(['expense_id' => $exp->id, 'filename' => $filename]))->save()) {
+                        if ($this->saveReceipts($request, $exp->id)) {
                             $feedback['code'] = 7;
                             $feedback['message'] = 'success';
                             $feedback['data'] = ['company_paid' => $exp->company_paid ? 'Yes' : 'No', 'status' => $exp->getStatus(), 'total' => $exp->total(),
-                                'report_date' => $exp->report_date, 'description' => str_limit($exp->description, 22), 'receipts' => $exp->receipts,
+                                'report_date' => $exp->report_date, 'description' => str_limit($exp->description, 22), 'receipts' => $exp->receipts->pluck('filename'),
                                 'ename' => str_limit($eng->name, 22), 'cname' => str_limit($eng->client->name, 37), 'expid' => $exp->id];
                         } else {
-                            $exp->delete();//rollback newly saved receipt record due to saving file failed
+                            $exp->delete();//rollback newly saved receipt record if  saving file failed
                             $feedback['code'] = 4;
-                            $feedback['message'] = 'Receipts file saving failed';
+                            $feedback['message'] = 'Receipts file saving failed, try to upload one by one.';
                         }
 
                     } else {
@@ -93,8 +92,6 @@ class ExpenseController extends Controller
             }
             return json_encode($feedback);
         }
-
-
     }
 
     /**
@@ -126,7 +123,7 @@ class ExpenseController extends Controller
                 $expense->report_date = Carbon::parse($expense->report_date)->format('m/d/Y');
                 return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name, 'report_date' => $expense->report_date, 'description' => $expense->description,
                     'review_state' => $expense->review_state, 'hotel' => $expense->hotel, 'flight' => $expense->flight, 'meal' => $expense->meal,
-                    'office_supply' => $expense->office_supply, 'car_rental' => $expense->car_rental, 'mileage_cost' => $expense->mileage_cost, 'other' => $expense->other,'total'=>number_format($expense->total(),2,'.',''),
+                    'office_supply' => $expense->office_supply, 'car_rental' => $expense->car_rental, 'mileage_cost' => $expense->mileage_cost, 'other' => $expense->other, 'total' => number_format($expense->total(), 2, '.', ''),
                 ]);
             }
             //else illegal request!
@@ -154,13 +151,19 @@ class ExpenseController extends Controller
                 $feedback['code'] = 0;
                 $feedback['message'] = 'Record not found or no authorization';
             } else if ($expense->couldBeUpdated()) {
-                if ($expense->update($request->except(['eid','receipts']))) {
-                   //todo: Receipts should be handling in another method-------------------!!!!!!
-                    $feedback['code'] = 7;
-                    $feedback['message'] = 'Record Update Success';
-                    $feedback['record'] = ['company_paid'=>$expense->company_paid?'Yes':'No','total'=>number_format($expense->total(),2),
-                        'receipts' => $expense->receipts, 'report_date' => $expense->report_date, 'description' => $expense->description,
-                        'status' => $expense->getStatus()];
+                //should not let normal user update their own status!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                if ($expense->update($request->except(['eid', 'receipts','review_status']))) {
+                    //todo: Receipts should be handling in another method-------------------!!!!!!
+                    if ($this->saveReceipts($request, $expense->id)) {
+                        $feedback['code'] = 7;
+                        $feedback['message'] = 'Record Update Success';
+                        $feedback['record'] = ['company_paid' => $expense->company_paid ? 'Yes' : 'No', 'total' => number_format($expense->total(), 2),
+                            'report_date' => $expense->report_date, 'description' => $expense->description, 'receipts'=>$expense->receipts->pluck('filename'),
+                            'status' => $expense->getStatus()];
+                    } else {
+                        $feedback['code'] = 6;
+                        $feedback['message'] = 'Adding Files Failed, expense update rollback';
+                    }
                 } else {
                     $feedback['code'] = 4;
                     $feedback['message'] = 'unknown error during updating';
@@ -195,5 +198,22 @@ class ExpenseController extends Controller
             }
             return json_encode(['message' => 'delete_failed']);
         }
+    }
+
+    /**
+     * Save the receipt files if uploaded with expense data
+     */
+    private function saveReceipts(Request $request, $expid)
+    {
+        //user didn't upload any receipt file allow them just save the expense data
+        if (!$request->hasFile('receipts')) {
+            return true;
+        }
+        $saved = false;
+        foreach ($request->receipts as $receipt) {
+            $filename = $receipt->store('receipts');
+            $saved = (new Receipt(['expense_id' => $expid, 'filename' => $filename]))->save();
+        }
+        return $saved;
     }
 }

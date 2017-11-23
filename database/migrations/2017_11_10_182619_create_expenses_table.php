@@ -19,14 +19,14 @@ class CreateExpensesTable extends Migration
             $table->date('report_date');
             $table->boolean('company_paid')->default(false)
             ->comment('whether the expense had already paid by New Life CFO');
-            $table->decimal('hotel',15,2)->default(0);
-            $table->decimal('flight',15,2)->default(0);
-            $table->decimal('meal',15,2)->default(0);
-            $table->decimal('office_supply',15,2)->default(0);
-            $table->decimal('car_rental',15,2)->default(0);
+            $table->decimal('hotel',15,2)->default(0)->nullable();
+            $table->decimal('flight',15,2)->default(0)->nullable();
+            $table->decimal('meal',15,2)->default(0)->nullable();
+            $table->decimal('office_supply',15,2)->default(0)->nullable();
+            $table->decimal('car_rental',15,2)->default(0)->nullable();
             //mileage_cost = mileage * 0.535
-            $table->decimal('mileage_cost',15,2)->default(0);
-            $table->decimal('other',15,2)->default(0);
+            $table->decimal('mileage_cost',15,2)->default(0)->nullable();
+            $table->decimal('other',15,2)->default(0)->nullable();
             $table->text('description')->nullable();
             $table->unsignedTinyInteger('review_state')->default(0)
                 ->comment('0=>not-reviewed,1=>review_approved,2=>review_changed,3=>concurred');
