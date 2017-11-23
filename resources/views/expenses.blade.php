@@ -314,6 +314,7 @@
                     $('#client-engagement').html('<option selected>' + data.ename + '</option>').selectpicker('refresh');
                     $('#input-report-date').datepicker('setDate', data.report_date);
                     $('#input-company-paid').val(data.company_paid);
+                    $('#input-hotel').val(data.hotel);
                     $('#input-flight').val(data.flight);
                     $('#input-meal').val(data.meal);
                     $('#input-office-supply').val(data.office_supply);
