@@ -184,7 +184,7 @@
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
-                                        <a href="#" data-featherlight="{{$receipt->filename}}">Files{{$loop->index}}</a>
+                                        <a href="#" data-featherlight="{{$receipt->filename}}">Files{{$loop->index+1}}</a>
                                     @endforeach
                                 </td>
                                 <td>{{str_limit($expense->description,37)}}</td>
@@ -379,7 +379,7 @@
         function outputLink(receipts) {
             var result = '';
             $(receipts).each(function (i, name) {
-                result += '<a href="#" data-featherlight="' + name + '">File ' + i + '<a/>';
+                result += '<a href="#" data-featherlight="' + name + '">File ' + (i +1)+ '<a/>';
             });
             return result;
         }
