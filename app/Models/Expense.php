@@ -40,7 +40,7 @@ class Expense extends Model
 
     public function couldBeDeleted()
     {
-        return $this->getStatus()[0]=='Pending';
+        return $this->getStatus()[0]=='Checking';
     }
 
     public function couldBeUpdated()

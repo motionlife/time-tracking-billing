@@ -184,7 +184,7 @@
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
-                                        <a href="{{$receipt->filename}}">Files{{$loop->index}}</a>
+                                        <a href="#" data-featherlight="{{$receipt->filename}}">Files{{$loop->index}}</a>
                                     @endforeach
                                 </td>
                                 <td>{{str_limit($expense->description,37)}}</td>
@@ -206,6 +206,7 @@
     </div>
 @endsection
 @section('my-js')
+    <script src="/js/featherlight.min.js"></script>
     <script>
         var update;//boolean indicate whether user intend to update or report new
         var expid;
@@ -391,3 +392,6 @@
         }
     </style>
 @endsection()
+@section('special-css')
+    <link rel="stylesheet" href="/css/featherlight.min.css">
+@endsection
