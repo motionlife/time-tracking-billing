@@ -23,25 +23,40 @@ class Engagement extends Model
     //get the leader(consultant) of the engagement
     public function leader()
     {
-        return $this->belongsTo(Consultant::class,'leader_id');
+        return $this->belongsTo(Consultant::class, 'leader_id');
     }
 
     //'0=/hourly,1=/15-day,2=/month,3=/year,4=engagement fixed,..'
     public function clientBilledType()
     {
         switch ($this->paying_cycle) {
-
             case 0:
                 return 'Hourly';
             case 1:
-                return 'Semi-monthly';
-            case 2:
                 return 'Monthly';
+            case 2:
+                return 'Semi-monthly';
             case 3:
                 return 'Engagement Fixed';
         }
         return 'Unknown';
     }
+
+    public static function billedType($cycle)
+    {
+        switch ($cycle) {
+            case 0:
+                return 'Hourly';
+            case 1:
+                return 'Monthly';
+            case 2:
+                return 'Semi-monthly';
+            case 3:
+                return 'Engagement Fixed';
+        }
+        return 'Unknown';
+    }
+
     public function state()
     {
         switch ($this->status) {

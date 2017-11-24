@@ -4,7 +4,7 @@
         <div class="container-fluid">
             {{--Begin of Modal--}}
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
-                 aria-hidden="true">
+                 aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">

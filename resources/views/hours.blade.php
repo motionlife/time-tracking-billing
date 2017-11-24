@@ -3,7 +3,7 @@
     <div class="main-content">
         <div class="container-fluid">
             {{--Begin of Modal--}}
-            <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
+            <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel" data-backdrop="static" data-keyboard="false"
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -24,7 +24,7 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-handshake-o"></i>&nbsp;Job Position:</span>
+                                        <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Job Position:</span>
                                         <select class="selectpicker" id="position" name="pid"
                                                 data-width="auto"></select>
                                         <span class="input-group-addon"><i
@@ -200,7 +200,7 @@
                             .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
-                        $('#task-id').selectpicker('val',data.task_id).selectpicker('refresh');
+                        $('#task-id').selectpicker('val',data.task_id);//.selectpicker('refresh');
                         $('#report-date').datepicker('setDate', data.report_date);
                         $('#billable-hours').val(data.billable_hours);
                         $('#non-billable-hours').val(data.non_billable_hours);

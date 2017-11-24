@@ -32,8 +32,8 @@ class Client extends Model
     {
         return $this->belongsTo(Consultant::class, 'buz_dev_person_id')
             ->withDefault([
-                'first_name' => 'New Life CFO',
-                'last_name' => 'New Life CFO'
+                'first_name' => 'New Life',
+                'last_name' => 'CFO'
             ]);
     }
 
@@ -47,6 +47,15 @@ class Client extends Model
             ]);
     }
 
+    public function whoDevelopedMe()
+    {
+        if ($this->outreferrer->first_name == 'N/A') {
+            return $this->dev_by_consultant->fullname();
+        } else {
+            return $this->outreferrer->fullname() . ' (O.R.)';
+        }
+    }
+
     //get all the available revenues
     public function revenues()
     {
@@ -56,7 +65,7 @@ class Client extends Model
     //client belong to which industry
     public function industry()
     {
-        return $this->belongsTo(Industry::class,'industry_id');
+        return $this->belongsTo(Industry::class, 'industry_id');
     }
 
     //get all the engagements of this client
@@ -70,7 +79,7 @@ class Client extends Model
         //only those engagements that bill client hourly
         $total = 0;
         foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientLaborBills($start,$end);
+            $total += $engagement->clientLaborBills($start, $end);
         }
         return $total;
     }
@@ -79,7 +88,7 @@ class Client extends Model
     {
         $total = 0;
         foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientExpenseBills($start,$end);
+            $total += $engagement->clientExpenseBills($start, $end);
         }
         return $total;
     }

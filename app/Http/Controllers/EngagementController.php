@@ -4,6 +4,7 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Client;
 
 class EngagementController extends Controller
 {
@@ -22,7 +23,7 @@ class EngagementController extends Controller
     {
         //
         $consultant = Auth::user()->entity;
-        return view('engagement', ['engagements' => $consultant->myEngagements()]);
+        return view('engagement', ['engagements' => $consultant->myEngagements($request->get('start'),$request->get('cid'))]);
     }
 
     /**
@@ -30,11 +31,16 @@ class EngagementController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //
+        if ($request->ajax()){
+            if ($request->get('fetch')=='business')
+                return Client::find($request->get('cid'))->whoDevelopedMe();
+        }
         $consultant = Auth::user()->entity;
-        return view('engagement', ['engagements' => $consultant->lead_engagements,'leader'=>true]);
+        return view('engagement', ['engagements' => $consultant->my_lead_engagements($request->get('start'),$request->get('cid')),
+            'leader'=>$consultant]);
     }
 
     /**

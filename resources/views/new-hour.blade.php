@@ -27,8 +27,7 @@
                             </div>
                             <br>
                             <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-handshake-o"></i>&nbsp;Job Position:</span>
+                                <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Job Position:</span>
                                 <select class="selectpicker" id="position" name="pid" data-width="auto"
                                         required></select>
                                 <span class="input-group-addon"><i class="fa fa-calendar"></i>&nbsp; Report Date</span>
@@ -137,11 +136,11 @@
                     url: "/hour/create",
                     data: {eid: $('#client-engagements').selectpicker('val'), fetch: 'position'},
                     success: function (data) {
-                        var p = $('#position').empty();
-                        $(data).each(function (i, e) {
-                            p.append("<option value=" + e.id + ">" + e.name + "</option>");
+                        var pos = $('#position').empty();
+                        $(data).each(function (i, p) {
+                            pos.append("<option value=" + p.id + ">" + p.name + "</option>");
                         });
-                        p.selectpicker('refresh');
+                        pos.selectpicker('refresh');
                     }
                 });
             });
