@@ -178,7 +178,7 @@
                                 .prependTo('#today-board').hide().fadeIn(1500);
                         } else {
                             toastr.error('Error! Saving record failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message)
+                                ', message: ' + feedback.message);
                         }
                     },
                     error: function (feedback) {

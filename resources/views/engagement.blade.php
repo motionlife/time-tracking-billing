@@ -172,7 +172,18 @@
                     <div class="col-md-6">
                         <div class="panel">
                             <div class="panel-heading">
-                                <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong></h3>
+                                <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong>
+                                    @if($manage)
+                                        <div class="pull-right">
+                                            <a href="javascript:void(0)" class="eng-edit" data-id="{{$engagement->id}}"><i
+                                                        class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                            <span>&nbsp;|&nbsp;</span>
+                                            <a href="javascript:void(0)" class="eng-delete"
+                                               data-id="{{$engagement->id}}"><i
+                                                        class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                        </div>
+                                    @endif
+                                </h3>
                                 <p class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong></p>
                                 <table class="table table-striped table-bordered table-responsive">
                                     <thead>
@@ -236,6 +247,7 @@
     <script>
         $(function () {
             var update;
+            var eid;
             $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
             toastr.options = {
                 "positionClass": "toast-top-right",
@@ -285,37 +297,94 @@
                 $('#engagementModal').modal('toggle');
             });
 
+            $('.eng-delete').on('click', function () {
+                var id = $(this).attr('data-id');
+                var anchor = $(this);
+                swal({
+                        title: "Are you sure?",
+                        text: "You will not be able to recover this engagement after delete it!",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, delete it!"
+                    },
+                    function () {
+                        $.post({
+                            url: "/engagement/" + id,
+                            data: {_token: "{{csrf_token()}}", _method: 'delete'},
+                            success: function (data) {
+                                if (data.message == 'succeed') {//remove item from the list
+                                    anchor.parent().parent().parent().parent().fadeOut(700, function () {
+                                        $(this).remove();
+                                    });
+                                    toastr.success('Success! Report has been deleted!');
+                                } else {
+                                    toastr.warning('Failed! Fail to delete the record!' + data.message);
+                                }
+                            },
+                            dataType: 'json'
+                        });
+                    });
+            });
+            $('.eng-edit').on('click', function () {
+                initModal();
+                $('#submit-modal').html('Update');
+                $.get({
+                    url: '/engagement/' + $(this).attr('data-id') + '/edit',
+                    success: function (data) {
+                        //update modal
+                        $('#engagement-name').val(data.name);
+                        $('#client-select').selectpicker('val', data.client_id);
+                        $('#leader_id').selectpicker('val', data.leader_id);
+                        $('#start-date').val(data.start_date);
+                        $('#buz_dev_share').val(data.buz_dev_share * 100);
+                        $('#cycle-select').val(data.paying_cycle);
+                        $('#billing_amount').val(data.cycle_billing);
+                        var table = $('#members-table');
+                        var tr = table.find('tr').first()
+                        //.clone().appendTo(table);
+                        $.each(data.arrangements, function (i, o) {
+                            tr.find('.cid').selectpicker('val', o.consultant_id);
+                            tr.find('.pid').selectpicker('val', o.position_id);
+                            tr.find('.b-rate').val(o.billing_rate);
+                            tr.find('.f-share').val(o.firm_share * 100);
+                            if (data.arrangements[i + 1]) {
+                                tr = tr.clone().appendTo(table);
+                                tr.find('a').addClass("deletable-row");
+                                tr.find('.bootstrap-select').replaceWith(function () {
+                                    return $('select', this);
+                                });
+                                tr.find('select').first().attr('disabled', false).selectpicker('val', '');
+                                tr.find('select').last().selectpicker('val', '');
+                            }
+                        });
+                    },
+                    dataType: 'json'
+                });
+                $('#engagementModal').modal('toggle');
+                eid = $(this).attr('data-id');
+                update = true;
+            });
+
             $('#engagement-form').on('submit', function (e) {
                 e.preventDefault();
                 formdata = $(this).serializeArray();
                 formdata.push({name: '_token', value: "{{csrf_token()}}"}, {
                     name: 'leader_id', value: $('#leader_id').selectpicker('val')
                 });
+                if (update) formdata.push({name: '_method', value: 'PUT'});
                 pushArrangements(formdata);
                 $.post({
-                    url: '/engagement',
+                    url: '/engagement/' + update ? eid : '',
                     data: formdata,
                     dataType: 'json',
                     success: function (feedback) {
                         if (feedback.code == 7) {
-                            if (update) {
-                                toastr.success('Success! Engagement has been updated!');
-                                tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
-                                tr.find('td:nth-child(8)').html(feedback.record.description);
-                                tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
-                                tr.addClass('update-highlight');//flash to show user that data already been updated
-                                setTimeout(function () {
-                                    tr.removeClass('update-highlight');
-                                }, 2100);
-                            } else {
-                                //prepend it at the top of the list
-                                toastr.success('Success! Expense has been created!');
-//                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
-//                                    .prependTo('#main-table').hide().fadeIn(1500);
-                            }
+                            toastr.success('Success! Engagement has been ' + update ? 'updated!' : 'created!');
+                            setTimeout(location.reload.bind(location), 2000);
                         } else {
                             toastr.error('Error! Saving failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message)
+                                ', message: ' + feedback.message);
                         }
                     },
                     error: function (feedback) {
@@ -391,17 +460,20 @@
             margin: -0.8em 0 -0.9em 0;
         }
 
-        td > i{
+        td > i {
             font-size: 0.7em;
             margin-right: 0.5em;
         }
-        td > i.Pending{
+
+        td > i.Pending {
             color: red;
         }
-        td > i.Active{
+
+        td > i.Active {
             color: #19ff38;
         }
-        td > i.Closed{
+
+        td > i.Closed {
             color: Grey;
         }
     </style>

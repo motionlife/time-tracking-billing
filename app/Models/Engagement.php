@@ -3,6 +3,7 @@
 namespace newlifecfo\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use newlifecfo\User;
 
 class Engagement extends Model
 {
@@ -20,6 +21,15 @@ class Engagement extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function couldBeDeleted(User $user)
+    {
+        return $this->state() != 'Active' || $user->priority > 10;
+    }
+
+    public function couldBeUpdated(User $user)
+    {
+        return $this->state() != 'Close' || $user->priority > 10;
+    }
     //get the leader(consultant) of the engagement
     public function leader()
     {

@@ -276,7 +276,7 @@
                             }, 2100);
                         } else {
                             toastr.error('Error! Updating failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message)
+                                ', message: ' + feedback.message);
                         }
                     },
                     error: function (feedback) {
