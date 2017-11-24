@@ -63,7 +63,7 @@ class ExpenseController extends Controller
                 $feedback['message'] = 'Engagement not found.';
             } else if ($eng->isClosed()) {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'The Engagement has been closed or not valid any more.';
+                $feedback['message'] = 'Non-active Engagement!!!, it\'s been closed or still pending? Please contact supervisor.';
             } else {
                 $arr = $consultant->getArrangementByEidPid($eid);
                 if (!$arr) {

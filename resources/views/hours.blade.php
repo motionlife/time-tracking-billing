@@ -174,7 +174,7 @@
             var hid;
             toastr.options = {
                 "positionClass": "toast-top-right",
-                "timeOut": "2000"
+                "timeOut": "3000"
             };
             $('#filter-button').on('click', function () {
                 var eid = $('#client-engagements').selectpicker('val');

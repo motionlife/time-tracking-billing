@@ -45,8 +45,13 @@ class Consultant extends Model
 
     public function my_lead_engagements($start = null, $cid = null)
     {
-        $filered = $this->lead_engagements()->where('start_date', '>=', $start ?: '1970-01-01');
+        $filered = $this->lead_engagements()->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC');
         return isset($cid) ? $filered->where('client_id', $cid)->get() : $filered->get();
+    }
+
+    public function isSupervisor()
+    {
+        return $this->user->priority > 10;
     }
 
     //all the arrangements he's attended
@@ -87,8 +92,8 @@ class Consultant extends Model
     public function myEngagements($start = null, $cid = null)
     {
         $eids = $this->arrangements()->pluck('engagement_id');
-        return isset($cid) ? Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->where('client_id', $cid)->get() :
-            Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->get();
+        return isset($cid) ? Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->where('client_id', $cid)->orderBy('created_at', 'DESC')->get() :
+            Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC')->get();
     }
 
     public function getPositionsByEid($eid)

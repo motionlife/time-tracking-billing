@@ -214,7 +214,7 @@
         $(function () {
             toastr.options = {
                 "positionClass": "toast-top-right",
-                "timeOut": "2000"
+                "timeOut": "3000"
             };
             $('.input-numbers').on('change', function () {
                 updateTotal();
