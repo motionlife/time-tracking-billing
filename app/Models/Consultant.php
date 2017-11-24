@@ -40,7 +40,13 @@ class Consultant extends Model
     //all the engagements he has ever leaded
     public function lead_engagements()
     {
-        return $this->hasMany(Engagement::class,'leader_id');
+        return $this->hasMany(Engagement::class, 'leader_id');
+    }
+
+    public function my_lead_engagements($start = null, $cid = null)
+    {
+        $filered = $this->lead_engagements()->where('start_date', '>=', $start ?: '1970-01-01');
+        return isset($cid) ? $filered->where('client_id', $cid)->get() : $filered->get();
     }
 
     //all the arrangements he's attended
@@ -78,10 +84,11 @@ class Consultant extends Model
             });
     }
 
-    public function myEngagements()
+    public function myEngagements($start = null, $cid = null)
     {
         $eids = $this->arrangements()->pluck('engagement_id');
-        return Engagement::whereIn('id', $eids)->get();
+        return isset($cid) ? Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->where('client_id', $cid)->get() :
+            Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->get();
     }
 
     public function getPositionsByEid($eid)
