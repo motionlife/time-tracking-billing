@@ -190,6 +190,7 @@ class EngagementController extends Controller
                 if ($eng->couldBeDeleted(Auth::user())) {
                     if ($eng->delete()) return json_encode(['message' => 'succeed']);
                 }
+                return json_encode(['message' => 'Can\'t delete this Active engagement']);
             }
             return json_encode(['message' => ' No authorization']);
         }
@@ -221,15 +222,19 @@ class EngagementController extends Controller
         foreach ($eng->arrangements as $arr) {
             $i = array_search($arr->consultant_id, $cids);
             if ($i == false) {
-                //delete the consultant
-                if($arr->delete()) return false;
-            } else {
-                //update
-                if (!Arrangement::updateOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $cids[$i], 'position_id' => $pids[$i]],
-                    ['billing_rate' => $bs[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))
-                    return false;
+                //delete the removed consultant
+                $arr->delete();
+                //todo:: soft delete arrangement. update the status of this arrangement
             }
-
+        }
+        //add new one if exist and update the old guys
+        foreach ($cids as $i => $cid) {
+            if (!Arrangement::updateOrCreate(
+                ['engagement_id' => $eng->id, 'consultant_id' => $cid],
+                ['billing_rate' => $bs[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0, 'position_id' => $pids[$i]]
+            )) {
+                return false;
+            }
         }
         return true;
     }

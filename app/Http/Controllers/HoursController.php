@@ -73,7 +73,7 @@ class HoursController extends Controller
                 $feedback['message'] = 'Engagement not found.';
             } else if ($eng->isClosed()) {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Non-active Engagement!!!, it\'s been closed or still pending? Please contact supervisor.';
+                $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {
                 $arr = $consultant->getArrangementByEidPid($eid, $pid);
                 if (!$arr) {

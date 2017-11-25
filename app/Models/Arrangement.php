@@ -14,7 +14,7 @@ class Arrangement extends Model
     //get it's parent engagement
     public function engagement()
     {
-        return $this->belongsTo(Engagement::class);
+        return $this->belongsTo(Engagement::class);//should we add with default?
     }
 
     //get the arranged consultant

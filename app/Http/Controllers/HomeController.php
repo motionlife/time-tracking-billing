@@ -32,6 +32,8 @@ class HomeController extends Controller
                 'total_last_nb' => 0, 'last_buz_dev' => 0, 'last2_buz_dev' => 0,];
             $consultant = Auth::user()->entity;
             foreach ($consultant->arrangements as $arr) {
+                //todo: to deal with the case where it's engagement hab been deleted, Alter Arrangement table add status column
+                if(!$arr->engagement) continue;
                 foreach ($arr->dailyHoursAndIncome($data['dates']['startOfLast'], $data['dates']['endOfLast'], $arr->engagement->id) as $day => $amounts) {
                     $data['total_last_nb'] += $amounts[1];
                     if (isset($data['eids'][$amounts[3]])) $data['eids'][$amounts[3]]++; else $data['eids'][$amounts[3]] = 1;

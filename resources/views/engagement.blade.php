@@ -72,7 +72,7 @@
                                         <span class="input-group-addon"><i
                                                     class="fa fa-money"></i>&nbsp;Billing Amount:<strong>$</strong></span>
                                         <input class="form-control" id="billing_amount" name="cycle_billing"
-                                               type="number" step="0.01" min="0" placeholder="N/A" disabled>
+                                               type="number" step="0.01" min="0" placeholder="N/A">
 
                                     </div>
                                     <br>
@@ -274,12 +274,12 @@
                     }
                 })
             });
-            $('#cycle-select').on('change', function () {
-                if ($(this).selectpicker('val') != 0) {
+            $('#cycle-select').on('changed.bs.select', function (e) {
+                if (this.value!= 0) {
                     $('#billing_amount').attr('disabled', false).attr('placeholder', 'per cycle');
                     $('#bill-pay-head').html('Pay Rate');
                 } else {
-                    $('#billing_amount').attr('placeholder', 'N/A').attr('disabled', true).val('');
+                    $('#billing_amount').attr({'placeholder': 'N/A', 'disabled': true}).val('');
                     $('#bill-pay-head').html('Billing Rate');
                 }
             });
@@ -290,9 +290,9 @@
                 height: '210px'
             });
             $('#build-engagement').on('click', function () {
-                //modal initialization
-                initModal();
                 update = false;
+                //modal initialization
+                initModal(false);
                 $('#submit-modal').text('Build');
                 $('#engagementModal').modal('toggle');
             });
@@ -327,7 +327,7 @@
                     });
             });
             $('.eng-edit').on('click', function () {
-                initModal();
+                initModal(true);
                 $('#submit-modal').html('Update');
                 $.get({
                     url: '/engagement/' + $(this).attr('data-id') + '/edit',
@@ -338,10 +338,18 @@
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
-                        $('#cycle-select').val(data.paying_cycle);
+                        $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
+                        if (data.paying_cycle != 0) {
+                            $('#bill-pay-head').html('Pay Rate');
+                            $('#billing_amount').attr('disabled',false);
+                        }
+                        else {
+                            $('#bill-pay-head').html('Billing Rate');
+                            $('#billing_amount').attr({'placeholder': 'N/A', 'disabled': true}).val('');
+                        }
                         var table = $('#members-table');
-                        var tr = table.find('tr').first()
+                        var tr = table.find('tr').first();
                         //.clone().appendTo(table);
                         $.each(data.arrangements, function (i, o) {
                             tr.find('.cid').selectpicker('val', o.consultant_id);
@@ -375,7 +383,7 @@
                 if (update) formdata.push({name: '_method', value: 'PUT'});
                 pushArrangements(formdata);
                 $.post({
-                    url: '/engagement/' + update ? eid : '',
+                    url: update ? "/engagement/" + eid : "/engagement",
                     data: formdata,
                     dataType: 'json',
                     success: function (feedback) {
@@ -416,17 +424,39 @@
             });
             $(document).on('click', '.deletable-row', function () {
                 var tr = $(this).parent().parent();
-                tr.fadeOut(300, function () {
-                    $(this).remove();
-                });
+                if (update) {
+                    swal({
+                            title: "Are you sure?",
+                            text: "Once the consultant has been removed he/she can no longer report hours to it any more!",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, remove!"
+                        },
+                        function () {
+                            tr.fadeOut(300, function () {
+                                $(this).remove();
+                            });
+                            toastr.success('Consultant been removed!');
+                        });
+                } else {
+                    tr.fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                }
             });
         });
 
-        function initModal() {
+        function initModal(update) {
             //$('#billing_amount').val('').attr('disabled', true);
             var tb = $("#members-table");
             tb.find("tr:not(:first-child)").remove();
             tb.find("tr.selectpicker").selectpicker('refresh');
+            if (!update) {
+                $('#cycle-select').selectpicker('val', 0);
+                $('#bill-pay-head').html('Billing Rate');
+                $('#billing_amount').val('').attr('disabled', true);
+            }
         }
 
         function pushArrangements(form) {
