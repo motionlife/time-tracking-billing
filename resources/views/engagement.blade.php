@@ -302,7 +302,7 @@
                 var anchor = $(this);
                 swal({
                         title: "Are you sure?",
-                        text: "You will not be able to recover this engagement after delete it!",
+                        text: "Consultants under this engagement will not be able to report hours to it after delete it!",
                         type: "warning",
                         showCancelButton: true,
                         confirmButtonColor: "#DD6B55",

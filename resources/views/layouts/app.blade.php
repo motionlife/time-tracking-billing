@@ -61,7 +61,7 @@
                                 <span>{{ Auth::user()->fullName() }}</span> <i
                                         class="icon-submenu lnr lnr-chevron-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#"><i class="lnr lnr-user"></i> <span>My Profile</span></a></li>
+                                <li><a href="/profile"><i class="lnr lnr-user"></i> <span>My Profile</span></a></li>
                                 <li><a href="#"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
                                 <li><a href="#"><i class="lnr lnr-cog"></i> <span>Settings</span></a></li>
                                 {{--<li><a href="#"><i class="lnr lnr-exit"></i> <span>Logout</span></a></li>--}}
@@ -119,16 +119,11 @@
                             </div>
                         </li>
 
-                        <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i>
-                        <span>Model Test</span></a></li>
-                        <li><a href="notifications.html" class=""><i class="lnr lnr-alarm"></i>
-                                <span>Notifications</span></a></li>
+                        <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i> <span>Model Test</span></a></li>
+                        <li><a href="/profile" class="{{Request::is('profile') ?'active':''}}"><i class="lnr lnr-user"></i><span>My Profile</span></a></li>
+                        <li><a href="/notifications" class=""><i class="lnr lnr-alarm"></i><span>Notifications</span></a></li>
 
-                        <li><a href="tables.html" class=""><i class="lnr lnr-dice"></i> <span>Tables</span></a></li>
-                        <li><a href="typography.html" class=""><i class="lnr lnr-text-format"></i>
-                                <span>Typography</span></a></li>
-                        <li><a href="icons.html" class=""><i class="lnr lnr-linearicons"></i> <span>Icons</span></a>
-                        </li>
+                        <li><a href="/admin" class=""><i class="lnr lnr-users"></i> <span>Administration</span></a></li>
                     </ul>
                 </nav>
             </div>

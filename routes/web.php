@@ -28,4 +28,5 @@ Route::get('/receipts/{name}', function ($name) {
     header("Content-type: image/jpeg");
     echo Storage::get('receipts/' . $name);
 });
+Route::match(['get', 'post'],'/profile','ProfileController@index');
 

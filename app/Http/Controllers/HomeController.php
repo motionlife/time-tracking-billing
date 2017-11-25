@@ -85,7 +85,7 @@ class HomeController extends Controller
 //            return json_encode($data);
             return view('home', ['data' => $data]);
         } else {
-            return abort(403, 'Unauthorized action.');
+            return view('auth.pending');
         }
     }
 
