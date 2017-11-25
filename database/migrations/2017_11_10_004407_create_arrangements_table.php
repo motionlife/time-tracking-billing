@@ -21,6 +21,7 @@ class CreateArrangementsTable extends Migration
             $table->decimal('billing_rate', 15, 2)
                 ->comment('used as pay_rate when client\'s pay_cycle is not hourly');
             $table->double('firm_share')->comment('the percentage of share that company should get');
+            $table->tinyInteger('status')->default(0)->comment('0:normal arrangement;1. detached from engagement');
             $table->timestamps();
         });
     }

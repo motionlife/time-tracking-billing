@@ -47,6 +47,7 @@ class EngagementSeeder extends Seeder
                         'consultant_id' => $this->get_consultant_id($line[7]),
                         'billing_rate' => $this->number($line[9]),
                         'firm_share' => $this->number($line[10]) / 100,
+                        'status'=>0,
                     ]);
                 }
             }

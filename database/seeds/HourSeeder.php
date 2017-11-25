@@ -19,8 +19,8 @@ class HourSeeder extends Seeder
      */
     public function run()
     {
-        dump($this->verify('Alex Liu'));
-        return;
+//        dump($this->verify('Alex Liu'));
+//        return;
         if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
