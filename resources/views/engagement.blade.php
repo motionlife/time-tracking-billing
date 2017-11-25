@@ -147,9 +147,9 @@
                     <select class="selectpicker show-tick" data-width="fit" id="client-filter"
                             data-live-search="true">
                         <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
-                        @foreach(\newlifecfo\Models\Client::all()->pluck('name','id') as $id=>$client)
-                            <option value="{{$id}}"
-                                    data-content="<strong>{{$client}}</strong>" {{Request('cid')==$id?'selected':''}}></option>
+                        @foreach($cids as $cid)
+                            <option value="{{$cid}}"
+                                    data-content="<strong>{{\newlifecfo\Models\Client::find($cid)->name}}</strong>" {{Request('cid')==$cid?'selected':''}}></option>
                         @endforeach
                     </select>
                 </div>

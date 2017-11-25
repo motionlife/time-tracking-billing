@@ -25,7 +25,9 @@ class EngagementController extends Controller
     {
         //
         $consultant = Auth::user()->entity;
-        return view('engagement', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid'))]);
+        return view('engagement', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
+            'cids' => $consultant->myEngagements()->pluck('client_id')
+        ]);
     }
 
     /**
@@ -42,7 +44,7 @@ class EngagementController extends Controller
         }
         $consultant = Auth::user()->entity;
         return view('engagement', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
-            'leader' => $consultant]);
+            'leader' => $consultant, 'cids' => $consultant->lead_engagements->pluck('client_id')]);
     }
 
     /**
