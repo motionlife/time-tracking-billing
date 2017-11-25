@@ -29,4 +29,5 @@ Route::get('/receipts/{name}', function ($name) {
     echo Storage::get('receipts/' . $name);
 });
 Route::match(['get', 'post'],'/profile','ProfileController@index');
+Route::match(['get', 'post'],'/admin','AdminController@index');
 

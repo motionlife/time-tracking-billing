@@ -42,7 +42,9 @@
                             <button type="submit" class="btn btn-primary btn-lg btn-block">LOGIN</button>
                             <div class="bottom">
                                 <span class="helper-text"><i class="fa fa-lock"></i> <a
-                                            href="{{route('password.request') }}">Forgot password?</a></span>
+                                            href="{{route('password.request') }}">Forgot password?</a></span>|
+                                <span class="helper-text"><i class="fa fa-user-o" aria-hidden="true"></i></i> <a
+                                            href="/register">Need an account?</a></span>
                             </div>
                         </form>
                     </div>
@@ -50,7 +52,7 @@
                 <div class="right">
                     <div class="overlay"></div>
                     <div class="content text">
-                        <h1 class="heading">New Life CFO Time Reporting System</h1>
+                        <h1 class="heading"><a href="/" style="color: white; text-decoration: underline;">New Life CFO</a> Time Reporting System</h1>
                         <h6>© 2017 New Life CFO. All Rights Reserved.</h6>
                     </div>
                 </div>

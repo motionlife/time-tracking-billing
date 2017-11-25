@@ -33,9 +33,9 @@ class User extends Authenticatable
 
     const ROLES = ['Unassigned', 'Client', 'Outside Referrer', 'Consultant', 'General Admin', 'Super Admin', 'root'];
 
-    public function hasIncome()
+    public function isVerified()
     {
-        return $this->role > 1;
+        return $this->role >= 1;
     }
 
     public function fullName()
