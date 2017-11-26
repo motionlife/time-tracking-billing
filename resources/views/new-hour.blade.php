@@ -67,6 +67,12 @@
 
                             </div>
                             <br>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i
+                                            class="fa fa-money"></i>&nbsp;Estimated Income:</span>
+                                <input type="text" id="income-estimate" disabled value="" class="form-control">
+                            </div>
+                            <br>
                             <textarea id="description" class="form-control" name="description" placeholder="description"
                                       rows="5"></textarea>
                             <br>
@@ -137,13 +143,23 @@
                     data: {eid: $('#client-engagements').selectpicker('val'), fetch: 'position'},
                     success: function (data) {
                         var pos = $('#position').empty();
-                        $(data).each(function (i, p) {
-                            pos.append("<option value=" + p.id + ">" + p.name + "</option>");
+                        $(data).each(function (i, arr) {
+                            pos.append("<option value=" + arr.position.id + " data-br=" + arr.br + " data-fs=" + arr.fs + ">" + arr.position.name + "</option>");
                         });
                         pos.selectpicker('refresh');
+                        //also store the billing rate and firm share
                     }
                 });
             });
+
+            $('#billable-hours').on('change', function () {
+                var opt = $('#position').find(':selected');
+                var br = opt.attr('data-br');
+                var fs = opt.attr('data-fs');
+                var bh = $(this).val();
+                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
+            });
+
 
             $('#hour-form').on('submit', function (e) {
                 var eid = $('#client-engagements').selectpicker('val');

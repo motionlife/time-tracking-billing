@@ -43,7 +43,9 @@ class HoursController extends Controller
         $hours = $consultant->justCreatedHourReports(Carbon::today()->startOfDay(), Carbon::today()->endOfDay());
 
         if ($request->ajax()) {
-            if ($request->get('fetch') == 'position') return $consultant->getPositionsByEid($request->get('eid'));
+            if ($request->get('fetch') == 'position') {
+                return $consultant->getArrInfoByEid($request->get('eid'));
+            }
         }
 
         return view('new-hour', [

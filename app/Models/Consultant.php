@@ -103,10 +103,10 @@ class Consultant extends Model
             Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC')->get();
     }
 
-    public function getPositionsByEid($eid)
+    public function getArrInfoByEid($eid)
     {
-        return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($item) {
-            return $item->position;
+        return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($arr) {
+            return ['position'=>$arr->position,'br'=>$arr->billing_rate,'fs'=>$arr->firm_share];
         });
     }
 
