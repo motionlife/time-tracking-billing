@@ -26,7 +26,7 @@ class HoursController extends Controller
     {
         $consultant = Auth::user()->consultant;
         $hours = $this->paginate($consultant->recentHourOrExpenseReports($request->get('start'),
-            $request->get('end'), $request->get('eid'),true), 25);
+            $request->get('end'), $request->get('eid'), true), 25);
         return view('hours', ['hours' => $hours,
             'clientIds' => $consultant->EngagementByClient()]);
     }
@@ -72,7 +72,7 @@ class HoursController extends Controller
             if (!$eng) {
                 $feedback['code'] = 0;
                 $feedback['message'] = 'Engagement not found.';
-            } else if ($eng->state()=='closed') {
+            } else if ($eng->state() == 'closed') {
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {
@@ -87,7 +87,7 @@ class HoursController extends Controller
                         $feedback['message'] = 'success';
                         $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
                             'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
-                            'ename' => $eng->name, 'cname' => $eng->client->name,'hid'=>$hour->id];
+                            'ename' => $eng->name, 'cname' => $eng->client->name, 'hid' => $hour->id];
                     } else {
                         $feedback['code'] = 3;
                         $feedback['message'] = 'unknown error happened while saving';
@@ -152,18 +152,14 @@ class HoursController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
             $hour = Hour::find($id);
-            if (!$hour || $hour->arrangement->consultant_id != $consultant->id) {
-
-                $feedback['code'] = 0;
-                $feedback['message'] = 'Record not found or no authorization';
-            } else if ($hour->couldBeUpdated()) {
+            if ($user->can('update', $hour)) {
                 if ($hour->update($request->all())) {
                     $feedback['code'] = 7;
                     $feedback['message'] = 'Record Update Success';
@@ -183,7 +179,7 @@ class HoursController extends Controller
 
             } else {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Record Cannot be updated now';
+                $feedback['message'] = 'Cannot be updated now, no authorization';
             }
             return json_encode($feedback);
         }
@@ -198,18 +194,14 @@ class HoursController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->consultant;
-
+        $user = Auth::user();
         if ($request->ajax()) {
-
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
-            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
-                if ($hour->couldBeDeleted()) {
-                    if ($hour->delete()) return json_encode(['message' => 'succeed']);
-                }
+            if ($user->can('delete', $hour)) {
+                if ($hour->delete()) return json_encode(['message' => 'succeed']);
             }
-            return json_encode(['message' => 'delete_failed']);
+            return json_encode(['message' => 'delete_failed, no authorization']);
         }
     }
 }

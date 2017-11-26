@@ -62,7 +62,7 @@ class ExpenseController extends Controller
             if (!$eng) {
                 $feedback['code'] = 0;
                 $feedback['message'] = 'Engagement not found.';
-            } else if ($eng->state()=='closed') {
+            } else if ($eng->state() == 'closed') {
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {
@@ -71,7 +71,7 @@ class ExpenseController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts','review_status']));
+                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts', 'review_status']));
                     if ($exp->save()) {
                         if ($this->saveReceipts($request, $exp->id)) {
                             $feedback['code'] = 7;
@@ -141,25 +141,22 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
             $expense = Expense::find($id);
-            if (!$expense || $expense->arrangement->consultant_id != $consultant->id) {
-                $feedback['code'] = 0;
-                $feedback['message'] = 'Record not found or no authorization';
-            } else if ($expense->couldBeUpdated()) {
+            if ($user->can('update', $expense)) {
                 //should not let normal user update their own status!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if ($expense->update($request->except(['eid', 'receipts','review_status']))) {
+                if ($expense->update($request->except(['eid', 'receipts', 'review_status']))) {
                     //todo: Receipts should be handling in another method-------------------!!!!!!
                     if ($this->saveReceipts($request, $expense->id)) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'Record Update Success';
                         $feedback['record'] = ['company_paid' => $expense->company_paid ? 'Yes' : 'No', 'total' => number_format($expense->total(), 2),
-                            'report_date' => $expense->report_date, 'description' => $expense->description, 'receipts'=>$expense->receipts->pluck('filename'),
+                            'report_date' => $expense->report_date, 'description' => $expense->description, 'receipts' => $expense->receipts->pluck('filename'),
                             'status' => $expense->getStatus()];
                     } else {
                         $feedback['code'] = 6;
@@ -172,7 +169,7 @@ class ExpenseController extends Controller
 
             } else {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Record Cannot be updated now';
+                $feedback['message'] = 'Cannot be updated now, no authorization';
             }
             return json_encode($feedback);
         }
@@ -187,15 +184,12 @@ class ExpenseController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
-
             $expense = Expense::find($id);
             //must check if this $expense record belong to the consultant!!!
-            if ($expense && $expense->arrangement->consultant_id == $consultant->id) {
-                if ($expense->couldBeDeleted()) {
-                    if ($expense->delete()) return json_encode(['message' => 'succeed']);
-                }
+            if ($user->can('delete', $expense)) {
+                if ($expense->delete()) return json_encode(['message' => 'succeed']);
             }
             return json_encode(['message' => 'delete_failed']);
         }

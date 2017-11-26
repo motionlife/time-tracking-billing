@@ -10,7 +10,6 @@ class ArrangementPolicy
 {
     use HandlesAuthorization;
 
-
     public function before($user, $ability)
     {
         if ($user->isSuperAdmin()) {

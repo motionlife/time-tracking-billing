@@ -54,16 +54,16 @@ class Hour extends Model
         }
     }
 
-    public function couldBeDeleted()
-    {
-        return $this->getStatus()[0]=='Pending';
-    }
-
-    public function couldBeUpdated()
-    {
-        $status = $this->getStatus();
-        return ($status[0]=='Pending'||$status[0]=='Modified');
-    }
+//    public function couldBeDeleted()
+//    {
+//        return $this->getStatus()[0]=='Pending';
+//    }
+//
+//    public function couldBeUpdated()
+//    {
+//        $status = $this->getStatus();
+//        return ($status[0]=='Pending'||$status[0]=='Modified');
+//    }
 
 
     public function getStatus()

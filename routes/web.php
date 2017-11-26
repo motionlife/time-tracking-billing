@@ -30,4 +30,6 @@ Route::get('/receipts/{name}', function ($name) {
 });
 Route::match(['get', 'post'],'/profile','ProfileController@index');
 Route::match(['get', 'post'],'/admin','AdminController@index');
-
+Route::get('/notifications',function (){
+   return 'Not Implemented Yet';
+});

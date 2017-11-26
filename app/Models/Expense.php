@@ -47,16 +47,16 @@ class Expense extends Model
         }
     }
 
-    public function couldBeDeleted()
-    {
-        return $this->getStatus()[0]=='Checking';
-    }
-
-    public function couldBeUpdated()
-    {
-        $status = $this->getStatus();
-        return ($status[0]=='Checking'||$status[0]=='Modified');
-    }
+//    public function couldBeDeleted()
+//    {
+//        return $this->getStatus()[0]=='Checking';
+//    }
+//
+//    public function couldBeUpdated()
+//    {
+//        $status = $this->getStatus();
+//        return ($status[0]=='Checking'||$status[0]=='Modified');
+//    }
 
     public function getStatus()
     {

@@ -48,7 +48,7 @@ class ExpenseSeeder extends Seeder
                     $con_name = $line[3];
                     //check if is an un-enrolled arrangement
                     $eng = Engagement::firstOrCreate(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name],
-                        ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30")]);
+                        ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30"),'status'=>0]);
                     //fetch first or create
                     $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $this->get_consultant_id($con_name), 'position_id' => $this->get_pos_id($position)],
                         ['billing_rate' => 0, 'firm_share' => 1.0]);//temporarily assign firm_share to 0, updated by another file
