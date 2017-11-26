@@ -72,7 +72,7 @@ class HoursController extends Controller
             if (!$eng) {
                 $feedback['code'] = 0;
                 $feedback['message'] = 'Engagement not found.';
-            } else if ($eng->isClosed()) {
+            } else if ($eng->state()=='closed') {
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {

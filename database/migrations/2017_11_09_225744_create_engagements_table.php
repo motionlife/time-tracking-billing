@@ -23,7 +23,7 @@ class CreateEngagementsTable extends Migration
             $table->double('buz_dev_share')->default(0);
             //indicate whether the engagement has closed or sth
             $table->unsignedTinyInteger('status')->default(1)
-                ->comment('0=>open,1=>closed');
+                ->comment('0=>open,1=>pending');
             //indicate how the client gonna pay, ie. paying cycle type
             $table->unsignedTinyInteger('paying_cycle')->default(0)
                 ->comment('0=/hourly,1=/15-day,2=/month,3=/year,4=engagement fixed,..');
@@ -33,6 +33,7 @@ class CreateEngagementsTable extends Migration
             //$table->decimal('total_billing', 15, 2)->default(0);
             //$table->decimal('operating_profit', 15, 2)->default(0)->comment('=total_billing - payrolls');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

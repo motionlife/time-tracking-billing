@@ -25,6 +25,7 @@ class CreateConsultantsTable extends Migration
             $table->boolean('inactive')->default(0)
                 ->comment('default 1=yes');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

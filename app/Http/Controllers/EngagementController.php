@@ -197,7 +197,7 @@ class EngagementController extends Controller
             //must check if this $expense record belong to the consultant!!!
             if ($user->can('delete', $eng)) {
                 foreach ($eng->arrangements as $arrangement) {
-                    $arrangement->delete();//todo: should soft delete arrangement and engagement
+                    $arrangement->delete();
                 }
                 if ($eng->delete()) {
                     return json_encode(['message' => 'succeed']);

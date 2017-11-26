@@ -3,10 +3,19 @@
 namespace newlifecfo\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use newlifecfo\User;
 
 class Engagement extends Model
 {
+    use SoftDeletes;
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
     protected $guarded = [];
 
     //get all the arrangements that attached to this engagement
@@ -108,10 +117,5 @@ class Engagement extends Model
     public function incomeForBuzDev($start = '1970-01-01', $end = '2038-01-19')
     {
         return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
-    }
-
-    public function isClosed()
-    {
-        return $this->status == 1;
     }
 }

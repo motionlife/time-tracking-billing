@@ -20,6 +20,7 @@ class CreateRevenuesTable extends Migration
             $table->decimal('revenue',15,2)->nullable();
             $table->decimal('ebit',15,2)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

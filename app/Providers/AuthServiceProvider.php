@@ -23,8 +23,8 @@ class AuthServiceProvider extends ServiceProvider
         'newlifecfo\Model' => 'newlifecfo\Policies\ModelPolicy',
         Engagement::class => EngagementPolicy::class,
         Arrangement::class=>ArrangementPolicy::class,
-        Hour::class=>HourPolicy::class,
-        Expense::class=>EngagementPolicy::class
+//        Hour::class=>HourPolicy::class,
+//        Expense::class=>EngagementPolicy::class
     ];
 
     /**

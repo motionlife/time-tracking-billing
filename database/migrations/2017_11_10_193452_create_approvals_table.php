@@ -24,6 +24,7 @@ class CreateApprovalsTable extends Migration
                 ->comment('0=>not read; 1=>read_not_approved;2=>read_approved;3=>not_concur!...');
             $table->text('feedback')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

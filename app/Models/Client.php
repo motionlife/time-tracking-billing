@@ -3,12 +3,21 @@
 namespace newlifecfo\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use newlifecfo\Models\Templates\Contact;
 use newlifecfo\Models\Templates\Industry;
 use newlifecfo\User;
 
 class Client extends Model
 {
+    use SoftDeletes;
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['deleted_at'];
     protected $guarded = [];
 
     //Get the corresponding system user of this client

@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
                 ->comment('0=>unassigned,1=>consultant,2=>client,3=>outside_referrer,4=>general admin,5=>super admin,6=>root');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

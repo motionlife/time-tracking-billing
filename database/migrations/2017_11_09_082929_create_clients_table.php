@@ -26,6 +26,7 @@ class CreateClientsTable extends Migration
             $table->boolean('complex_structure')->nullable();
             $table->boolean('messy_accounting_at_begin')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

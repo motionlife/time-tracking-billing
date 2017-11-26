@@ -19,6 +19,7 @@ class CreateReceiptsTable extends Migration
             $table->string('filename');
             $table->text('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

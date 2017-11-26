@@ -23,6 +23,7 @@ class CreateArrangementsTable extends Migration
             $table->double('firm_share')->comment('the percentage of share that company should get');
             $table->tinyInteger('status')->default(0)->comment('0:normal arrangement;1. detached from engagement');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
