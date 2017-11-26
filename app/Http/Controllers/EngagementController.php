@@ -117,11 +117,16 @@ class EngagementController extends Controller
      */
     public function edit($id, Request $request)
     {
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
             $eng = Engagement::find($id);
-            if ($eng && $eng->leader->id == $consultant->id) {
-                $eng->arrangements;
+            if ($user->can('view', $eng)) {
+                foreach ($eng->arrangements as $arrangement) {
+                    if(!$user->can('view',$arrangement)){
+                        $arrangement->billing_rate='';
+                        $arrangement->firm_share='';
+                    }
+                }
                 return $eng;
             }
             //else illegal request! todo: some feedback
@@ -191,6 +196,9 @@ class EngagementController extends Controller
             $eng = Engagement::find($id);
             //must check if this $expense record belong to the consultant!!!
             if ($user->can('delete', $eng)) {
+                foreach ($eng->arrangements as $arrangement) {
+                    $arrangement->delete();//todo: should soft delete arrangement and engagement
+                }
                 if ($eng->delete()) {
                     return json_encode(['message' => 'succeed']);
                 } else {
@@ -227,8 +235,8 @@ class EngagementController extends Controller
             $i = array_search($arr->consultant_id, $cids);
             if ($i == false) {
                 //delete the removed consultant
+                //soft delete indicates the consultant has been removed from his original engagement
                 $arr->delete();
-                //todo:: soft delete arrangement. update the status of this arrangement
             }
         }
         //add new one if exist and update the old guys

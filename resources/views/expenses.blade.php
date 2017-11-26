@@ -46,33 +46,33 @@
                                         <span class="input-group-addon"><i class="fa fa-bed" aria-hidden="true"></i>&nbsp;Hotel:$</span>
                                         <input class="form-control input-numbers" id="input-hotel" name="hotel"
                                                type="number" placeholder="numbers only"
-                                               step="0.01" min="0">
+                                               step="0.1" min="0">
                                         <span class="input-group-addon"><i class="fa fa-plane" aria-hidden="true"></i>&nbsp;Flight:$</span>
                                         <input class="form-control input-numbers" id="input-flight" name="flight"
-                                               type="number" step="0.01" min="0" placeholder="numbers only">
+                                               type="number" step="0.1" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-coffee" aria-hidden="true"></i>&nbsp;Meal:$</span>
                                         <input class="form-control input-numbers" id="input-meal" name="meal"
                                                type="number" placeholder="numbers only"
-                                               step="0.01" min="0">
+                                               step="0.1" min="0">
                                         <span class="input-group-addon"><i class="fa fa-paperclip"
                                                                            aria-hidden="true"></i>&nbsp;Office Supply:$</span>
                                         <input class="form-control input-numbers" id="input-office-supply"
                                                name="office_supply"
-                                               type="number" step="0.01" min="0" placeholder="numbers only">
+                                               type="number" step="0.1" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;Car Rental:$</span>
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
-                                               step="0.01" min="0">
+                                               step="0.1" min="0">
                                         <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost:$</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
                                                name="mileage_cost"
-                                               type="number" step="0.01" min="0" placeholder="numbers only">
+                                               type="number" step="0.1" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -80,11 +80,11 @@
                                                                            aria-hidden="true"></i>&nbsp;Other:$</span>
                                         <input class="form-control input-numbers" id="input-other" name="other"
                                                type="number" placeholder="numbers only"
-                                               step="0.01" min="0">
+                                               step="0.1" min="0">
                                         <span class="input-group-addon"><i class="fa fa-calculator"
                                                                            aria-hidden="true"></i>&nbsp;<strong>Total:$</strong></span>
                                         <input class="form-control" id="expense-total" name="total" type="number"
-                                               step="0.01" disabled>
+                                               step="0.1" disabled>
                                     </div>
                                     <br>
                                     <div class="input-group">

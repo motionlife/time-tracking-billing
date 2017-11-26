@@ -72,7 +72,7 @@
                                         <span class="input-group-addon"><i
                                                     class="fa fa-money"></i>&nbsp;Billing Amount:<strong>$</strong></span>
                                         <input class="form-control" id="billing_amount" name="cycle_billing"
-                                               type="number" step="0.01" min="0" placeholder="N/A">
+                                               type="number" step="0.1" min="0" placeholder="N/A">
 
                                     </div>
                                     <br>
@@ -226,8 +226,15 @@
                                                 <th scope="row">{{$loop->index+1}}</th>
                                                 <td>{{$arrangement->consultant->fullname()}}</td>
                                                 <td> {{$arrangement->position->name}}</td>
-                                                <td>${{$arrangement->billing_rate}}</td>
-                                                <td>{{$hourly? $formatter->format($arrangement->firm_share):'-'}}</td>
+                                                <td>
+                                                    @can('view',$arrangement)
+                                                        ${{$arrangement->billing_rate}}
+                                                    @endcan
+                                                </td>
+                                                <td>  @can('view',$arrangement)
+                                                        {{$hourly? $formatter->format($arrangement->firm_share):'-'}}
+                                                    @endcan
+                                                </td>
                                             </tr>
                                         @endforeach
                                         </tbody>
@@ -275,7 +282,7 @@
                 })
             });
             $('#cycle-select').on('changed.bs.select', function (e) {
-                if (this.value!= 0) {
+                if (this.value != 0) {
                     $('#billing_amount').attr('disabled', false).attr('placeholder', 'per cycle');
                     $('#bill-pay-head').html('Pay Rate');
                 } else {
@@ -342,7 +349,7 @@
                         $('#billing_amount').val(data.cycle_billing);
                         if (data.paying_cycle != 0) {
                             $('#bill-pay-head').html('Pay Rate');
-                            $('#billing_amount').attr('disabled',false);
+                            $('#billing_amount').attr('disabled', false);
                         }
                         else {
                             $('#bill-pay-head').html('Billing Rate');
@@ -389,7 +396,7 @@
                     success: function (feedback) {
                         if (feedback.code == 7) {
                             toastr.success('Success! Engagement has been ' + update ? 'updated!' : 'created!');
-                            setTimeout(location.reload.bind(location), 2000);
+                            setTimeout(location.reload.bind(location), 1000);
                         } else {
                             toastr.error('Error! Saving failed, code: ' + feedback.code +
                                 ', message: ' + feedback.message);
