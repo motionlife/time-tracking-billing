@@ -35,7 +35,7 @@ class User extends Authenticatable
 
     public function isVerified()
     {
-        return $this->role >= 1;
+        return $this->role != 0;
     }
 
     public function isSuperAdmin()

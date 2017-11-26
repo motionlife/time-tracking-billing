@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Engagement;
+use newlifecfo\User;
 
 class EngagementController extends Controller
 {
@@ -58,6 +59,7 @@ class EngagementController extends Controller
     public function store(Request $request)
     {
         //
+        //$user = Auth::user()
         $consultant = Auth::user()->consultant;
         $feedback = [];
         if ($request->ajax()) {
@@ -66,11 +68,12 @@ class EngagementController extends Controller
                 $eng = new Engagement(['client_id' => $request->get('client_id'), 'leader_id' => $lid,
                     'name' => $request->get('name'), 'start_date' => $request->get('start_date'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
-                    'cycle_billing' => $request->get('cycle_billing') ?: 0
+                    'cycle_billing' => $request->get('cycle_billing') ?: 0, 'status' => 1
                 ]);
-                //only supervisor can touch the status
-                if ($consultant->isSupervisor()) $eng->status = $request->get('status');
-                else  $eng->status = 1;//indicate the engagement shall be pending once it created
+                //only supervisor can touch the status(no need to apply policy here)
+                /* if ($this->authorize('activate', $eng) || $this->authorize('close', $eng))
+                     $eng->status = $request->get('status');
+                 else  $eng->status = 1;//indicate the engagement shall be pending once it created*/
 
                 if ($eng->save()) {
                     if ($this->saveArrangements($request, $eng->id)) {
@@ -133,29 +136,26 @@ class EngagementController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
+     * @param User $user
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->consultant;
-        //same reported hours
+        $user = Auth::user();
         $feedback = [];
         if ($request->ajax()) {
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
             $eng = Engagement::find($id);
-            if (!$eng || $eng->leader->id != $consultant->id) {
-                $feedback['code'] = 0;
-                $feedback['message'] = 'Engagement not found or no authorization';
-            } else if ($eng->couldBeUpdated(Auth::user())) {
+            if ($user->can('update', $eng)) {
                 //should not let normal user update their own status!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if ($eng->update(['client_id' => $request->get('client_id'),
                     'name' => $request->get('name'), 'start_date' => $request->get('start_date'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
                     'cycle_billing' => $request->get('cycle_billing') ?: 0
                 ])) {
-                    //only supervisor can touch the status
-                    if ($consultant->isSupervisor()) $eng->update(['status' => $request->get('status')]);
+                    //only manager or superAdmin can touch the status
+                    if ($user->can('activate', $eng)) $eng->update(['status' => $request->get('status') ?: 1]);
                     if ($this->updateArrangements($request, $eng)) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'Record Update Success';
@@ -170,7 +170,7 @@ class EngagementController extends Controller
 
             } else {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Engagement Cannot be updated now';
+                $feedback['message'] = 'Active engagement can only be updated by manager';
             }
             return json_encode($feedback);
         }
@@ -185,16 +185,17 @@ class EngagementController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
 
             $eng = Engagement::find($id);
             //must check if this $expense record belong to the consultant!!!
-            if ($eng && $eng->leader->id == $consultant->id) {
-                if ($eng->couldBeDeleted(Auth::user())) {
-                    if ($eng->delete()) return json_encode(['message' => 'succeed']);
+            if ($user->can('delete', $eng)) {
+                if ($eng->delete()) {
+                    return json_encode(['message' => 'succeed']);
+                } else {
+                    return json_encode(['message' => 'Can\'t delete this Active engagement']);
                 }
-                return json_encode(['message' => 'Can\'t delete this Active engagement']);
             }
             return json_encode(['message' => ' No authorization']);
         }
@@ -206,7 +207,6 @@ class EngagementController extends Controller
         $fs = $request->get('firm_shares');
         $bs = $request->get('billing_rates');
         foreach ($request->get('consultant_ids') as $i => $cid) {
-
             if ($cid && $pids[$i]) {
                 if (!Arrangement::updateOrCreate(['engagement_id' => $id, 'consultant_id' => $cid, 'position_id' => $pids[$i]],
                     ['billing_rate' => $bs[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))

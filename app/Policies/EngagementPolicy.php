@@ -61,7 +61,7 @@ class EngagementPolicy
         //active state, the team leader can only add member to it, which shall pass the policy of arrangement
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return $consultant->id == $engagement->leader_id && $engagement->state() == 'Pending';
+            return $user->isManager() || ($consultant->id == $engagement->leader_id && $engagement->state() == 'Pending');
         }
         return false;
     }
@@ -84,7 +84,7 @@ class EngagementPolicy
         //Only the leader can DELETE a pending engagement, to which no one had reported hours
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return $consultant->id == $engagement->leader_id && $engagement->state() == 'Pending';
+            return ($user->isManager() || $consultant->id == $engagement->leader_id) && $engagement->state() == 'Pending';
         }
         return false;
     }
@@ -99,6 +99,6 @@ class EngagementPolicy
     public function close(User $user, Engagement $engagement)
     {
         //Policy: Only the leader can change a engagement's state to close--SOFT DELETE
-        return $user->isManager() && $engagement->state() != 'non-deletable';
+        return $user->isManager() && $engagement->state() == 'Active';
     }
 }

@@ -49,11 +49,6 @@ class Consultant extends Model
         return isset($cid) ? $filered->where('client_id', $cid)->get() : $filered->get();
     }
 
-    public function isSupervisor()
-    {
-        return $this->user->priority > 10;
-    }
-
     //all the arrangements he's attended
     public function arrangements()
     {

@@ -22,7 +22,7 @@ class CreateEngagementsTable extends Migration
             $table->date('close_date')->nullable();
             $table->double('buz_dev_share')->default(0);
             //indicate whether the engagement has closed or sth
-            $table->unsignedTinyInteger('status')->default(0)
+            $table->unsignedTinyInteger('status')->default(1)
                 ->comment('0=>open,1=>closed');
             //indicate how the client gonna pay, ie. paying cycle type
             $table->unsignedTinyInteger('paying_cycle')->default(0)

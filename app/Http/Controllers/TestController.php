@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Illuminate\Http\Request;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
+use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Templates\Position;
 use newlifecfo\Models\Templates\Task;
 use newlifecfo\Models\Templates\Taskgroup;
@@ -19,6 +20,11 @@ class TestController extends Controller
 
     public function index(Request $request)
     {
+
+//        $eng = Engagement::find($request->get('id'));
+//        if ($this->authorize('activate', $eng))
+//          return 'yes';
+//        return 'no';
         if ($request->get('verify')) {
             $out = [];
             foreach (Consultant::all() as $con) {
