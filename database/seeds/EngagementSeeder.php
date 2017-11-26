@@ -39,6 +39,7 @@ class EngagementSeeder extends Seeder
                         'name' => $eng_name,
                         'start_date' => $start,
                         'buz_dev_share' => $share,
+                        'status'=>0
                     ])->id;
                 } else if ($line[6]) {
                     Arrangement::create([
