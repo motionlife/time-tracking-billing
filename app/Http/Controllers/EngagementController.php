@@ -25,7 +25,7 @@ class EngagementController extends Controller
     public function index(Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         return view('engagement', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
             'cids' => $consultant->myEngagements()->pluck('client_id')->unique()
         ]);
@@ -40,10 +40,11 @@ class EngagementController extends Controller
     {
         //
         if ($request->ajax()) {
+            //return the business development info to the request
             if ($request->get('fetch') == 'business')
                 return Client::find($request->get('cid'))->whoDevelopedMe();
         }
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         return view('engagement', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
             'leader' => $consultant, 'cids' => $consultant->lead_engagements->pluck('client_id')->unique()]);
     }
@@ -57,7 +58,7 @@ class EngagementController extends Controller
     public function store(Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         $feedback = [];
         if ($request->ajax()) {
             $lid = $request->get('leader_id');
@@ -113,7 +114,7 @@ class EngagementController extends Controller
      */
     public function edit($id, Request $request)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
             $eng = Engagement::find($id);
             if ($eng && $eng->leader->id == $consultant->id) {
@@ -136,7 +137,7 @@ class EngagementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
@@ -184,7 +185,7 @@ class EngagementController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
 
             $eng = Engagement::find($id);

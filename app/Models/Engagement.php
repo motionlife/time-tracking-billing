@@ -21,15 +21,17 @@ class Engagement extends Model
         return $this->belongsTo(Client::class);
     }
 
-    public function couldBeDeleted(User $user)
-    {
-        return $this->state() != 'Active' || $user->priority > 10;
-    }
 
-    public function couldBeUpdated(User $user)
-    {
-        return $this->state() != 'Close' || $user->priority > 10;
-    }
+//    public function couldBeDeleted(User $user)
+//    {
+//        return $this->state() != 'Active' || $user->priority > 10;
+//    }
+//    public function couldBeUpdated(User $user)
+//    {
+//        return $this->state() != 'Close' || $user->priority > 10;
+//    }
+
+
     //get the leader(consultant) of the engagement
     public function leader()
     {
@@ -72,11 +74,13 @@ class Engagement extends Model
         switch ($this->status) {
 
             case 0:
-                return 'Active';
+                return 'Active';//Operating, running
             case 1:
-                return 'Pending';
+                return 'Pending';//when just created before approval by boss
             case 2:
                 return 'Closed';
+            case 3:
+                return 'non-deletable';
         }
         return 'Unknown';
     }

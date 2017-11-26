@@ -51,7 +51,7 @@ class ProfileController extends Controller
                         $feedback['message'] = 'An error happened during update';
                     }
                 } else if ($request->get('update') == 'business') {
-                    $consultant = $user->entity;
+                    $consultant = $user->consultant;
                     if ($consultant->update(['standard_rate' => $request->get('standard_rate'),
                         'standard_percentage' => $request->get('standard_percentage') / 100,
                         'isEmployee' => $request->get('isEmployee'), 'inactive' => $request->get('inactive')

@@ -38,24 +38,34 @@ class User extends Authenticatable
         return $this->role >= 1;
     }
 
+    public function isSuperAdmin()
+    {
+        return $this->priority > 50;
+    }
+
+    public function isManager()
+    {
+        return $this->priority > 10 && $this->priority < 50;
+    }
+
     public function fullName()
     {
         return $this->first_name . ' ' . $this->last_name;
     }
 
-    //Get the corresponding role entity
-    public function entity()
+    public function consultant()
     {
-        switch (self::ROLES[$this->role]) {
-            case 'Consultant':
-                return $this->hasOne(Consultant::class);
-            case 'Client':
-                return $this->hasOne(Client::class);
-            case 'Outside Referrer':
-                return $this->hasOne(Outreferrer::class);
-            default:
-                return $this;
-        }
+        if (self::ROLES[$this->role] == 'Consultant') return $this->hasOne(Consultant::class);
+    }
+
+    public function client()
+    {
+        if (self::ROLES[$this->role] == 'client') return $this->hasOne(Client::class);
+    }
+
+    public function outreferrer()
+    {
+        if (self::ROLES[$this->role] == 'Outside Referrer') return $this->hasOne(Outreferrer::class);
     }
 
     //all the approval this user has been processed

@@ -80,7 +80,7 @@
                         <label class="col-lg-3 control-label">Standard Rate $/hr:</label>
                         <div class="col-lg-8">
                             <input class="form-control" name="standard_rate" type="number"
-                                   value="{{$user->entity->standard_rate}}"
+                                   value="{{$user->consultant->standard_rate}}"
                                    required>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                         <label class="col-lg-3 control-label">Standard Percentage %:</label>
                         <div class="col-lg-8">
                             <input class="form-control" name="standard_percentage" type="number" max="100"
-                                   value="{{$user->entity->standard_percentage*100}}"
+                                   value="{{$user->consultant->standard_percentage*100}}"
                                    required>
                         </div>
                     </div>
@@ -98,7 +98,7 @@
                             <div class="ui-select">
                                 <select id="is_employee" name="isEmployee" class="selectpicker" data-width="100%">
                                     <option value="0" }>No</option>
-                                    <option value="1" {{$user->entity->isEmployee?"selected":""}}>Yes</option>
+                                    <option value="1" {{$user->consultant->isEmployee?"selected":""}}>Yes</option>
                                 </select>
                             </div>
                         </div>
@@ -109,7 +109,7 @@
                             <div class="ui-select">
                                 <select id="inactive" name="inactive" class="selectpicker" data-width="100%">
                                     <option value="0" }>No</option>
-                                    <option value="1" {{$user->entity->inactive?"selected":""}}>Yes</option>
+                                    <option value="1" {{$user->consultant->inactive?"selected":""}}>Yes</option>
                                 </select>
                             </div>
                         </div>

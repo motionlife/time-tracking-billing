@@ -29,7 +29,7 @@ class HomeController extends Controller
         $data = ['dates' => $this->getDays(),
             'last_b' => [], 'last_nb' => [], 'last_earn' => [], 'eids' => [], 'total_last_b' => 0, 'total_last_earn' => 0, 'total_last2_earn' => 0, 'last_expense' => 0, 'last2_expense' => 0,
             'total_last_nb' => 0, 'last_buz_dev' => 0, 'last2_buz_dev' => 0,];
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         foreach ($consultant->arrangements as $arr) {
             //todo: to deal with the case where it's engagement hab been deleted, Alter Arrangement table add status column
             if (!$arr->engagement) continue;

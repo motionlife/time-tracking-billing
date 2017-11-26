@@ -24,7 +24,7 @@ class HoursController extends Controller
 
     public function index(Request $request)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         $hours = $this->paginate($consultant->recentHourOrExpenseReports($request->get('start'),
             $request->get('end'), $request->get('eid'),true), 25);
         return view('hours', ['hours' => $hours,
@@ -39,7 +39,7 @@ class HoursController extends Controller
     public function create(Request $request)
     {
         //today's report
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         $hours = $consultant->justCreatedHourReports(Carbon::today()->startOfDay(), Carbon::today()->endOfDay());
 
         if ($request->ajax()) {
@@ -60,7 +60,7 @@ class HoursController extends Controller
      */
     public function store(Request $request)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         //same reported hours
         $feedback = [];
         $eid = $request->get('eid');
@@ -106,7 +106,7 @@ class HoursController extends Controller
      */
     public function show($id, Request $request)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
@@ -127,7 +127,7 @@ class HoursController extends Controller
     public function edit($id, Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
@@ -152,7 +152,7 @@ class HoursController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
@@ -198,7 +198,7 @@ class HoursController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
 
         if ($request->ajax()) {
 

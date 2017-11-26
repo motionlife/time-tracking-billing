@@ -24,7 +24,7 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         $expenses = $this->paginate($consultant->recentHourOrExpenseReports($request->get('start'),
             $request->get('end'), $request->get('eid'), false), 25);
         return view('expenses', ['expenses' => $expenses,
@@ -51,7 +51,7 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         //same reported hours
         $feedback = [];
         $eid = $request->get('eid');
@@ -115,7 +115,7 @@ class ExpenseController extends Controller
     public function edit($id, Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
             $expense = Expense::find($id);
             //must check if this hour record belong to the consultant!!!
@@ -141,7 +141,7 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
@@ -187,7 +187,7 @@ class ExpenseController extends Controller
     public function destroy($id, Request $request)
     {
         //
-        $consultant = Auth::user()->entity;
+        $consultant = Auth::user()->consultant;
         if ($request->ajax()) {
 
             $expense = Expense::find($id);
