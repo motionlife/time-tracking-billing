@@ -27,11 +27,11 @@
                                 <td>{{$user->last_name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
-                                <td><select name="user_role" class="selectpicker">
-                                        <option value="0" {{!$user->isVerified()?"selected":""}}  data-content="<span class='label label-{{$user->getRoleClass()}}'>Unrecognized</span>"></option>
-                                        <option value="1" {{$user->isNormalUser()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>Normal User</span>"></option>
-                                        <option value="2" {{$user->isManager()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>General Admin</span>"></option>
-                                        <option value="3" {{$user->isSuperAdmin()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>Super Admin</span>"></option>
+                                <td><select name="user_role" class="selectpicker" data-width="auto">
+                                        <option value="0" {{!$user->isVerified()?"selected":""}}  data-content="<span class='label label-danger'>Unrecognized</span>"></option>
+                                        <option value="1" {{$user->isNormalUser()?"selected":""}} data-content="<span class='label label-success'>Normal User</span>"></option>
+                                        <option value="2" {{$user->isManager()?"selected":""}} data-content="<span class='label label-info'>General Admin</span>"></option>
+                                        <option value="3" {{$user->isSuperAdmin()?"selected":""}} data-content="<span class='label label-warning'>Super Admin</span>"></option>
                                     </select></td>
                                 <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a>
                                 </td>

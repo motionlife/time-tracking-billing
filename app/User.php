@@ -56,14 +56,6 @@ class User extends Authenticatable
         return self::ROLES[$this->role];
     }
 
-    public function getRoleClass()
-    {
-        if (!$this->isVerified()) return 'warning';
-        if ($this->isNormalUser()) return 'success';
-        if ($this->isManager()) return 'info';
-        if ($this->isSuperAdmin()) return 'danger';//btn-primary
-    }
-
     public function isVerifiedConsultant()
     {
         return $this->isVerified() && self::ROLES[$this->role] == 'Consultant';
