@@ -15,7 +15,7 @@ class EngagementController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('verified');
+        $this->middleware('verifiedConsultant');
     }
 
     /**
@@ -27,7 +27,7 @@ class EngagementController extends Controller
     {
         //
         $consultant = Auth::user()->consultant;
-        return view('engagement', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
+        return view('engagements', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
             'cids' => $consultant->myEngagements()->pluck('client_id')->unique()
         ]);
     }
@@ -46,7 +46,7 @@ class EngagementController extends Controller
                 return Client::find($request->get('cid'))->whoDevelopedMe();
         }
         $consultant = Auth::user()->consultant;
-        return view('engagement', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
+        return view('engagements', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
             'leader' => $consultant, 'cids' => $consultant->lead_engagements->pluck('client_id')->unique()]);
     }
 

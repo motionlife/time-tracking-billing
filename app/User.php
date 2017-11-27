@@ -43,7 +43,30 @@ class User extends Authenticatable
 
     public function isVerified()
     {
-        return $this->role != 0;
+        return $this->priority != 0;
+    }
+
+    public function isNormalUser()
+    {
+        return $this->priority > 0 && $this->priority < 10;
+    }
+
+    public function getType()
+    {
+        return self::ROLES[$this->role];
+    }
+
+    public function getRoleClass()
+    {
+        if (!$this->isVerified()) return 'unrecognized';
+        if ($this->isNormalUser()) return 'normal-user';
+        if ($this->isManager()) return 'general-admin';
+        if ($this->isSuperAdmin()) return 'super-admin';
+    }
+
+    public function isVerifiedConsultant()
+    {
+        return $this->isVerified() && self::ROLES[$this->role] == 'Consultant';
     }
 
     public function isSuperAdmin()

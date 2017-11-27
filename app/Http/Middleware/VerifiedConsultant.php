@@ -5,7 +5,7 @@ namespace newlifecfo\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class VerifiedUser
+class VerifiedConsultant
 {
     /**
      * Handle an incoming request.
@@ -16,8 +16,8 @@ class VerifiedUser
      */
     public function handle($request, Closure $next)
     {
-        if (!Auth::user()->isVerified()){
-            return redirect('profile');
+        if (!Auth::user()->isVerifiedConsultant()){
+            return redirect('pending');
         }
         return $next($request);
     }

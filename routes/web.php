@@ -28,8 +28,9 @@ Route::get('/receipts/{name}', function ($name) {
     header("Content-type: image/jpeg");
     echo Storage::get('receipts/' . $name);
 });
-Route::match(['get', 'post'],'/profile','ProfileController@index');
-Route::match(['get', 'post'],'/admin','AdminController@index');
-Route::get('/notifications',function (){
-   return 'Not Implemented Yet';
+Route::match(['get', 'post'], '/profile', 'ProfileController@index');
+Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
+Route::match(['get', 'post'], '/notification', 'NotificationController@index');
+Route::get('/pending',function (){
+   return view('auth.pending');
 });

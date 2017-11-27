@@ -15,6 +15,7 @@
                             your application to use this system. </h2>
 
                     </div>
+                    <p>But right now you can <a href="/profile">update your profile</a></p>
                 </div>
             </div>
         </div>

@@ -24,7 +24,9 @@ class OutreferrerSeeder extends Seeder
                 'email' => $faker->unique()->safeEmail,
                 'password' => $password ?: $password = bcrypt('secret'),
                 'role' => array_search('Outside Referrer',User::ROLES),
-                'remember_token' => str_random(20)]);
+                'remember_token' => str_random(20),
+                'priority'=>1
+            ]);
 
             $contact = Contact::create(['email' => $user->email,
                 'profile_img_path' => str_random(10).'.jpg',

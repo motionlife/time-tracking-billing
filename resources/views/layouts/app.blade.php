@@ -120,10 +120,21 @@
                         </li>
 
                         <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i> <span>Model Test</span></a></li>
-                        <li><a href="/profile" class="{{Request::is('profile') ?'active':''}}"><i class="lnr lnr-user"></i><span>My Profile</span></a></li>
-                        <li><a href="/notifications" class=""><i class="lnr lnr-alarm"></i><span>Notifications</span></a></li>
+                        <li><a href="/profile" class="{{Request::is('profile') ?'active':''}}"><i class="fa fa-id-badge" aria-hidden="true">&nbsp;</i><span>My Profile</span></a></li>
+                        <li><a href="/notification" class="{{Request::is('notification') ?'active':''}}"><i class="lnr lnr-alarm"></i><span>Notifications</span></a></li>
 
-                        <li><a href="/admin" class=""><i class="lnr lnr-users"></i> <span>Administration</span></a></li>
+                        <li>
+                            <a href="#subPages3" data-toggle="collapse"
+                               class="{{str_contains(Request::path(),'admin') ? 'active':'collapsed '}}"><i
+                                        class="lnr lnr-users"></i> <span>Administration</span> <i
+                                        class="icon-submenu lnr lnr-chevron-left"></i></a>
+                            <div id="subPages3" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}" >
+                                <ul class="nav">
+                                    <li><a href="/admin/users" class="{{Request::is('admin/users') ?'active':''}}">Users</a></li>
+                                    <li><a href="/admin/clients" class="{{Request::is('admin/clients') ?'active':''}}">Clients</a></li>
+                                </ul>
+                            </div>
+                        </li>
                     </ul>
                 </nav>
             </div>
