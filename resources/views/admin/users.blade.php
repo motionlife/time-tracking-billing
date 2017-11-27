@@ -27,11 +27,11 @@
                                 <td>{{$user->last_name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
-                                <td><select name="user_role" class="selectpicker" data-style={{$user->getRoleClass()}}>
-                                        <option value="0" {{!$user->isVerified()?"selected":""}}>Unrecognized</option>
-                                        <option value="1" {{$user->isNormalUser()?"selected":""}}>Normal User</option>
-                                        <option value="2" {{$user->isManager()?"selected":""}}>General Admin</option>
-                                        <option value="3" {{$user->isSuperAdmin()?"selected":""}}>Super Admin</option>
+                                <td><select name="user_role" class="selectpicker">
+                                        <option value="0" {{!$user->isVerified()?"selected":""}}  data-content="<span class='label label-{{$user->getRoleClass()}}'>Unrecognized</span>"></option>
+                                        <option value="1" {{$user->isNormalUser()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>Normal User</span>"></option>
+                                        <option value="2" {{$user->isManager()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>General Admin</span>"></option>
+                                        <option value="3" {{$user->isSuperAdmin()?"selected":""}} data-content="<span class='label label-{{$user->getRoleClass()}}'>Super Admin</span>"></option>
                                     </select></td>
                                 <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a>
                                 </td>
