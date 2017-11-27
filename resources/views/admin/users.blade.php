@@ -27,7 +27,7 @@
                                 <td>{{$user->last_name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
-                                <td class="{{$user->getRoleClass()}}"><select name="user_role" class="selectpicker">
+                                <td><select name="user_role" class="selectpicker" data-style={{$user->getRoleClass()}}>
                                         <option value="0" {{!$user->isVerified()?"selected":""}}>Unrecognized</option>
                                         <option value="1" {{$user->isNormalUser()?"selected":""}}>Normal User</option>
                                         <option value="2" {{$user->isManager()?"selected":""}}>General Admin</option>
@@ -65,19 +65,6 @@
     <style>
         td a{
             color:red;
-        }
-        td.unrecognized{
-            border: 2px solid #fff743;
-
-        }
-        td.normal-user{
-            border: 2px solid #63ff34;
-        }
-        td.general-admin{
-            border: 2px solid #4bb3ff;
-        }
-        td.super-admin{
-            border: 2px solid #ff040c;
         }
     </style>
 @endsection
