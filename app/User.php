@@ -58,10 +58,10 @@ class User extends Authenticatable
 
     public function getRoleClass()
     {
-        if (!$this->isVerified()) return 'btn-warning';
-        if ($this->isNormalUser()) return 'btn-success';
-        if ($this->isManager()) return 'btn-info';
-        if ($this->isSuperAdmin()) return 'btn-danger';//btn-primary
+        if (!$this->isVerified()) return 'warning';
+        if ($this->isNormalUser()) return 'success';
+        if ($this->isManager()) return 'info';
+        if ($this->isSuperAdmin()) return 'danger';//btn-primary
     }
 
     public function isVerifiedConsultant()
