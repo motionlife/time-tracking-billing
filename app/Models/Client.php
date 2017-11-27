@@ -52,7 +52,7 @@ class Client extends Model
         return $this->belongsTo(Outreferrer::class)
             ->withDefault([
                 'first_name' => 'N/A',
-                'last_name' => 'N/A'
+                'last_name' => ''
             ]);
     }
 
@@ -68,7 +68,7 @@ class Client extends Model
     //get all the available revenues
     public function revenues()
     {
-        $this->hasMany(Revenue::class);
+        return $this->hasMany(Revenue::class);
     }
 
     //client belong to which industry

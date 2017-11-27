@@ -4,6 +4,7 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\User;
 
 class AdminController extends Controller
 {
@@ -15,11 +16,11 @@ class AdminController extends Controller
         //todo: add isAdmin middleware
     }
 
-    public function index($id)
+    public function index($resource, Request $request)
     {
-        switch ($id) {
+        switch ($resource) {
             case 'users':
-                return $this->userAdmin();
+                return $this->userAdmin($request);
             case 'clients':
                 return $this->clientAdmin();
             case 'positions':
@@ -32,28 +33,63 @@ class AdminController extends Controller
         return 'Cannot be managed';
     }
 
-    private function userAdmin()
+    private function userAdmin(Request $request)
     {
 
+        if ($request->ajax()) {
+            $feedback = [];
+            $target = User::find($request->get('uid'));
+            $user = Auth::user();
+            if ($user->priority > $target->priority) {
+                if ($request->get('action') == 'delete') {
+                    $target->delete();
+                    $feedback['code'] = 7;
+                } else if ($request->get('action') == 'update') {
+                    switch ($request->get('role')) {
+                        case 0:
+                            $target->priority = 0;
+                            break;
+                        case 1:
+                            $target->priority = 1;
+                            break;
+                        case 2:
+                            $target->priority = 11;
+                            break;
+                        case 3:
+                            $target->priority = 51;
+                            break;
+                    }
+                    if ($user->priority > $target->priority) {
+                        $target->save();
+                        $feedback['code'] = 7;
+                    }
+                }
+            }
+            return json_encode($feedback);
+        } else {
+            return view('admin.users');
+        }
 
-
-        return view('admin.users');
     }
 
-    private function clientAdmin()
+    private
+    function clientAdmin()
     {
         return view('admin.clients');
     }
 
-    private function positionAdmin()
+    private
+    function positionAdmin()
     {
     }
 
-    private function taskAdmin()
+    private
+    function taskAdmin()
     {
     }
 
-    private function industryAdmin()
+    private
+    function industryAdmin()
     {
     }
 }
