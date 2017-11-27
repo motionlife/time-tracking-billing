@@ -207,8 +207,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="panel-body slim-scroll">
-                                <div id="demo-line-chart" class="">
+                            <div class="panel-body slim-scroll member-table">
                                     @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
                                     <table class="table table-sm">
                                         <thead>
@@ -239,7 +238,6 @@
                                         @endforeach
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -291,10 +289,10 @@
                 }
             });
             $('.slim-scroll').slimScroll({
-                height: '150px'
+                height: '130px'
             });
             $('#member-roll').slimScroll({
-                height: '210px'
+                height: '220px'
             });
             $('#build-engagement').on('click', function () {
                 update = false;
@@ -481,6 +479,9 @@
 
 @section('special-css')
     <style>
+        .member-table{
+            margin-top: -4.0%;
+        }
         .table td, .table th {
             text-align: center;
         }

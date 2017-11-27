@@ -129,16 +129,17 @@ class HoursController extends Controller
     public function edit($id, Request $request)
     {
         //
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
             $hour = Hour::find($id);
             //must check if this hour record belong to the consultant!!!
-            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
+            if ($user->can('view',$hour)) {
                 $arr = $hour->arrangement;
                 $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
                 return json_encode(['ename' => $arr->engagement->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
                     'billable_hours' => number_format($hour->billable_hours, 1), 'non_billable_hours' => number_format($hour->non_billable_hours, 1),
-                    'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name
+                    'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name,
+                    'billing_rate'=>$arr->billing_rate,'firm_share'=>$arr->firm_share
                 ]);
             }
             //else illegal request!

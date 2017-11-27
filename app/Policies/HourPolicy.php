@@ -23,12 +23,13 @@ class HourPolicy
      * Determine whether the user can view the hour.
      *
      * @param  \newlifecfo\User $user
-     * @param  \newlifecfo\Hour $hour
+     * @param  \newlifecfo\Models\Hour $hour
      * @return mixed
      */
     public function view(User $user, Hour $hour)
     {
         //
+        return $hour->arrangement->consultant_id = $user->consultant->id || $user->isManager();
     }
 
     /**
@@ -46,7 +47,7 @@ class HourPolicy
      * Determine whether the user can update the hour.
      *
      * @param  \newlifecfo\User $user
-     * @param  \newlifecfo\Hour $hour
+     * @param  \newlifecfo\Models\Hour $hour
      * @return mixed
      */
     public function update(User $user, Hour $hour)
@@ -61,7 +62,7 @@ class HourPolicy
      * Determine whether the user can delete the hour.
      *
      * @param  \newlifecfo\User $user
-     * @param  \newlifecfo\Hour $hour
+     * @param  \newlifecfo\Models\Hour $hour
      * @return mixed
      */
     public function delete(User $user, Hour $hour)

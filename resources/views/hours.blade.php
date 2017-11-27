@@ -3,7 +3,8 @@
     <div class="main-content">
         <div class="container-fluid">
             {{--Begin of Modal--}}
-            <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel" data-backdrop="static" data-keyboard="false"
+            <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
+                 data-backdrop="static" data-keyboard="false"
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -64,6 +65,13 @@
                                                type="number" step="0.1" min="0"
                                                placeholder="numbers only">
 
+                                    </div>
+                                    <br>
+                                    <div class="input-group">
+                                <span class="input-group-addon"><i
+                                            class="fa fa-money"></i>&nbsp;Estimated Income:</span>
+                                        <input type="text" id="income-estimate" disabled value="" class="form-control"
+                                               data-br="" data-fs="">
                                     </div>
                                     <br>
                                     <textarea id="description" class="form-control" name="description"
@@ -189,6 +197,14 @@
                 }
             );
 
+            $('#billable-hours').on('change', function () {
+                var income = $('#income-estimate');
+                var br =income.attr('data-br');
+                var fs = income.attr('data-fs');
+                var bh = $(this).val();
+                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
+            });
+
             $('td a:nth-child(1)').on('click', function () {
                 tr = $(this).parent().parent();
                 hid = $(this).parent().attr('data-id');
@@ -196,13 +212,14 @@
                     url: '/hour/' + hid + '/edit',
                     success: function (data) {
                         //update modal
+                        $('#income-estimate').attr({'data-br': data.billing_rate}, {'data-fs': data.firm_share});
                         $('#client-engagement').attr('disabled', true)
                             .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
-                        $('#task-id').selectpicker('val',data.task_id);//.selectpicker('refresh');
+                        $('#task-id').selectpicker('val', data.task_id);//.selectpicker('refresh');
                         $('#report-date').datepicker('setDate', data.report_date);
-                        $('#billable-hours').val(data.billable_hours);
+                        $('#billable-hours').val(data.billable_hours).trigger("change");
                         $('#non-billable-hours').val(data.non_billable_hours);
                         $('#description').val(data.description);
                         $('#report-update').attr('disabled', data.review_state != "0");

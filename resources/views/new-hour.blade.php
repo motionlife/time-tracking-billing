@@ -151,7 +151,7 @@
                     }
                 });
             });
-
+            $('#position').on('change',function(){$('#billable-hours').trigger("change");});
             $('#billable-hours').on('change', function () {
                 var opt = $('#position').find(':selected');
                 var br = opt.attr('data-br');
