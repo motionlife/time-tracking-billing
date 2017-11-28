@@ -30,7 +30,7 @@ class AdminController extends Controller
             case 'industries':
                 return $this->industryAdmin();
         }
-        return 'Cannot be managed';
+        return 'Resource Cannot Be Managed, No Authorization!';
     }
 
     private function userAdmin(Request $request)

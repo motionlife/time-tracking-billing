@@ -130,8 +130,11 @@
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages3" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}" >
                                 <ul class="nav">
+                                    <li><a href="/admin/hours" class="{{Request::is('admin/hours')?'active':''}}">Endorse Hours</a></li>
+                                    <li><a href="/admin/engagements" class="{{Request::is('admin/engagements')?'active':''}}">Grant Engagement</a></li>
                                     <li><a href="/admin/users" class="{{Request::is('admin/users') ?'active':''}}">Users</a></li>
                                     <li><a href="/admin/clients" class="{{Request::is('admin/clients') ?'active':''}}">Clients</a></li>
+                                    <li><a href="/admin/miscellaneous" class="{{Request::is('admin/clients') ?'active':''}}">Other Resources</a></li>
                                 </ul>
                             </div>
                         </li>
