@@ -9,7 +9,7 @@
                     <h5>total:{{$users->count()}}</h5>
                 </div>
                 <div class="panel-body">
-                    <table class="table table-responsive" style="width: 80%;">
+                    <table class="table table-responsive" style="width: 87%;">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -52,6 +52,7 @@
 @endsection
 @section('my-js')
     <script>
+        var previous;
         $(function () {
             toastr.options = {
                 "positionClass": "toast-top-right",
@@ -96,6 +97,7 @@
                     });
             });
             $('tbody tr select').on('change',function () {
+                var select = $(this);
                 var role = $(this).val();
                 var tr = $(this).parent().parent().parent();
                 var uid = tr.attr('data-id');
@@ -107,14 +109,19 @@
                             toastr.success('Update user success!');
                         } else {
                             toastr.warning('Update failed, no authorization.');
+                            //todo: setback to its original value if failed to update
+                            select.selectpicker('val',previous);
                         }
                     },
                     error: function (e) {
                         toastr.error('An error happened.'+e.message);
+                        select.selectpicker('val',previous);
                     },
                     dataType:'json'
                 })
-            })
+            }).on('shown.bs.select',function () {
+                previous = $(this).val();
+            });
         });
 
     </script>
