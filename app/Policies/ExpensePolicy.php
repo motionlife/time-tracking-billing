@@ -10,6 +10,14 @@ class ExpensePolicy
 {
     use HandlesAuthorization;
 
+    public function before($user, $ability)
+    {
+        if ($user->isSuperAdmin()) {
+            return true;
+        } else if (!$user->isVerified()) {
+            return false;
+        }
+    }
     /**
      * Determine whether the user can view the expense.
      *
