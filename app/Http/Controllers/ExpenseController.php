@@ -71,7 +71,7 @@ class ExpenseController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts', 'review_status']));
+                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts', 'review_state']));
                     if ($exp->save()) {
                         if ($this->saveReceipts($request, $exp->id)) {
                             $feedback['code'] = 7;
@@ -123,6 +123,7 @@ class ExpenseController extends Controller
                 return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name, 'report_date' => $expense->report_date, 'description' => $expense->description,
                     'review_state' => $expense->review_state, 'hotel' => $expense->hotel, 'flight' => $expense->flight, 'meal' => $expense->meal,
                     'office_supply' => $expense->office_supply, 'car_rental' => $expense->car_rental, 'mileage_cost' => $expense->mileage_cost, 'other' => $expense->other, 'total' => number_format($expense->total(), 2, '.', ''),
+                    'cname' => $arr->consultant->fullname(), 'feedback' => $expense->feedback
                 ]);
             }
             //else illegal request!
@@ -142,19 +143,17 @@ class ExpenseController extends Controller
         //same reported hours
         $feedback = [];
         if ($request->ajax()) {
-            //business logic validation is important
-            //1. check the if the reported engagement is his valid engagement
             $expense = Expense::find($id);
             if ($user->can('update', $expense)) {
-                //should not let normal user update their own status!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                if ($expense->update($request->except(['eid', 'receipts', 'review_status']))) {
+                $excepted = $user->isSupervisor() && $request->get('review_state') != 'undefined' ? ['eid', 'receipts'] : ['eid', 'receipts', 'review_state'];
+                if ($expense->update($request->except($excepted))) {
                     //todo: Receipts should be handling in another method-------------------!!!!!!
                     if ($this->saveReceipts($request, $expense->id)) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'Record Update Success';
                         $feedback['record'] = ['company_paid' => $expense->company_paid ? 'Yes' : 'No', 'total' => number_format($expense->total(), 2),
                             'report_date' => $expense->report_date, 'description' => $expense->description, 'receipts' => $expense->receipts->pluck('filename'),
-                            'status' => $expense->getStatus()];
+                            'status' => $expense->getStatus(),];
                     } else {
                         $feedback['code'] = 6;
                         $feedback['message'] = 'Adding Files Failed, expense update rollback';

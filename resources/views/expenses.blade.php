@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+    @php $admin = Request::is('admin/expense'); @endphp
     <div class="main-content" xmlns:javascript="https://www.w3.org/1999/xhtml">
         <div class="container-fluid">
             {{--Begin of Modal--}}
@@ -9,9 +10,16 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="expenseModalLabel">Expense Detail</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-times" aria-hidden="true"></i>
-                            </button>
+                            <div class="row" style="margin: -1em -1em;color:#a2ebff;">
+                                <div class="col-md-8">
+                                    <h2 id="consultant-name"></h2>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <form action="" id="expense-form">
                             {{ csrf_field() }}
@@ -46,33 +54,33 @@
                                         <span class="input-group-addon"><i class="fa fa-bed" aria-hidden="true"></i>&nbsp;Hotel:$</span>
                                         <input class="form-control input-numbers" id="input-hotel" name="hotel"
                                                type="number" placeholder="numbers only"
-                                               step="0.1" min="0">
+                                               step="0.01" min="0">
                                         <span class="input-group-addon"><i class="fa fa-plane" aria-hidden="true"></i>&nbsp;Flight:$</span>
                                         <input class="form-control input-numbers" id="input-flight" name="flight"
-                                               type="number" step="0.1" min="0" placeholder="numbers only">
+                                               type="number" step="0.01" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-coffee" aria-hidden="true"></i>&nbsp;Meal:$</span>
                                         <input class="form-control input-numbers" id="input-meal" name="meal"
                                                type="number" placeholder="numbers only"
-                                               step="0.1" min="0">
+                                               step="0.01" min="0">
                                         <span class="input-group-addon"><i class="fa fa-paperclip"
                                                                            aria-hidden="true"></i>&nbsp;Office Supply:$</span>
                                         <input class="form-control input-numbers" id="input-office-supply"
                                                name="office_supply"
-                                               type="number" step="0.1" min="0" placeholder="numbers only">
+                                               type="number" step="0.01" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;Car Rental:$</span>
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
-                                               step="0.1" min="0">
+                                               step="0.01" min="0">
                                         <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost:$</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
                                                name="mileage_cost"
-                                               type="number" step="0.1" min="0" placeholder="numbers only">
+                                               type="number" step="0.01" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -80,11 +88,11 @@
                                                                            aria-hidden="true"></i>&nbsp;Other:$</span>
                                         <input class="form-control input-numbers" id="input-other" name="other"
                                                type="number" placeholder="numbers only"
-                                               step="0.1" min="0">
+                                               step="0.01" min="0">
                                         <span class="input-group-addon"><i class="fa fa-calculator"
                                                                            aria-hidden="true"></i>&nbsp;<strong>Total:$</strong></span>
                                         <input class="form-control" id="expense-total" name="total" type="number"
-                                               step="0.1" disabled>
+                                               step="0.01" disabled>
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -98,6 +106,26 @@
                                               placeholder="description"
                                               rows="5"></textarea>
                                     <br>
+                                    @if($admin)
+                                        <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="fancy-radio">
+                                                        <input name="review_state" value="1" type="radio">
+                                                        <span><i></i>Endorse Report</span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fancy-radio">
+                                                        <input name="review_state" value="2" type="radio">
+                                                        <span><i></i>Recommend Re-submit</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <input class="form-control" name="feedback" id="hour-feedback"
+                                                   placeholder="feedback" type="text">
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -114,11 +142,13 @@
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">Expenses History</h3>
+                        <h3 class="panel-title">{{$admin?'Reported Expense Pool':'Expenses History'}}</h3>
                         <p class="panel-subtitle">{{$expenses->total()}} results</p>
-                        <a class="btn btn-success update-pro" id="add-expense" href="javascript:void(0)"
-                           title="Report Your Expense"><i class="fa fa-plus" aria-hidden="true"></i>
-                            <span>Add New</span></a>
+                        @if(!$admin)
+                            <a class="btn btn-success update-pro" id="add-expense" href="javascript:void(0)"
+                               title="Report Your Expense"><i class="fa fa-plus" aria-hidden="true"></i>
+                                <span>Add New</span></a>
+                        @endif
                     </div>
 
                     <div class="panel-body col-md-9">
@@ -166,7 +196,7 @@
                             <th>Report Date</th>
                             <th>Total</th>
                             <th>Receipts</th>
-                            <th>Description</th>
+                            <th>{{$admin?'Consultant':'Description'}}</th>
                             <th>Status</th>
                             <th>Operate</th>
                         </tr>
@@ -174,7 +204,11 @@
                         <tbody id="main-table">
                         <?php $offset = ($expenses->currentPage() - 1) * $expenses->perPage() + 1;?>
                         @foreach($expenses as $expense)
-                            <?php $eng = $expense->arrangement->engagement ?>
+                            @php
+                                $arr = $expense->arrangement;
+                                $eng = $arr->engagement;
+                                $cname =$arr->consultant->fullname();
+                            @endphp
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->name,22)}}</td>
@@ -184,10 +218,17 @@
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
-                                        <a href="#" data-featherlight="{{$receipt->filename}}">Files{{$loop->index+1}}</a>
+                                        <a href="#"
+                                           data-featherlight="/{{$receipt->filename}}">Files{{$loop->index+1}}</a>
                                     @endforeach
                                 </td>
-                                <td>{{str_limit($expense->description,37)}}</td>
+                                <td>
+                                    @if($admin)
+                                        <strong>{{str_limit($cname,25)}}</strong>
+                                    @else
+                                        {{str_limit($hour->description,37)}}
+                                    @endif
+                                </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
                                 <td><a href=" javascript:editExpense({{$expense->id}})"><i
                                             class="fa fa-pencil-square-o"></i></a><a
@@ -270,7 +311,7 @@
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
                                 tr.find('td:nth-child(6) strong').html('$' + feedback.record.total);
                                 tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
-                                tr.find('td:nth-child(8)').html(feedback.record.description);
+                                @if(!$admin)tr.find('td:nth-child(8)').html(feedback.record.description);@endif
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                                 tr.addClass('update-highlight');//flash to show user that data already been updated
                                 setTimeout(function () {
@@ -326,6 +367,13 @@
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state != "0");
+                    $('#consultant-name').text(data.cname);
+                            @if($admin)
+                    var radios = $("input[name=review_state]");
+                    radios.first().attr('checked', data.review_state == 1);
+                    radios.last().attr('checked', data.review_state == 2);
+                    $('#hour-feedback').val(data.feedback);
+                    @endif
                 },
                 dataType: 'json'
             });
@@ -379,7 +427,7 @@
         function outputLink(receipts) {
             var result = '';
             $(receipts).each(function (i, name) {
-                result += '<a href="#" data-featherlight="' + name + '">File ' + (i +1)+ '<a/>';
+                result += '<a href="#" data-featherlight="/' + name + '">File ' + (i + 1) + '<a/>';
             });
             return result;
         }

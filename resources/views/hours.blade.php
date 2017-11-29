@@ -11,9 +11,16 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="hourModalLabel">Reported Record Detail</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-times" aria-hidden="true"></i>
-                            </button>
+                            <div class="row" style="margin: -1em -1em;color:#a2ebff;">
+                                <div class="col-md-8">
+                                    <h2 id="consultant-name"></h2>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <form action="" id="hour-form">
                             <div class="modal-body">
@@ -79,12 +86,33 @@
                                               placeholder="description"
                                               rows="5"></textarea>
                                     <br>
+                                    @if($admin)
+                                        <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="fancy-radio">
+                                                        <input name="endorse-or-not" value="1" type="radio">
+                                                        <span><i></i>Endorse Report</span>
+                                                    </label>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="fancy-radio">
+                                                        <input name="endorse-or-not" value="2" type="radio">
+                                                        <span><i></i>Recommend Re-submit</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <input class="form-control" name="feedback" id="hour-feedback"
+                                                   placeholder="feedback" type="text">
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button class="btn btn-primary" id="report-update" type="submit"
-                                        data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Update
+                                        data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing"><i
+                                            class="{{$admin?'fa fa-paper-plane':''}}" aria-hidden="true"></i>&nbsp;Update
                                 </button>
                             </div>
                         </form>
@@ -141,7 +169,7 @@
                             <th>Task</th>
                             <th>Billable Hours</th>
                             <th>Report Date</th>
-                            <th>Description</th>
+                            <th>{{$admin?'Consultant':'Description'}}</th>
                             <th>Status</th>
                             <th>Operate</th>
                         </tr>
@@ -149,7 +177,11 @@
                         <tbody>
                         <?php $offset = ($hours->currentPage() - 1) * $hours->perPage() + 1;?>
                         @foreach($hours as $hour)
-                            <?php $eng = $hour->arrangement->engagement ?>
+                            @php
+                                $arr = $hour->arrangement;
+                                $eng = $arr->engagement;
+                                $cname =$arr->consultant->fullname();
+                            @endphp
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->name,19)}}</td>
@@ -157,7 +189,13 @@
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                 <td>{{$hour->report_date}}</td>
-                                <td>{{str_limit($hour->description,29)}}</td>
+                                <td>
+                                    @if($admin)
+                                        <strong>{{str_limit($cname,25)}}</strong>
+                                    @else
+                                        {{str_limit($hour->description,29)}}
+                                    @endif
+                                </td>
                                 <td><span class="label label-{!!$hour->getStatus()[1].'">'.$hour->getStatus()[0]!!}</span></td>
                                 <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i
                                                 class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"><i
@@ -222,6 +260,13 @@
                         $('#non-billable-hours').val(data.non_billable_hours);
                         $('#description').val(data.description);
                         $('#report-update').attr('disabled', data.review_state != "0");
+                        $('#consultant-name').text(data.cname);
+                         @if($admin)
+                        var radios = $("input[name=endorse-or-not]");
+                        radios.first().attr('checked', data.review_state == 1);
+                        radios.last().attr('checked', data.review_state == 2);
+                        $('#hour-feedback').val(data.feedback);
+                        @endif
                     },
                     dataType: 'json'
                 });
@@ -269,20 +314,22 @@
                         task_id: $('#task-id').selectpicker('val'),
                         billable_hours: $('#billable-hours').val(),
                         non_billable_hours: $('#non-billable-hours').val(),
-                        description: $('#description').val()
+                        description: $('#description').val(),
+                        @if($admin)
+                        review_state: $("input[name=endorse-or-not]:checked").val(),
+                        feedback: $('#hour-feedback').val()
+                        @endif
                     },
                     dataType: 'json',
                     success: function (feedback) {
                         //notify the user
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been updated!');
-                            //no need to update engagement and client
-//                            tr.find('td:nth-child(2)').html(feedback.record.ename);
-//                            tr.find('td:nth-child(3)').html(feedback.record.cname);
                             tr.find('td:nth-child(4)').html(feedback.record.task);
                             tr.find('td:nth-child(5) strong').html(feedback.record.billable_hours);
                             tr.find('td:nth-child(6)').html(feedback.record.report_date);
-                            tr.find('td:nth-child(7)').html(feedback.record.description);
+                            @if(!$admin) tr.find('td:nth-child(7)').html(feedback.record.description);
+                            @endif
                             tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                             tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
                             var flash = tr;

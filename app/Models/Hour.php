@@ -79,10 +79,10 @@ class Hour extends Model
                 $status = ['Approved', 'success'];
                 break;
             case 2:
-                $status = ['Modified', 'info'];
+                $status = ['Modified', 'default'];
                 break;
             case 3:
-                $status = ['BossReplied', 'default'];
+                $status = ['BossReplied', 'info'];
                 break;
             case 4:
                 $status = ['Rejected', 'danger'];

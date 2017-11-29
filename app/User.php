@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->priority > 0 && $this->priority < 10;
     }
 
+    public function isSupervisor()
+    {
+        return $this->isManager() || $this->isSuperAdmin();
+    }
+
     public function getType()
     {
         return self::ROLES[$this->role];
