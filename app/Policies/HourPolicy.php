@@ -29,7 +29,7 @@ class HourPolicy
     public function view(User $user, Hour $hour)
     {
         //
-        return $hour->arrangement->consultant_id = $user->consultant->id || $user->isManager();
+        return $hour->arrangement->consultant_id == $user->consultant->id || $user->isManager();
     }
 
     /**

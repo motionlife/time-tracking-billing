@@ -76,7 +76,7 @@
                     },
                     function () {
                         $.post({
-                            url: '/admin/users',
+                            url: '/admin/user',
                             data: {_token: "{{csrf_token()}}", action: 'delete',uid:uid},
                             success: function (feedback) {
                                 if (feedback.code == 7) {
@@ -102,7 +102,7 @@
                 var tr = $(this).parent().parent().parent();
                 var uid = tr.attr('data-id');
                 $.post({
-                    url: '/admin/users',
+                    url: '/admin/user',
                     data: {_token: "{{csrf_token()}}", action: 'update',uid:uid,role:role},
                     success: function (feedback) {
                         if (feedback.code == 7) {
