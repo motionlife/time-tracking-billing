@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="main-content" xmlns:javascript="http://www.w3.org/1999/xhtml">
+    <div class="main-content" xmlns:javascript="https://www.w3.org/1999/xhtml">
         <div class="container-fluid">
             {{--Begin of Modal--}}
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
