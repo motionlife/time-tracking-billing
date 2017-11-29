@@ -108,11 +108,10 @@ class HoursController extends Controller
      */
     public function show($id, Request $request)
     {
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
             $hour = Hour::find($id);
-            //must check if this hour record belong to the consultant!!!
-            if ($hour && $hour->arrangement->consultant_id == $consultant->id) {
+            if ($user->can('view', $hour)) {
                 return json_encode($hour);
             }
             //else illegal request!

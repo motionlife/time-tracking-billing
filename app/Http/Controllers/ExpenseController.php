@@ -114,12 +114,10 @@ class ExpenseController extends Controller
      */
     public function edit($id, Request $request)
     {
-        //
-        $consultant = Auth::user()->consultant;
+        $user = Auth::user();
         if ($request->ajax()) {
             $expense = Expense::find($id);
-            //must check if this hour record belong to the consultant!!!
-            if ($expense && $expense->arrangement->consultant_id == $consultant->id) {
+            if ($user->can('view', $expense)) {
                 $arr = $expense->arrangement;
                 $expense->report_date = Carbon::parse($expense->report_date)->format('m/d/Y');
                 return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name, 'report_date' => $expense->report_date, 'description' => $expense->description,
@@ -129,7 +127,6 @@ class ExpenseController extends Controller
             }
             //else illegal request!
         }
-
     }
 
     /**

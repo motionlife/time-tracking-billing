@@ -20,6 +20,7 @@ class ExpensePolicy
     public function view(User $user, Expense $expense)
     {
         //
+        return $expense->arrangement->consultant_id = $user->consultant->id || $user->isManager();
     }
 
     /**

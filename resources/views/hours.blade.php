@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+    @php $admin = Request::is('admin/hour'); @endphp
     <div class="main-content">
         <div class="container-fluid">
             {{--Begin of Modal--}}
@@ -94,7 +95,7 @@
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">Time Reporting History</h3>
+                        <h3 class="panel-title">{{$admin?'Reported Hour Pool':'Time Reporting History'}}</h3>
                         <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
                     <div class="panel-body col-md-9">
@@ -197,7 +198,7 @@
 
             $('#billable-hours').on('change', function () {
                 var income = $('#income-estimate');
-                var br =income.attr('data-br');
+                var br = income.attr('data-br');
                 var fs = income.attr('data-fs');
                 var bh = $(this).val();
                 $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
