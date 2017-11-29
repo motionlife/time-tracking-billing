@@ -70,19 +70,6 @@ class Consultant extends Model
             ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'DESC')->take($amount)->get();
     }
 
-    public function myEngagementByClient()
-    {
-        //what if arr's eng had been deleted Should add stuatus to arrangement
-        //todo: Alter Arrangement table add status column, use it to deal with the case where it's engagement hab been deleted
-        $eids = Engagement::all()->pluck('id');
-        return $this->arrangements->whereIn('engagement_id',$eids)->groupBy('engagement_id')
-            ->mapToGroups(function ($item, $key) {
-                $eng = Engagement::find($key);
-                $cid = $eng->client->id;
-                return [$cid => [$eng->id, $eng->name]];
-            });
-    }
-
     public function myEngagements($start = null, $cid = null)
     {
         $eids = $this->arrangements()->pluck('engagement_id');

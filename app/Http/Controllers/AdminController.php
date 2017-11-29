@@ -101,22 +101,17 @@ class AdminController extends Controller
     {
         $hours = $this->paginate(Hour::recentReports($request->get('start'), $request->get('end'),
             $request->get('eid')), 25);
-        $clientIds = Arrangement::all()->groupBy('engagement_id')
-            ->mapToGroups(function ($item, $key) {
-                $eng = Engagement::find($key);
-                $cid = $eng->client->id;
-                return [$cid => [$eng->id, $eng->name]];
-            });
+
         return view('hours', ['hours' => $hours,
-            'clientIds' => $clientIds]);
+            'clientIds' => Engagement::groupedByClient()]);
     }
 
     private function expenseEndorsement($request)
     {
-        $consultant = Auth::user()->consultant;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
             $request->get('end'), $request->get('eid')), 25);
         return view('expenses', ['expenses' => $expenses,
-            'clientIds' => $consultant->myEngagementByClient()]);
+            'clientIds' => Engagement::groupedByClient()]);
     }
+
 }

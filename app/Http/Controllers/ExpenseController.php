@@ -26,9 +26,9 @@ class ExpenseController extends Controller
     {
         $consultant = Auth::user()->consultant;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), false), 25);
+            $request->get('end'), $request->get('eid'), $consultant), 25);
         return view('expenses', ['expenses' => $expenses,
-            'clientIds' => $consultant->myEngagementByClient()]);
+            'clientIds' => Engagement::groupedByClient($consultant)]);
     }
 
 

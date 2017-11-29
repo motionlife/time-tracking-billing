@@ -28,7 +28,7 @@ class HoursController extends Controller
         $hours = $this->paginate(Hour::recentReports($request->get('start'),
             $request->get('end'), $request->get('eid'), $consultant), 25);
         return view('hours', ['hours' => $hours,
-            'clientIds' => $consultant->myEngagementByClient()]);
+            'clientIds' => Engagement::groupedByClient($consultant)]);
     }
 
     /**
@@ -50,7 +50,7 @@ class HoursController extends Controller
 
         return view('new-hour', [
             'hours' => $hours,
-            'clientIds' => $consultant->myEngagementByClient()
+            'clientIds' => Engagement::groupedByClient($consultant)
         ]);
     }
 

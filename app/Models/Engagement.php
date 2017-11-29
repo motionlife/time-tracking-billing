@@ -31,15 +31,14 @@ class Engagement extends Model
     }
 
 
-//    public function couldBeDeleted(User $user)
-//    {
-//        return $this->state() != 'Active' || $user->priority > 10;
-//    }
-//    public function couldBeUpdated(User $user)
-//    {
-//        return $this->state() != 'Close' || $user->priority > 10;
-//    }
-
+    public static function groupedByClient($consultant = null)
+    {
+        if (isset($consultant)) $eids = $consultant->arrangements()->pluck('engagement_id');
+        return (isset($consultant) ? self::all()->whereIn('id', $eids) : self::all())
+            ->mapToGroups(function ($item, $key) {
+                return [$item->client_id => [$item->id, $item->name]];
+            });
+    }
 
     //get the leader(consultant) of the engagement
     public function leader()
