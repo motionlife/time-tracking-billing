@@ -101,10 +101,8 @@ class HomeController extends Controller
             $dates['endOfLast2'] = Carbon::parse('first day of last month')->addDays(14)->endOfDay();
         }
         for ($i = 12; $i > 0; $i--) {
-            $dates['mon'][Carbon::now()->addMonth(-$i)->format('y-M')] = [0, 0];
+            $dates['mon'][Carbon::now()->startOfMonth()->subMonth($i)->format('y-M')] = [0, 0];
         }
-        //fix no feb when today is 29
-        $dates['mon']['17-Feb']=[0,0];
         return $dates;
     }
 
