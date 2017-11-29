@@ -226,7 +226,7 @@
                                     @if($admin)
                                         <strong>{{str_limit($cname,25)}}</strong>
                                     @else
-                                        {{str_limit($hour->description,37)}}
+                                        {{str_limit($expense->description,37)}}
                                     @endif
                                 </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
