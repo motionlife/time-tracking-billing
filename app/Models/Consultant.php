@@ -46,6 +46,12 @@ class Consultant extends Model
         return $this->hasMany(Client::class, 'buz_dev_person_id');
     }
 
+    //all the arrangements he's attended
+    public function arrangements()
+    {
+        return $this->hasMany(Arrangement::class);
+    }
+
     //all the engagements he has ever leaded
     public function lead_engagements()
     {
@@ -58,32 +64,13 @@ class Consultant extends Model
         return isset($cid) ? $filered->where('client_id', $cid)->get() : $filered->get();
     }
 
-    //all the arrangements he's attended
-    public function arrangements()
-    {
-        return $this->hasMany(Arrangement::class);
-    }
-
-    public function recentHourOrExpenseReports($start = null, $end = null, $eid = null, $hour = true)
-    {
-        $resource = $hour ? Hour::class : Expense::class;
-        $aids = isset($eid) ? $this->arrangements()->where('engagement_id', $eid)->pluck('id') :
-            $this->arrangements()->pluck('id');
-        //isset($eid) ? Engagement::find($eid)->arrangements->pluck('id') :
-        if ($start || $end)
-            return $resource::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
-        else
-            return $resource::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
-    }
-
     public function justCreatedHourReports($start = null, $end = null, $amount=null)
     {
         return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
             ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'DESC')->take($amount)->get();
     }
 
-    public function EngagementByClient()
+    public function myEngagementByClient()
     {
         //what if arr's eng had been deleted Should add stuatus to arrangement
         //todo: Alter Arrangement table add status column, use it to deal with the case where it's engagement hab been deleted
@@ -103,14 +90,14 @@ class Consultant extends Model
             Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC')->get();
     }
 
-    public function getArrInfoByEid($eid)
+    public function getMyArrInfoByEid($eid)
     {
         return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($arr) {
             return ['position'=>$arr->position,'br'=>$arr->billing_rate,'fs'=>$arr->firm_share];
         });
     }
 
-    public function getArrangementByEidPid($eid, $pid = null)
+    public function getMyArrangementByEidPid($eid, $pid = null)
     {
         if (isset($pid))
             return $this->arrangements()->where([['engagement_id', '=', $eid], ['position_id', '=', $pid]])->first();

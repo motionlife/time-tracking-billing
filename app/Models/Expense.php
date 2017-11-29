@@ -47,16 +47,18 @@ class Expense extends Model
         }
     }
 
-//    public function couldBeDeleted()
-//    {
-//        return $this->getStatus()[0]=='Checking';
-//    }
-//
-//    public function couldBeUpdated()
-//    {
-//        $status = $this->getStatus();
-//        return ($status[0]=='Checking'||$status[0]=='Modified');
-//    }
+    public static function recentReports($start = null, $end = null, $eid = null, $consultant = null)
+    {
+        $arrangements = isset($consultant) ? $consultant->arrangements() : Arrangement::all();
+
+        $aids = isset($eid) ? $arrangements->where('engagement_id', $eid)->pluck('id') : $arrangements->pluck('id');
+
+        if ($start || $end)
+            return self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
+        else
+            return self::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
+    }
 
     public function getStatus()
     {

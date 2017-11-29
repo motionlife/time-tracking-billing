@@ -97,11 +97,10 @@
                         <h3 class="panel-title">Time Reporting History</h3>
                         <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
-
                     <div class="panel-body col-md-9">
                         <div class="form-inline pull-right" style="font-family:FontAwesome;">
                             <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="auto" id="client-engagements"
+                                <select class="selectpicker show-tick" data-width="fit" id="client-engagements"
                                         data-live-search="true">
                                     <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
                                     </option>
@@ -114,7 +113,6 @@
                                     @endforeach
                                 </select>
                             </div>
-
                             <div class="form-group">
                                 <input class="date-picker form-control" id="start-date"
                                        placeholder="&#xf073; Start Day"
@@ -186,7 +184,7 @@
             };
             $('#filter-button').on('click', function () {
                 var eid = $('#client-engagements').selectpicker('val');
-                window.location.href = '/hour?eid=' + (eid ? eid : '') +
+                window.location.href = 'hour?eid=' + (eid ? eid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });
             $('.date-picker').datepicker(

@@ -29,7 +29,7 @@
                                 <td>{{$user->last_name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
-                                <td><select name="user_role" class="selectpicker" data-width="auto">
+                                <td><select name="user_role" class="selectpicker show-tick" data-width="auto">
                                         <option value="0"
                                                 {{!$user->isVerified()?"selected":""}}  data-content="<span class='label label-danger'>Unrecognized</span>"></option>
                                         <option value="1"
@@ -109,7 +109,6 @@
                             toastr.success('Update user success!');
                         } else {
                             toastr.warning('Update failed, no authorization.');
-                            //todo: setback to its original value if failed to update
                             select.selectpicker('val',previous);
                         }
                     },

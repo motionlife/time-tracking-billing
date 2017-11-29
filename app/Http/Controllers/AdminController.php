@@ -4,6 +4,10 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Arrangement;
+use newlifecfo\Models\Engagement;
+use newlifecfo\Models\Expense;
+use newlifecfo\Models\Hour;
 use newlifecfo\User;
 
 class AdminController extends Controller
@@ -13,21 +17,25 @@ class AdminController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('verifiedConsultant');
-        //todo: add isAdmin middleware
+        //todo: add isAdmin middleware here. !!!important
     }
 
     public function index($resource, Request $request)
     {
         switch ($resource) {
-            case 'users':
+            case 'hour':
+                return $this->hourEndorsement($request);
+            case 'expense':
+                return $this->expenseEndorsement($request);
+            case 'user':
                 return $this->userAdmin($request);
-            case 'clients':
+            case 'client':
                 return $this->clientAdmin();
-            case 'positions':
+            case 'position':
                 return $this->positionAdmin();
-            case 'tasks':
+            case 'task':
                 return $this->taskAdmin();
-            case 'industries':
+            case 'industry':
                 return $this->industryAdmin();
         }
         return 'Resource Cannot Be Managed, No Authorization!';
@@ -72,24 +80,43 @@ class AdminController extends Controller
 
     }
 
-    private
-    function clientAdmin()
+    private function clientAdmin()
     {
         return view('admin.clients');
     }
 
-    private
-    function positionAdmin()
+    private function positionAdmin()
     {
     }
 
-    private
-    function taskAdmin()
+    private function taskAdmin()
     {
     }
 
-    private
-    function industryAdmin()
+    private function industryAdmin()
     {
+    }
+
+    private function hourEndorsement($request)
+    {
+        $hours = $this->paginate(Hour::recentReports($request->get('start'), $request->get('end'),
+            $request->get('eid')), 25);
+        $clientIds = Arrangement::all()->groupBy('engagement_id')
+            ->mapToGroups(function ($item, $key) {
+                $eng = Engagement::find($key);
+                $cid = $eng->client->id;
+                return [$cid => [$eng->id, $eng->name]];
+            });
+        return view('hours', ['hours' => $hours,
+            'clientIds' => $clientIds]);
+    }
+
+    private function expenseEndorsement($request)
+    {
+        $consultant = Auth::user()->consultant;
+        $expenses = $this->paginate(Expense::recentReports($request->get('start'),
+            $request->get('end'), $request->get('eid')), 25);
+        return view('expenses', ['expenses' => $expenses,
+            'clientIds' => $consultant->myEngagementByClient()]);
     }
 }

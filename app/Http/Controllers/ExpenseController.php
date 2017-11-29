@@ -25,10 +25,10 @@ class ExpenseController extends Controller
     public function index(Request $request)
     {
         $consultant = Auth::user()->consultant;
-        $expenses = $this->paginate($consultant->recentHourOrExpenseReports($request->get('start'),
+        $expenses = $this->paginate(Expense::recentReports($request->get('start'),
             $request->get('end'), $request->get('eid'), false), 25);
         return view('expenses', ['expenses' => $expenses,
-            'clientIds' => $consultant->EngagementByClient()]);
+            'clientIds' => $consultant->myEngagementByClient()]);
     }
 
 
@@ -66,7 +66,7 @@ class ExpenseController extends Controller
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {
-                $arr = $consultant->getArrangementByEidPid($eid);
+                $arr = $consultant->getMyArrangementByEidPid($eid);
                 if (!$arr) {
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';

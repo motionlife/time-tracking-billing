@@ -25,10 +25,10 @@ class HoursController extends Controller
     public function index(Request $request)
     {
         $consultant = Auth::user()->consultant;
-        $hours = $this->paginate($consultant->recentHourOrExpenseReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), true), 25);
+        $hours = $this->paginate(Hour::recentReports($request->get('start'),
+            $request->get('end'), $request->get('eid'), $consultant), 25);
         return view('hours', ['hours' => $hours,
-            'clientIds' => $consultant->EngagementByClient()]);
+            'clientIds' => $consultant->myEngagementByClient()]);
     }
 
     /**
@@ -44,13 +44,13 @@ class HoursController extends Controller
 
         if ($request->ajax()) {
             if ($request->get('fetch') == 'position') {
-                return $consultant->getArrInfoByEid($request->get('eid'));
+                return $consultant->getMyArrInfoByEid($request->get('eid'));
             }
         }
 
         return view('new-hour', [
             'hours' => $hours,
-            'clientIds' => $consultant->EngagementByClient()
+            'clientIds' => $consultant->myEngagementByClient()
         ]);
     }
 
@@ -78,7 +78,7 @@ class HoursController extends Controller
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
             } else {
-                $arr = $consultant->getArrangementByEidPid($eid, $pid);
+                $arr = $consultant->getMyArrangementByEidPid($eid, $pid);
                 if (!$arr) {
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';

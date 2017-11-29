@@ -124,7 +124,7 @@
                     <div class="panel-body col-md-9">
                         <div class="form-inline pull-right" style="font-family:FontAwesome;">
                             <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="auto" id="client-engagements"
+                                <select class="selectpicker show-tick" data-width="fit" id="client-engagements"
                                         data-live-search="true">
                                     <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
                                     </option>
@@ -221,7 +221,7 @@
             });
             $('#filter-button').on('click', function () {
                 var eid = $('#client-engagements').selectpicker('val');
-                window.location.href = '/expense?eid=' + (eid ? eid : '') +
+                window.location.href = 'expense?eid=' + (eid ? eid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });
             $('.date-picker').datepicker(

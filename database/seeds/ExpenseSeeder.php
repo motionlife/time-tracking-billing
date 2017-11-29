@@ -79,7 +79,8 @@ class ExpenseSeeder extends Seeder
                                 'report_date' => $line[4],
                                 'billable_hours' => $bh,
                                 'non_billable_hours' => $nbh,
-                                'description' => $line[10]
+                                'description' => $line[10],
+                                'review_state'=>1
                             ]);
                         }
                     }

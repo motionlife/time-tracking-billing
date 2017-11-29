@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Hour;
 
 class HomeController extends Controller
 {
@@ -80,7 +81,7 @@ class HomeController extends Controller
         ksort($data['last_b']);//data used for plotting the chart
 
         //data for latest hour report
-        $data['recent_hours'] = $consultant->recentHourOrExpenseReports()->take(5);
+        $data['recent_hours'] = Hour::recentReports(null,null,null,$consultant)->take(5);
 //            return json_encode($data);
         return view('home', ['data' => $data]);
     }

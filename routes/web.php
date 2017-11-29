@@ -32,5 +32,6 @@ Route::match(['get', 'post'], '/profile', 'ProfileController@index');
 Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
 Route::match(['get', 'post'], '/notification', 'NotificationController@index');
 Route::get('/pending',function (){
+    if(Auth::user()->isVerified()) return back();
    return view('auth.pending');
-});
+})->middleware('auth');
