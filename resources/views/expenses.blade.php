@@ -247,7 +247,7 @@
     </div>
 @endsection
 @section('my-js')
-    <script src="/js/featherlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.10/featherlight.min.js"></script>
     <script>
         var update;//boolean indicate whether user intend to update or report new
         var expid;
@@ -441,5 +441,5 @@
     </style>
 @endsection()
 @section('special-css')
-    <link rel="stylesheet" href="/css/featherlight.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.10/featherlight.min.css">
 @endsection

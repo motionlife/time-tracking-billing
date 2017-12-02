@@ -366,4 +366,4 @@
             margin-left: 1.5em;
         }
     </style>
-@endsection()
+@endsection
