@@ -51,8 +51,7 @@ class ExpensePolicy
      */
     public function update(User $user, Expense $expense)
     {
-        $status = $expense->getStatus();
-        return ($expense->arrangement->consultant_id = $user->consultant->id && ($status[0] == 'Checking' || $status[0] == 'Modified'))
+        return ($expense->arrangement->consultant_id = $user->consultant->id && $expense->unfinalized())
             || $user->isManager();
     }
 
@@ -65,6 +64,6 @@ class ExpensePolicy
      */
     public function delete(User $user, Expense $expense)
     {
-        return $expense->getStatus()[0]=='Checking'||$user->isManager();
+        return $expense->isPending()||$user->isManager();
     }
 }

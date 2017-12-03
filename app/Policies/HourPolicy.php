@@ -29,7 +29,7 @@ class HourPolicy
     public function view(User $user, Hour $hour)
     {
         //
-        return $hour->arrangement->consultant_id == $user->consultant->id || $user->isManager();
+        return $hour->arrangement->consultant_id == $user->consultant->id || $user->isSupervisor();
     }
 
     /**
@@ -53,9 +53,8 @@ class HourPolicy
     public function update(User $user, Hour $hour)
     {
         //
-        $status = $hour->getStatus();
-        return ($hour->arrangement->consultant_id = $user->consultant->id && ($status[0] == 'Pending' || $status[0] == 'Modified'))
-            || $user->isManager();
+        return ($hour->arrangement->consultant_id = $user->consultant->id && $hour->unfinalized())
+            || $user->isSupervisor();
     }
 
     /**
@@ -68,7 +67,7 @@ class HourPolicy
     public function delete(User $user, Hour $hour)
     {
         //
-        return ($hour->arrangement->consultant_id = $user->consultant->id && $hour->getStatus()[0] == 'Pending')
-            || $user->isManager();
+        return ($hour->arrangement->consultant_id = $user->consultant->id && $hour->isPending())
+            || $user->isSupervisor();
     }
 }

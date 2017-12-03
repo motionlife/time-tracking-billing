@@ -83,7 +83,7 @@ class HoursController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid']));
+                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid','review_state']));
                     if ($hour->save()) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'success';

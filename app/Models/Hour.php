@@ -32,6 +32,7 @@ class Hour extends Model
         return $this->belongsTo(Task::class);
     }
 
+    //deprecated
     public function summary(array &$data)
     {
         $day = new Carbon($this->report_date);
@@ -67,6 +68,14 @@ class Hour extends Model
             return self::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
     }
 
+    public function isPending()
+    {
+        return $this->getStatus()[0] == 'Pending';
+    }
+    public function unfinalized()
+    {
+        return ($this->getStatus()[0] == 'Pending' || $this->getStatus()[0] == 'Modified');
+    }
 
     public function getStatus()
     {
