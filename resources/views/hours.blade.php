@@ -97,7 +97,8 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
-                                                        <input name="endorse-or-not" value="2" type="radio">
+                                                        <input id="not-approved" name="endorse-or-not" value="2"
+                                                               type="radio">
                                                         <span><i></i>Recommend Re-submit</span>
                                                     </label>
                                                 </div>
@@ -249,7 +250,7 @@
                     url: '/hour/' + hid + '/edit',
                     success: function (data) {
                         //update modal
-                        $('#income-estimate').attr({'data-br': data.billing_rate}, {'data-fs': data.firm_share});
+                        $('#income-estimate').attr({"data-br": data.billing_rate, "data-fs": data.firm_share});
                         $('#client-engagement').attr('disabled', true)
                             .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
@@ -259,12 +260,12 @@
                         $('#billable-hours').val(data.billable_hours).trigger("change");
                         $('#non-billable-hours').val(data.non_billable_hours);
                         $('#description').val(data.description);
-                        $('#report-update').attr('disabled', data.review_state != "0");
+                        $('#report-update').attr('disabled', data.review_state !== "0");
                         $('#consultant-name').text(data.cname);
-                         @if($admin)
+                                @if($admin)
                         var radios = $("input[name=endorse-or-not]");
-                        radios.first().attr('checked', data.review_state == 1);
-                        radios.last().attr('checked', data.review_state == 2);
+                        radios.first().attr('checked', data.review_state === "1");
+                        $('#not-approved').attr('checked', data.review_state === "2");
                         $('#hour-feedback').val(data.feedback);
                         @endif
                     },

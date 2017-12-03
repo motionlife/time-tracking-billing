@@ -117,12 +117,12 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
-                                                        <input name="review_state" value="2" type="radio">
+                                                        <input name="review_state" id="not-approved" value="2" type="radio">
                                                         <span><i></i>Recommend Re-submit</span>
                                                     </label>
                                                 </div>
                                             </div>
-                                            <input class="form-control" name="feedback" id="hour-feedback"
+                                            <input class="form-control" name="feedback" id="expense-feedback"
                                                    placeholder="feedback" type="text">
                                         </div>
                                     @endif
@@ -366,13 +366,13 @@
                     $('#input-receipts').val('');//Current didn't want them to modify already uploaded receipts
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
-                    $('#report-update').attr('disabled', data.review_state != "0");
+                    $('#report-update').attr('disabled', data.review_state !== "0");
                     $('#consultant-name').text(data.cname);
                             @if($admin)
                     var radios = $("input[name=review_state]");
-                    radios.first().attr('checked', data.review_state == 1);
-                    radios.last().attr('checked', data.review_state == 2);
-                    $('#hour-feedback').val(data.feedback);
+                    radios.first().attr('checked', data.review_state === "1");
+                    $('#not-approved').attr('checked', data.review_state === "2");
+                    $('#expense-feedback').val(data.feedback);
                     @endif
                 },
                 dataType: 'json'

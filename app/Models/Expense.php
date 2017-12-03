@@ -62,11 +62,11 @@ class Expense extends Model
 
     public function isPending()
     {
-        return $this->getStatus()[0] == 'Checking';
+        return $this->getStatus()[0] == 'Pending';
     }
     public function unfinalized()
     {
-        return ($this->getStatus()[0] == 'Checking' || $this->getStatus()[0] == 'Modified');
+        return ($this->getStatus()[0] == 'Pending' || $this->getStatus()[0] == 'Modified');
     }
 
 
@@ -75,16 +75,16 @@ class Expense extends Model
         $status = [];
         switch ($this->review_state) {
             case 0:
-                $status = ['Checking', 'warning'];
+                $status = ['Pending', 'warning'];
                 break;
             case 1:
                 $status = ['Approved', 'success'];
                 break;
             case 2:
-                $status = ['Modified', 'info'];
+                $status = ['Modified', 'default'];
                 break;
             case 3:
-                $status = ['BossReplied', 'default'];
+                $status = ['BossReplied', 'info'];
                 break;
             case 4:
                 $status = ['Rejected', 'danger'];
