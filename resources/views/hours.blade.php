@@ -97,7 +97,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
-                                                        <input id="not-approved" name="endorse-or-not" value="2"
+                                                        <input name="endorse-or-not" value="2"
                                                                type="radio">
                                                         <span><i></i>Recommend Re-submit</span>
                                                     </label>
@@ -262,10 +262,9 @@
                         $('#description').val(data.description);
                         $('#report-update').attr('disabled', data.review_state !== "0");
                         $('#consultant-name').text(data.cname);
-                                @if($admin)
-                        var radios = $("input[name=endorse-or-not]");
-                        radios.first().attr('checked', data.review_state === "1");
-                        $('#not-approved').attr('checked', data.review_state === "2");
+                        @if($admin)
+                        $("input[name=endorse-or-not][value=" + data.review_state + "]").prop('checked', true);
+                        if(data.review_state==="0") $("input[name=endorse-or-not]").prop('checked', false);
                         $('#hour-feedback').val(data.feedback);
                         @endif
                     },

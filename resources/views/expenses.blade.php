@@ -117,7 +117,8 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
-                                                        <input name="review_state" id="not-approved" value="2" type="radio">
+                                                        <input name="review_state" value="2"
+                                                               type="radio">
                                                         <span><i></i>Recommend Re-submit</span>
                                                     </label>
                                                 </div>
@@ -219,7 +220,7 @@
                                 <td>
                                     @foreach($expense->receipts as $receipt)
                                         <a href="#"
-                                           data-featherlight="/{{$receipt->filename}}">Files{{$loop->index+1}}</a>
+                                           data-featherlight="/{{$receipt->filename}}">File{{$loop->index+1}}</a>
                                     @endforeach
                                 </td>
                                 <td>
@@ -311,7 +312,8 @@
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
                                 tr.find('td:nth-child(6) strong').html('$' + feedback.record.total);
                                 tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
-                                @if(!$admin)tr.find('td:nth-child(8)').html(feedback.record.description);@endif
+                                @if(!$admin)tr.find('td:nth-child(8)').html(feedback.record.description);
+                                @endif
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                                 tr.addClass('update-highlight');//flash to show user that data already been updated
                                 setTimeout(function () {
@@ -368,10 +370,9 @@
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state !== "0");
                     $('#consultant-name').text(data.cname);
-                            @if($admin)
-                    var radios = $("input[name=review_state]");
-                    radios.first().attr('checked', data.review_state === "1");
-                    $('#not-approved').attr('checked', data.review_state === "2");
+                    @if($admin)
+                    $("input[name=review_state][value=" + data.review_state + "]").prop('checked', true);
+                    if(data.review_state==="0") $("input[name=review_state]").prop('checked', false);
                     $('#expense-feedback').val(data.feedback);
                     @endif
                 },
