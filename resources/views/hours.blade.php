@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    @php $admin = Request::is('admin/time'); @endphp
+    @php $admin = Request::is('admin/hour'); @endphp
     <div class="main-content">
         <div class="container-fluid">
             {{--Begin of Modal--}}

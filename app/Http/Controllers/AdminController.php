@@ -24,7 +24,7 @@ class AdminController extends Controller
     public function index($resource, Request $request)
     {
         switch ($resource) {
-            case 'time':
+            case 'hour':
                 return $this->hourEndorsement($request);
             case 'expense':
                 return $this->expenseEndorsement($request);

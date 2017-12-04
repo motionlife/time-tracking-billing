@@ -95,10 +95,10 @@
                         </li>
                         <li>
                             <a href="#subPages" data-toggle="collapse"
-                               class="{{str_contains(Request::path(),'hour') ? 'active':'collapsed '}}"><i
+                               class="{{substr(Request::path(),0,4)=='hour' ? 'active':'collapsed '}}"><i
                                         class="lnr lnr-clock"></i> <span>Time</span> <i
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
-                            <div id="subPages" class="collapse {{str_contains(Request::path(),'hour') ?'in':''}}">
+                            <div id="subPages" class="collapse {{substr(Request::path(),0,4)=='hour'  ?'in':''}}">
                                 <ul class="nav">
                                     <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Overview</a>
                                     </li>
@@ -116,11 +116,11 @@
                         </li>
                         <li>
                             <a href="#subPages2" data-toggle="collapse"
-                               class="{{str_contains(Request::path(),'engagement') ? 'active':'collapsed '}}"><i
+                               class="{{substr(Request::path(),0,10)=='engagement'  ? 'active':'collapsed '}}"><i
                                         class="lnr lnr-briefcase"></i> <span>Engagements</span> <i
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages2"
-                                 class="collapse {{str_contains(Request::path(),'engagement') ?'in':''}}">
+                                 class="collapse {{substr(Request::path(),0,10)=='engagement' ?'in':''}}">
                                 <ul class="nav">
                                     <li><a href="{{route('engagement.index')}}"
                                            class="{{Request::is('engagement') ?'active':''}}">Overview</a></li>
@@ -142,7 +142,7 @@
                                             class="icon-submenu lnr lnr-chevron-left"></i></a>
                                 <div id="subPages3" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}">
                                     <ul class="nav">
-                                        <li><a href="/admin/time" class="{{Request::is('admin/time')?'active':''}}">Endorse
+                                        <li><a href="/admin/hour" class="{{Request::is('admin/hour')?'active':''}}">Endorse
                                                 Hours</a></li>
                                         <li><a href="/admin/expense"
                                                class="{{Request::is('admin/expense')?'active':''}}">Endorse Expenses</a>
