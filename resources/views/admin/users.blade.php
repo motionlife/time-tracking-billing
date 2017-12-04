@@ -93,7 +93,7 @@
                                 toastr.error('An error happened.' + e.message);
                             },
                             dataType: 'json'
-                        })
+                        });
                     });
             });
             $('tr select').on('change', function () {
@@ -117,9 +117,10 @@
                         select.selectpicker('val', previous);
                     },
                     dataType: 'json'
-                })
+                });
             }).on('shown.bs.select', function () {
                 previous = $(this).val();
+                $(this).selectpicker('refresh');
             });
         });
 
