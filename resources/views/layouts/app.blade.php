@@ -103,7 +103,7 @@
                                     <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Overview</a>
                                     </li>
                                     <li><a href="{{route('hour.create')}}"
-                                           class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
+                                           class="{{Request::is('hour/create') ?'active':''}}">Report Time</a></li>
                                 </ul>
                             </div>
                         </li>
