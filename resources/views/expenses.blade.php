@@ -168,7 +168,15 @@
                                     @endforeach
                                 </select>
                             </div>
-
+                            <div class="form-group">
+                                <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
+                                        data-live-search="true">
+                                    <option value="" data-icon="glyphicon-user" selected>Consultant</option>
+                                    @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                        <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <input class="date-picker form-control" id="start-date"
                                        placeholder="&#xf073; Start Day"
@@ -263,7 +271,8 @@
             });
             $('#filter-button').on('click', function () {
                 var eid = $('#client-engagements').selectpicker('val');
-                window.location.href = 'expense?eid=' + (eid ? eid : '') +
+                var conid = $('#consultant-select').selectpicker('val');
+                window.location.href = 'expense?eid=' + (eid ? eid : '') + '&conid=' + (conid ? conid : '') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });
             $('.date-picker').datepicker(
@@ -372,7 +381,7 @@
                     $('#consultant-name').text(data.cname);
                     @if($admin)
                     $("input[name=review_state][value=" + data.review_state + "]").prop('checked', true);
-                    if(data.review_state==="0") $("input[name=review_state]").prop('checked', false);
+                    if (data.review_state === "0") $("input[name=review_state]").prop('checked', false);
                     $('#expense-feedback').val(data.feedback);
                     @endif
                 },

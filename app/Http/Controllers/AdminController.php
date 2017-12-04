@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
+use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Expense;
 use newlifecfo\Models\Hour;
@@ -27,6 +28,8 @@ class AdminController extends Controller
                 return $this->hourEndorsement($request);
             case 'expense':
                 return $this->expenseEndorsement($request);
+            case 'engagement':
+                return $this->grantEngagement($request);
             case 'user':
                 return $this->userAdmin($request);
             case 'client':
@@ -99,8 +102,9 @@ class AdminController extends Controller
 
     private function hourEndorsement($request)
     {
+        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
         $hours = $this->paginate(Hour::recentReports($request->get('start'), $request->get('end'),
-            $request->get('eid')), 25);
+            $request->get('eid'), $consultant), 25);
 
         return view('hours', ['hours' => $hours,
             'clientIds' => Engagement::groupedByClient()]);
@@ -108,10 +112,16 @@ class AdminController extends Controller
 
     private function expenseEndorsement($request)
     {
+        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid')), 25);
+            $request->get('end'), $request->get('eid'), $consultant), 25);
         return view('expenses', ['expenses' => $expenses,
             'clientIds' => Engagement::groupedByClient()]);
+    }
+
+    private function grantEngagement($request)
+    {
+        return view('engagements');
     }
 
 }
