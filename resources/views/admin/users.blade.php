@@ -63,7 +63,7 @@
                 "timeOut": "2000",
                 "extendedTimeOut": "700"
             };
-            $('tbody tr a').on('click', function () {
+            $('tr a').on('click', function () {
                 var tr = $(this).parent().parent();
                 var uid = tr.attr('data-id');
                 swal({
@@ -96,7 +96,7 @@
                         })
                     });
             });
-            $('tbody tr select').on('change', function () {
+            $('tr select').on('change', function () {
                 var select = $(this);
                 var role = $(this).val();
                 var tr = $(this).parent().parent().parent();
