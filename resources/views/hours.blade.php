@@ -143,6 +143,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @if($admin)
                             <div class="form-group">
                                 <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
                                         data-live-search="true">
@@ -152,6 +153,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            @endif
                             <div class="form-group">
                                 <input class="date-picker form-control" id="start-date"
                                        placeholder="&#xf073; Start Day"

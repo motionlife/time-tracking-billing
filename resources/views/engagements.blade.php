@@ -345,7 +345,7 @@
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
-                        if (data.paying_cycle != 0) {
+                        if (data.paying_cycle !== "0") {
                             $('#bill-pay-head').html('Pay Rate');
                             $('#billing_amount').attr('disabled', false);
                         }
@@ -355,7 +355,6 @@
                         }
                         var table = $('#members-table');
                         var tr = table.find('tr').first();
-                        //.clone().appendTo(table);
                         $.each(data.arrangements, function (i, o) {
                             tr.find('.cid').selectpicker('val', o.consultant_id);
                             tr.find('.pid').selectpicker('val', o.position_id);

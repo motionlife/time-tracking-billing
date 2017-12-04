@@ -99,13 +99,13 @@
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages" class="collapse {{str_contains(Request::path(),'hour') ?'in':''}}" >
                                 <ul class="nav">
-                                    <li><a href="{{route('hour.create')}}" class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
                                     <li><a href="{{route('hour.index')}}" class="{{Request::is('hour') ?'active':''}}">Overview</a></li>
-                                    <li><a href="{{route('hour.show','wage')}}" class="{{Request::is('hour/wage') ?'active':''}}">Payroll</a></li>
+                                    <li><a href="{{route('hour.create')}}" class="{{Request::is('hour/create') ?'active':''}}">Report New</a></li>
                                 </ul>
                             </div>
                         </li>
-                        <li><a href="{{route('expense.index')}}" class="{{Request::is('expense') ?'active':'collapsed'}}"><i class="lnr lnr-bus" aria-hidden="true"></i><span>Expenses</span></a></li>
+                        <li><a href="{{route('expense.index')}}" class="{{Request::is('expense') ?'active':'collapsed'}}"><i class="fa fa-taxi" aria-hidden="true"></i><span>Expenses</span></a></li>
+                        <li><a href="/payroll" class="{{Request::is('payroll') ?'active':''}}"><i class="fa fa-envira" aria-hidden="true"></i><span>Payroll</span></a></li>
                         <li>
                             <a href="#subPages2" data-toggle="collapse"
                                class="{{str_contains(Request::path(),'engagement') ? 'active':'collapsed '}}"><i
@@ -118,11 +118,8 @@
                                 </ul>
                             </div>
                         </li>
-
-                        <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i> <span>Model Test</span></a></li>
                         <li><a href="/profile" class="{{Request::is('profile') ?'active':''}}"><i class="fa fa-id-badge" aria-hidden="true">&nbsp;</i><span>My Profile</span></a></li>
-                        <li><a href="/notification" class="{{Request::is('notification') ?'active':''}}"><i class="lnr lnr-alarm"></i><span>Notifications</span></a></li>
-
+                        <li><a href="/message" class="{{Request::is('message') ?'active':''}}"><i class="fa fa-envelope-o" aria-hidden="true"></i><span>Messages</span></a></li>
                         <li>
                             <a href="#subPages3" data-toggle="collapse"
                                class="{{str_contains(Request::path(),'admin') ? 'active':'collapsed '}}"><i
@@ -139,6 +136,7 @@
                                 </ul>
                             </div>
                         </li>
+                        <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i> <span>Dev Test</span></a></li>
                     </ul>
                 </nav>
             </div>

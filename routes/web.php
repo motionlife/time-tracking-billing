@@ -23,15 +23,25 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('hour', 'HoursController');
 Route::resource('expense', 'ExpenseController');
 Route::resource('engagement', 'EngagementController');
-Route::get('/test', 'TestController@index')->name('test');
+Route::match(['get', 'post'], '/payroll', 'PayrollController@index');
+Route::match(['get', 'post'], '/profile', 'ProfileController@index');
+Route::match(['get', 'post'], '/message', 'MessageController@index');
+Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
+Route::get('/pending', function () {
+    if (Auth::user()->isVerified()) return back();
+    return view('auth.pending');
+})->middleware('auth');
+
+//todo use controller to deal with file including pdf file
 Route::get('/receipts/{name}', function ($name) {
-    header("Content-type: image/jpeg");
+    //header("Content-type: " . str_contains($name, 'pdf') ? "application/pdf" : "image/*");
+    if (str_contains($name, 'pdf')) {
+        header("Content-type:application/pdf");
+    } else {
+        header("Content-type:image/*");
+    }
+
     echo Storage::get('receipts/' . $name);
 });
-Route::match(['get', 'post'], '/profile', 'ProfileController@index');
-Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
-Route::match(['get', 'post'], '/notification', 'NotificationController@index');
-Route::get('/pending',function (){
-    if(Auth::user()->isVerified()) return back();
-   return view('auth.pending');
-})->middleware('auth');
+
+Route::get('/test', 'TestController@index')->name('test');

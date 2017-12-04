@@ -168,15 +168,17 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
-                                        data-live-search="true">
-                                    <option value="" data-icon="glyphicon-user" selected>Consultant</option>
-                                    @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                                        <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @if($admin)
+                                <div class="form-group">
+                                    <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
+                                            data-live-search="true">
+                                        <option value="" data-icon="glyphicon-user" selected>Consultant</option>
+                                        @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                            <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                             <div class="form-group">
                                 <input class="date-picker form-control" id="start-date"
                                        placeholder="&#xf073; Start Day"
@@ -227,8 +229,11 @@
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
-                                        <a href="#"
-                                           data-featherlight="/{{$receipt->filename}}">File{{$loop->index+1}}</a>
+                                        @if(str_contains($receipt->filename,'pdf'))
+                                            <a href="{{$receipt->filename}}"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>
+                                        @else
+                                            <a href="#" data-featherlight="{{$receipt->filename}}"><i class="fa fa-file-image-o" aria-hidden="true"></i></a>
+                                        @endif
                                     @endforeach
                                 </td>
                                 <td>
@@ -239,7 +244,7 @@
                                     @endif
                                 </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
-                                <td><a href=" javascript:editExpense({{$expense->id}})"><i
+                                <td class="operation"><a href=" javascript:editExpense({{$expense->id}})"><i
                                             class="fa fa-pencil-square-o"></i></a><a
                                             href="javascript:deleteExpense({{$expense->id}})"><i
                                                 class="fa fa-times"></i></a></td>
@@ -437,14 +442,18 @@
         function outputLink(receipts) {
             var result = '';
             $(receipts).each(function (i, name) {
-                result += '<a href="#" data-featherlight="/' + name + '">File ' + (i + 1) + '<a/>';
+                if(name.indexOf('pdf')!==-1){
+                    result += '<a href="/' + name + '"><i class="fa fa-file-pdf-o" aria-hidden="true"></i><a/>';
+                }else{
+                    result += '<a href="#" data-featherlight="/' + name + '"><i class="fa fa-file-image-o" aria-hidden="true"></i><a/>';
+                }
             });
             return result;
         }
 
     </script>
     <style>
-        td a:nth-child(2) {
+        td.operation a:nth-child(2) {
             color: red;
             margin-left: 1.5em;
         }

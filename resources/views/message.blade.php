@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="container-fluid">
-<h1>Notifications</h1>
+<h1>Messages</h1>
         </div>
     </div>
 @endsection
