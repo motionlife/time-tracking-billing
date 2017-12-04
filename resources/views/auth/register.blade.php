@@ -82,7 +82,7 @@
                                 <div class="form-group">
                                     <label for="password-confirm" class="col-md-4 control-label">Register As</label>
                                     <div class="col-md-6">
-                                        <select name="role" class="selectpicker" data-width="100%" id="user-role">
+                                        <select name="role" class="selectpicker" data-width="100%" id="user-role" disabled>
                                             <option value="3" selected >Consultant</option>
                                             <option value="1">Client</option>
                                             <option value="2">Outside Referrer</option>
