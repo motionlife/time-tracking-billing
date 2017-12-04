@@ -201,7 +201,7 @@
                                         <td>{{$engagement->start_date}}</td>
                                         <td>{{$formatter->format($engagement->buz_dev_share)}}</td>
                                         <td>{{$engagement->clientBilledType()}}</td>
-                                        <td><i class="fa fa-circle-o {{$engagement->state()}}"
+                                        <td><i class="fa fa-flag {{$engagement->state()}}"
                                                aria-hidden="true"></i>{{$engagement->state()}}</td>
                                     </tr>
                                     </tbody>

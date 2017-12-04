@@ -9,7 +9,7 @@
                     <h5>total:{{$users->count()}}</h5>
                 </div>
                 <div class="panel-body">
-                    <table class="table table-responsive" style="width: 87%;">
+                    <table class="table table-responsive">
                         <thead>
                         <tr>
                             <th>#</th>
@@ -77,7 +77,7 @@
                     function () {
                         $.post({
                             url: '/admin/user',
-                            data: {_token: "{{csrf_token()}}", action: 'delete',uid:uid},
+                            data: {_token: "{{csrf_token()}}", action: 'delete', uid: uid},
                             success: function (feedback) {
                                 if (feedback.code == 7) {
                                     toastr.success('Delete user success!');
@@ -90,35 +90,35 @@
                                 }
                             },
                             error: function (e) {
-                                toastr.error('An error happened.'+e.message);
+                                toastr.error('An error happened.' + e.message);
                             },
-                            dataType:'json'
+                            dataType: 'json'
                         })
                     });
             });
-            $('tbody tr select').on('change',function () {
+            $('tbody tr select').on('change', function () {
                 var select = $(this);
                 var role = $(this).val();
                 var tr = $(this).parent().parent().parent();
                 var uid = tr.attr('data-id');
                 $.post({
                     url: '/admin/user',
-                    data: {_token: "{{csrf_token()}}", action: 'update',uid:uid,role:role},
+                    data: {_token: "{{csrf_token()}}", action: 'update', uid: uid, role: role},
                     success: function (feedback) {
                         if (feedback.code == 7) {
                             toastr.success('Update user success!');
                         } else {
                             toastr.warning('Update failed, no authorization.');
-                            select.selectpicker('val',previous);
+                            select.selectpicker('val', previous);
                         }
                     },
                     error: function (e) {
-                        toastr.error('An error happened.'+e.message);
-                        select.selectpicker('val',previous);
+                        toastr.error('An error happened.' + e.message);
+                        select.selectpicker('val', previous);
                     },
-                    dataType:'json'
+                    dataType: 'json'
                 })
-            }).on('shown.bs.select',function () {
+            }).on('shown.bs.select', function () {
                 previous = $(this).val();
             });
         });

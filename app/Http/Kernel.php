@@ -3,6 +3,7 @@
 namespace newlifecfo\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use newlifecfo\Http\Middleware\Supervisor;
 use newlifecfo\Http\Middleware\VerifiedConsultant;
 
 class Kernel extends HttpKernel
@@ -58,6 +59,7 @@ class Kernel extends HttpKernel
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \newlifecfo\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verifiedConsultant'=>VerifiedConsultant::class
+        'verifiedConsultant'=>VerifiedConsultant::class,
+        'supervisor'=>Supervisor::class,
     ];
 }

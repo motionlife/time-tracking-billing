@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
+use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Expense;
@@ -17,14 +18,13 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('verifiedConsultant');
-        //todo: add isAdmin middleware here. !!!important
+        $this->middleware('supervisor');
     }
 
     public function index($resource, Request $request)
     {
         switch ($resource) {
-            case 'hour':
+            case 'time':
                 return $this->hourEndorsement($request);
             case 'expense':
                 return $this->expenseEndorsement($request);
@@ -121,7 +121,14 @@ class AdminController extends Controller
 
     private function grantEngagement($request)
     {
-        return view('engagements');
+        if ($request->ajax()) {
+            //return the business development info to the request
+            if ($request->get('fetch') == 'business')
+                return Client::find($request->get('cid'))->whoDevelopedMe();
+        }
+        $consultant = Auth::user()->consultant;
+        return view('engagements', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
+            'leader' => $consultant, 'cids' => $consultant->lead_engagements->pluck('client_id')->unique()]);
     }
 
 }

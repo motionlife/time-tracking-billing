@@ -21,6 +21,7 @@ class EngagementController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
@@ -35,6 +36,7 @@ class EngagementController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
@@ -55,6 +57,7 @@ class EngagementController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
     public function store(Request $request)
     {
@@ -102,7 +105,7 @@ class EngagementController extends Controller
      * Display the specified resource.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function show($id)
     {
@@ -113,6 +116,7 @@ class EngagementController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int $id
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function edit($id, Request $request)
@@ -131,7 +135,7 @@ class EngagementController extends Controller
             }
             //else illegal request! todo: some feedback
         } else {
-            return "Illegeal Request!";
+            return "Illegal Request!";
         }
 
     }
@@ -141,7 +145,6 @@ class EngagementController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @param User $user
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -185,6 +188,7 @@ class EngagementController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int $id
+     * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function destroy($id, Request $request)
