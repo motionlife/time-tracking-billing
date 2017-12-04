@@ -230,9 +230,9 @@
                                 <td>
                                     @foreach($expense->receipts as $receipt)
                                         @if(str_contains($receipt->filename,'pdf'))
-                                            <a href="{{$receipt->filename}}"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>
+                                            <a href="/{{$receipt->filename}}"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>
                                         @else
-                                            <a href="#" data-featherlight="{{$receipt->filename}}"><i class="fa fa-file-image-o" aria-hidden="true"></i></a>
+                                            <a href="#" data-featherlight="/{{$receipt->filename}}"><i class="fa fa-file-image-o" aria-hidden="true"></i></a>
                                         @endif
                                     @endforeach
                                 </td>
