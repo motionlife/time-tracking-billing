@@ -20,7 +20,7 @@
                     </div>
                 </form>
                 <div class="navbar-btn navbar-btn-right">
-                    <a class="btn btn-success update-pro" href="{{route('hour.create')}}" title="Report Your Time"><i
+                    <a class="btn btn-success" href="{{route('hour.create')}}" title="Report Your Time"><i
                                 class="fa fa-calendar" aria-hidden="true"></i> <span>REPORT TIME</span></a>
                 </div>
                 <div id="navbar-menu">

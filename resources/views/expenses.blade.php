@@ -8,18 +8,13 @@
                  aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" style="margin-bottom: -1.4em">
-                            <h3 class="modal-title" id="expenseModalLabel">Expense Detail</h3>
-                            <div class="row" style="margin: -1em -1em;color:#a2ebff;">
-                                <div class="col-md-8">
-                                    <h2 id="consultant-name"></h2>
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <i class="fa fa-times" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="hourModalLabel">Consultant:
+                                <span id="consultant-name" style="color: #4bb3ff;"></span>
+                                <a type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </a>
+                            </h3>
                         </div>
                         <form action="" id="expense-form">
                             {{ csrf_field() }}
@@ -144,17 +139,16 @@
 
             <div class="panel panel-headline">
                 <div class="row">
-                    <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">{{$admin?'Reported Expense Pool':'Expenses History'}}</h3>
+                    <div class="panel-heading col-md-2">
+                        <h3 class="panel-title">{{$admin?'Reported Expense Pool':'Expense History'}}</h3>
                         <p class="panel-subtitle">{{$expenses->total()}} results</p>
+                    </div>
+                    <div class="panel-body col-md-10">
                         @if(!$admin)
-                            <a class="btn btn-success update-pro" id="add-expense" href="javascript:void(0)"
-                               title="Report Your Expense"><i class="fa fa-plus" aria-hidden="true"></i>
+                            <a class="btn btn-success" id="add-expense" href="javascript:void(0)"
+                               title="New Expense"><i class="fa fa-plus" aria-hidden="true"></i>
                                 <span>Add New</span></a>
                         @endif
-                    </div>
-
-                    <div class="panel-body col-md-9">
                         @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
                         @endcomponent
                     </div>
@@ -164,8 +158,8 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Engagement</th>
                             <th>Client</th>
+                            <th>Engagement</th>
                             <th>Company Paid</th>
                             <th>Report Date</th>
                             <th>Total</th>
@@ -185,8 +179,8 @@
                             @endphp
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td>{{str_limit($eng->name,22)}}</td>
                                 <td>{{str_limit($eng->client->name,22)}}</td>
+                                <td>{{str_limit($eng->name,22)}}</td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
                                 <td>{{$expense->report_date}}</td>
                                 <td><strong>${{number_format($expense->total(),2)}}</strong></td>
@@ -209,7 +203,7 @@
                                     @endif
                                 </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
-                                <td class=" operation"><a href=" javascript:editExpense({{$expense->id}})"><i
+                                <td><a href=" javascript:editExpense({{$expense->id}})"><i
                                                 class="fa fa-pencil-square-o"></i></a><a
                                             href="javascript:deleteExpense({{$expense->id}})"><i
                                                 class="fa fa-times"></i></a></td>
@@ -302,7 +296,7 @@
                             } else {
                                 //prepend it at the top of the list
                                 toastr.success('Success! Expense has been created!');
-                                $('<tr><th scope="row">*</th><td>' + feedback.data.ename + '</td><td>' + feedback.data.cname + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
+                                $('<tr><th scope="row">*</th><td>' + feedback.data.cname + '</td><td>' + feedback.data.ename + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
                                     .prependTo('#main-table').hide().fadeIn(1500);
                             }
                         } else {
@@ -424,7 +418,7 @@
 
     </script>
     <style>
-        td.operation a:nth-child(2) {
+        td:last-child a:nth-child(2) {
             color: red;
             margin-left: 1.5em;
         }

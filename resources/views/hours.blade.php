@@ -9,106 +9,19 @@
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" style="margin-bottom: -1.2em">
-                            <h3 class="modal-title" id="hourModalLabel">Reported Record Detail</h3>
-                            <div class="row" style="margin: -1em -1em;color:#a2ebff;">
-                                <div class="col-md-8">
-                                    <h2 id="consultant-name"></h2>
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="hourModalLabel">Consultant:
+                                    <span id="consultant-name" style="color: #4bb3ff;"></span>
+                                    <a type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <i class="fa fa-times" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
+                                    </a>
+                            </h3>
                         </div>
                         <form action="" id="hour-form">
                             <div class="modal-body">
                                 <div class="panel-body">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-                                        <select id="client-engagement" class="selectpicker" data-width="auto"
-                                                name="eid">
-                                        </select>
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Job Position:</span>
-                                        <select class="selectpicker" id="position" name="pid"
-                                                data-width="auto"></select>
-                                        <span class="input-group-addon"><i
-                                                    class="fa fa-calendar"></i>&nbsp; Report Date</span>
-                                        <input class="date-picker form-control" id="report-date"
-                                               placeholder="mm/dd/yyyy"
-                                               name="report_date" type="text" required/>
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
-                                        <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
-                                                data-width="auto" name="task_id"
-                                                title="Please select one of the tasks your did">
-                                            @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
-                                                <?php $gname = $tgroup->name?>
-                                                @foreach($tgroup->tasks as $task)
-                                                    <option value="{{$task->id}}"
-                                                            data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
-                                                @endforeach
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-usd"></i>&nbsp;<strong>Billable Hours:</strong></span>
-                                        <input class="form-control" id="billable-hours" name="billable_hours"
-                                               type="number"
-                                               placeholder="numbers only"
-                                               step="0.1" min="0"
-                                               max="24" required>
-
-                                        <span class="input-group-addon"><i
-                                                    class="fa fa-hourglass-start"></i>&nbsp;Non-billable Hours:</span>
-                                        <input class="form-control" id="non-billable-hours" name="non_billable_hours"
-                                               type="number" step="0.1" min="0"
-                                               placeholder="numbers only">
-
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-money"></i>&nbsp;Estimated Income:</span>
-                                        <input type="text" id="income-estimate" disabled value="" class="form-control"
-                                               data-br="" data-fs="">
-                                    </div>
-                                    <br>
-                                    <textarea id="description" class="form-control" name="description"
-                                              placeholder="description"
-                                              rows="5"></textarea>
-                                    <br>
-                                    @if($admin)
-                                        <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="fancy-radio">
-                                                        <input name="endorse-or-not" value="1" type="radio">
-                                                        <span><i></i>Endorse Report</span>
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="fancy-radio">
-                                                        <input name="endorse-or-not" value="2"
-                                                               type="radio">
-                                                        <span><i></i>Recommend Re-submit</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <input class="form-control" name="feedback" id="hour-feedback"
-                                                   placeholder="feedback" type="text">
-                                        </div>
-                                    @else
-                                        <div id="feedback-info" style="margin-bottom: -1em"></div>
-                                    @endif
+                                    @component('components.hour-form',['admin'=>$admin])
+                                    @endcomponent
                                 </div>
                             </div>
                             <div class="modal-footer" style="margin-top: -0.7em">
@@ -139,8 +52,8 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Engagement</th>
                             <th>Client</th>
+                            <th>Engagement</th>
                             <th>Task</th>
                             <th>Billable Hours</th>
                             <th>Report Date</th>
@@ -159,8 +72,8 @@
                             @endphp
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td>{{str_limit($eng->name,19)}}</td>
                                 <td>{{str_limit($eng->client->name,19)}}</td>
+                                <td>{{str_limit($eng->name,19)}}</td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
                                 <td>{{$hour->report_date}}</td>
@@ -227,7 +140,7 @@
                         //update modal
                         $('#income-estimate').attr({"data-br": data.billing_rate, "data-fs": data.firm_share});
                         $('#client-engagement').attr('disabled', true)
-                            .empty().append('<option>' + data.ename + '</option>').selectpicker('refresh');
+                            .empty().append('<option selected>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
                         $('#task-id').selectpicker('val', data.task_id);//.selectpicker('refresh');

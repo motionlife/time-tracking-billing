@@ -10,72 +10,8 @@
                     </div>
                     <form method="POST" id="hour-form" action="/hour">
                         <div class="panel-body">
-                            <div class="input-group">
-                            <span class="input-group-addon"><i
-                                        class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-                                <select id="client-engagements" class="selectpicker show-tick" data-width="auto"
-                                        data-live-search="true" name="eid"
-                                        title="Select the engagements your want report to" required>
-                                    @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                                            @foreach($engagements as $eng)
-                                                <option value="{{$eng[0]}}">{{$eng[1]}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <br>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Job Position:</span>
-                                <select class="selectpicker" id="position" name="pid" data-width="auto"
-                                        required></select>
-                                <span class="input-group-addon"><i class="fa fa-calendar"></i>&nbsp; Report Date</span>
-                                <input class="date-picker form-control" id="report-date" placeholder="mm/dd/yyyy"
-                                       name="report_date" type="text" required/>
-
-                            </div>
-                            <br>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
-                                <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
-                                        data-width="auto" name="task_id"
-                                        title="Please select one of the tasks your did" required>
-                                    @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
-                                        <?php $gname = $tgroup->name?>
-                                        @foreach($tgroup->tasks as $task)
-                                            <option value="{{$task->id}}"
-                                                    data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
-                                        @endforeach
-                                    @endforeach
-                                </select>
-                            </div>
-                            <br>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-usd"></i>&nbsp;<strong>Billable Hours:</strong></span>
-                                <input class="form-control" id="billable-hours" name="billable_hours" type="number"
-                                       placeholder="numbers only"
-                                       step="0.1" min="0"
-                                       max="24" required>
-
-                                <span class="input-group-addon"><i
-                                            class="fa fa-hourglass-start"></i>&nbsp;Non-billable Hours:</span>
-                                <input class="form-control" id="non-billable-hours" name="non_billable_hours"
-                                       type="number" step="0.1" min="0"
-                                       placeholder="numbers only">
-
-                            </div>
-                            <br>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i
-                                            class="fa fa-money"></i>&nbsp;Estimated Income:</span>
-                                <input type="text" id="income-estimate" disabled value="" class="form-control">
-                            </div>
-                            <br>
-                            <textarea id="description" class="form-control" name="description" placeholder="description"
-                                      rows="5"></textarea>
-                            <br>
+                           @component('components.hour-form',['clientIds'=>$clientIds])
+                            @endcomponent
                         </div>
                         <div class="panel-footer">
                             <button class="btn btn-primary" id="report-button" type="submit"
@@ -135,12 +71,13 @@
                 "timeOut": "4000",
                 "extendedTimeOut": "900"
             };
-            $('#client-engagements').on('change', function () {
+            $('#client-engagement').on('change', function () {
+                var select = $(this);
                 $.ajax({
                     //fetch the corresponding position for him and add option to position option
                     type: "get",
                     url: "/hour/create",
-                    data: {eid: $('#client-engagements').selectpicker('val'), fetch: 'position'},
+                    data: {eid: select.selectpicker('val'), fetch: 'position'},
                     success: function (data) {
                         var pos = $('#position').empty();
                         $(data).each(function (i, arr) {
@@ -162,7 +99,7 @@
 
 
             $('#hour-form').on('submit', function (e) {
-                var eid = $('#client-engagements').selectpicker('val');
+                var eid = $('#client-engagement').selectpicker('val');
                 var token = "{{ csrf_token() }}";
                 $.ajax({
                     type: "POST",
