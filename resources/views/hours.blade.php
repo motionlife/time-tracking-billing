@@ -9,7 +9,7 @@
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header" style="margin-bottom: -1.2em">
                             <h3 class="modal-title" id="hourModalLabel">Reported Record Detail</h3>
                             <div class="row" style="margin: -1em -1em;color:#a2ebff;">
                                 <div class="col-md-8">
@@ -107,11 +107,11 @@
                                                    placeholder="feedback" type="text">
                                         </div>
                                     @else
-                                        <div id="feedback-info" style="margin-bottom: -0.9em"></div>
+                                        <div id="feedback-info" style="margin-bottom: -1em"></div>
                                     @endif
                                 </div>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer"  style="margin-top: -0.7em">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button class="btn btn-primary" id="report-update" type="submit"
                                         data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing"><i
