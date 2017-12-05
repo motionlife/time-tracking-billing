@@ -106,6 +106,8 @@
                                             <input class="form-control" name="feedback" id="hour-feedback"
                                                    placeholder="feedback" type="text">
                                         </div>
+                                    @else
+                                        <div id="feedback-info" style="margin-bottom: -0.9em"></div>
                                     @endif
                                 </div>
                             </div>
@@ -144,15 +146,15 @@
                                 </select>
                             </div>
                             @if($admin)
-                            <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
-                                        data-live-search="true">
-                                    <option value="" data-icon="glyphicon-user" selected>Consultant</option>
-                                    @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                                        <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <div class="form-group">
+                                    <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
+                                            data-live-search="true">
+                                        <option value="" data-icon="glyphicon-user" selected>Consultant</option>
+                                        @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                            <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @endif
                             <div class="form-group">
                                 <input class="date-picker form-control" id="start-date"
@@ -278,6 +280,10 @@
                         $("input[name=endorse-or-not][value=" + data.review_state + "]").prop('checked', true);
                         if (data.review_state === "0") $("input[name=endorse-or-not]").prop('checked', false);
                         $('#hour-feedback').val(data.feedback);
+                        @else
+                        if (data.review_state !== "0" && data.feedback !== null)
+                            $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
+                        else $('#feedback-info').removeClass('alert alert-success').text('');
                         @endif
                     },
                     dataType: 'json'

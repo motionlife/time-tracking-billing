@@ -104,7 +104,7 @@
                                     <br>
                                     <textarea id="description" class="form-control" name="description"
                                               placeholder="description"
-                                              rows="5"></textarea>
+                                              rows="4"></textarea>
                                     <br>
                                     @if($admin)
                                         <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
@@ -126,6 +126,8 @@
                                             <input class="form-control" name="feedback" id="expense-feedback"
                                                    placeholder="feedback" type="text">
                                         </div>
+                                    @else
+                                        <div id="feedback-info" style="margin-bottom: -0.9em"></div>
                                     @endif
                                 </div>
                             </div>
@@ -230,9 +232,11 @@
                                 <td>
                                     @foreach($expense->receipts as $receipt)
                                         @if(str_contains($receipt->filename,'pdf'))
-                                            <a href="/{{$receipt->filename}}"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></a>
+                                            <a href="/{{$receipt->filename}}"><i class="fa fa-file-pdf-o"
+                                                                                 aria-hidden="true"></i></a>
                                         @else
-                                            <a href="#" data-featherlight="/{{$receipt->filename}}"><i class="fa fa-file-image-o" aria-hidden="true"></i></a>
+                                            <a href="#" data-featherlight="/{{$receipt->filename}}"><i
+                                                        class="fa fa-file-image-o" aria-hidden="true"></i></a>
                                         @endif
                                     @endforeach
                                 </td>
@@ -244,8 +248,8 @@
                                     @endif
                                 </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
-                                <td class="operation"><a href=" javascript:editExpense({{$expense->id}})"><i
-                                            class="fa fa-pencil-square-o"></i></a><a
+                                <td class=" operation"><a href=" javascript:editExpense({{$expense->id}})"><i
+                                                class="fa fa-pencil-square-o"></i></a><a
                                             href="javascript:deleteExpense({{$expense->id}})"><i
                                                 class="fa fa-times"></i></a></td>
                             </tr>
@@ -388,7 +392,12 @@
                     $("input[name=review_state][value=" + data.review_state + "]").prop('checked', true);
                     if (data.review_state === "0") $("input[name=review_state]").prop('checked', false);
                     $('#expense-feedback').val(data.feedback);
+                    @else
+                        if (data.review_state !== "0" && data.feedback !== null)
+                            $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
+                        else $('#feedback-info').removeClass('alert alert-success').text('');
                     @endif
+
                 },
                 dataType: 'json'
             });
@@ -442,9 +451,9 @@
         function outputLink(receipts) {
             var result = '';
             $(receipts).each(function (i, name) {
-                if(name.indexOf('pdf')!==-1){
+                if (name.indexOf('pdf') !== -1) {
                     result += '<a href="/' + name + '"><i class="fa fa-file-pdf-o" aria-hidden="true"></i><a/>';
-                }else{
+                } else {
                     result += '<a href="#" data-featherlight="/' + name + '"><i class="fa fa-file-image-o" aria-hidden="true"></i><a/>';
                 }
             });
