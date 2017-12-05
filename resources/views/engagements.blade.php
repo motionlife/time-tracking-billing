@@ -134,80 +134,81 @@
         @endif
         {{--END OF MODAL--}}
         <div class="container-fluid">
-            <h3 class="page-title">{{$manage?'Engagements I lead':'Engagements I\'m in'}}
-                (total {{$engagements->count()}})</h3>
-            <div class="up-border">
-                @if($manage)
-                    <a href="javascript:void(0)" class="btn btn-success" id="build-engagement"><i class="fa fa-cubes">&nbsp;
-                            Build</i></a>
-                @endif
-                <div class="form-inline {{ $manage?'pull-right':''}}" style="font-family:FontAwesome;">
-                    <div class="form-group"
-                    ">
-                    <select class="selectpicker show-tick" data-width="fit" id="client-filter"
-                            data-live-search="true">
-                        <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
-                        @foreach($cids as $cid)
-                            <option value="{{$cid}}"
-                                    data-content="<strong>{{\newlifecfo\Models\Client::find($cid)->name}}</strong>" {{Request('cid')==$cid?'selected':''}}></option>
-                        @endforeach
-                    </select>
+            <div class="row">
+                <div class="col-md-4">
+                    <h3 class="page-title" style="margin: auto;">{{$manage?'Engagements I lead':'Engagements I\'m in'}}
+                        (total {{$engagements->count()}})</h3>
                 </div>
-                <div class="form-group">
-                    <input class="date-picker form-control" id="start-date-filter"
-                           placeholder="&#xf073; Start Day"
-                           value="{{Request('start')}}"
-                           type="text"/>
-                </div>
-                <div class="form-group">
-                    <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
+                <div class="col-md-8">
+                    <div class="form-inline pull-right" style="font-family:FontAwesome;">
+                        @if($manage)
+                            <a href="javascript:void(0)" class="btn btn-success" id="build-engagement"><i
+                                        class="fa fa-cubes">&nbsp;
+                                    Build</i></a>
+                        @endif
+                        <select class="selectpicker show-tick" data-width="fit" id="client-filter"
+                                data-live-search="true">
+                            <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
+                            @foreach($cids as $cid)
+                                <option value="{{$cid}}"
+                                        data-content="<strong>{{\newlifecfo\Models\Client::find($cid)->name}}</strong>" {{Request('cid')==$cid?'selected':''}}></option>
+                            @endforeach
+                        </select>
+
+                        <input class="date-picker form-control" size=10 id="start-date-filter"
+                               placeholder="&#xf073; Start after"
+                               value="{{Request('start')}}"
+                               type="text"/>
+
+                        <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
+                    </div>
                 </div>
             </div>
             <hr>
-        </div>
         @foreach($engagements as $engagement)
-            @if($loop->index%2==0)
-                <div class="row">
-                    @endif
-                    <div class="col-md-6">
-                        <div class="panel">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong>
-                                    @if($manage)
-                                        <div class="pull-right">
-                                            <a href="javascript:void(0)" class="eng-edit" data-id="{{$engagement->id}}"><i
-                                                        class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                                            <span>&nbsp;|&nbsp;</span>
-                                            <a href="javascript:void(0)" class="eng-delete"
-                                               data-id="{{$engagement->id}}"><i
-                                                        class="fa fa-trash-o" aria-hidden="true"></i></a>
-                                        </div>
-                                    @endif
-                                </h3>
-                                <p class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong></p>
-                                <table class="table table-striped table-bordered table-responsive">
-                                    <thead>
-                                    <tr>
-                                        <th>Leader</th>
-                                        <th>Started</th>
-                                        <th>Buz Dev Share</th>
-                                        <th>Billed Type</th>
-                                        <th>Status</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td>{{$engagement->leader->fullname()}}</td>
-                                        <td>{{$engagement->start_date}}</td>
-                                        <td>{{$formatter->format($engagement->buz_dev_share)}}</td>
-                                        <td>{{$engagement->clientBilledType()}}</td>
-                                        <td><i class="fa fa-flag {{$engagement->state()}}"
-                                               aria-hidden="true"></i>{{$engagement->state()}}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="panel-body slim-scroll member-table">
+                @if($loop->index%2==0)
+                    <div class="row">
+                        @endif
+                        <div class="col-md-6">
+                            <div class="panel">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong>
+                                        @if($manage)
+                                            <div class="pull-right">
+                                                <a href="javascript:void(0)" class="eng-edit"
+                                                   data-id="{{$engagement->id}}"><i
+                                                            class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                <span>&nbsp;|&nbsp;</span>
+                                                <a href="javascript:void(0)" class="eng-delete"
+                                                   data-id="{{$engagement->id}}"><i
+                                                            class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                            </div>
+                                        @endif
+                                    </h3>
+                                    <p class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong></p>
+                                    <table class="table table-striped table-bordered table-responsive">
+                                        <thead>
+                                        <tr>
+                                            <th>Leader</th>
+                                            <th>Started</th>
+                                            <th>Buz Dev Share</th>
+                                            <th>Billed Type</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{$engagement->leader->fullname()}}</td>
+                                            <td>{{$engagement->start_date}}</td>
+                                            <td>{{$formatter->format($engagement->buz_dev_share)}}</td>
+                                            <td>{{$engagement->clientBilledType()}}</td>
+                                            <td><i class="fa fa-flag {{$engagement->state()}}"
+                                                   aria-hidden="true"></i>{{$engagement->state()}}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="panel-body slim-scroll member-table">
                                     @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
                                     <table class="table table-sm">
                                         <thead>
@@ -238,14 +239,14 @@
                                         @endforeach
                                         </tbody>
                                     </table>
+                                </div>
                             </div>
                         </div>
+                        @if($loop->index%2==1||$loop->last)
                     </div>
-                    @if($loop->index%2==1||$loop->last)
-                </div>
-            @endif
-        @endforeach
-    </div>
+                @endif
+            @endforeach
+        </div>
     </div>
 @endsection
 @section('my-js')
@@ -478,9 +479,10 @@
 
 @section('special-css')
     <style>
-        .member-table{
+        .member-table {
             margin-top: -4.0%;
         }
+
         .table td, .table th {
             text-align: center;
         }
@@ -491,10 +493,6 @@
 
         .panel-subtitle strong {
             color: #27b2ff;
-        }
-
-        .up-border {
-            margin: -0.8em 0 -0.9em 0;
         }
 
         td > i {

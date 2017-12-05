@@ -123,9 +123,9 @@
                                  class="collapse {{substr(Request::path(),0,10)=='engagement' ?'in':''}}">
                                 <ul class="nav">
                                     <li><a href="{{route('engagement.index')}}"
-                                           class="{{Request::is('engagement') ?'active':''}}">Overview</a></li>
+                                           class="{{Request::is('engagement') ?'active':''}}">As member</a></li>
                                     <li><a href="{{route('engagement.create')}}"
-                                           class="{{Request::is('engagement/create') ?'active':''}}">My Teams</a></li>
+                                           class="{{Request::is('engagement/create') ?'active':''}}">As Leader</a></li>
                                 </ul>
                             </div>
                         </li>
