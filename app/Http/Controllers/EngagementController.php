@@ -126,14 +126,14 @@ class EngagementController extends Controller
             $eng = Engagement::find($id);
             if ($user->can('view', $eng)) {
                 foreach ($eng->arrangements as $arrangement) {
-                    if(!$user->can('view',$arrangement)){
-                        $arrangement->billing_rate='';
-                        $arrangement->firm_share='';
+                    if (!$user->can('view', $arrangement)) {
+                        $arrangement->billing_rate = '';
+                        $arrangement->firm_share = '';
                     }
+                    $arrangement->makeHidden(['engagement','created_at','updated_at','deleted_at']);
                 }
                 return $eng;
             }
-            //else illegal request! todo: some feedback
         } else {
             return "Illegal Request!";
         }

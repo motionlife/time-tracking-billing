@@ -10,10 +10,11 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 class="modal-title" id="engagementModalLabel">Setup A New Engagement</h3>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-times" aria-hidden="true"></i>
-                            </button>
+                            <h3 class="modal-title" id="engagementModalLabel"><span>Setup A New Engagement</span>
+                                <a type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </a>
+                            </h3>
                         </div>
                         <form action="" id="engagement-form">
                             <div class="modal-body">
@@ -154,24 +155,22 @@
                                         data-content="<strong>{{\newlifecfo\Models\Client::find($cid)->name}}</strong>" {{Request('cid')==$cid?'selected':''}}></option>
                             @endforeach
                         </select>
-
                         <input class="date-picker form-control" size=10 id="start-date-filter"
                                placeholder="&#xf073; Start after"
                                value="{{Request('start')}}"
                                type="text"/>
-
                         <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
                     </div>
                 </div>
             </div>
             <hr>
-        @foreach($engagements as $engagement)
+            @foreach($engagements as $engagement)
                 @if($loop->index%2==0)
                     <div class="row">
                         @endif
                         <div class="col-md-6">
                             <div class="panel">
-                                <div class="panel-heading">
+                                <div class="panel-heading engagement-table">
                                     <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong>
                                         @if($manage)
                                             <div class="pull-right">
@@ -185,7 +184,9 @@
                                             </div>
                                         @endif
                                     </h3>
-                                    <p class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong></p>
+                                    <div class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong>
+                                        <span class="label label-info pull-right">Total Members: <strong>{{$engagement->arrangements->count()}}</strong></span>
+                                    </div>
                                     <table class="table table-striped table-bordered table-responsive">
                                         <thead>
                                         <tr>
@@ -208,12 +209,11 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="panel-body slim-scroll member-table">
+                                <div class="panel-body slim-scroll arrangement-table">
                                     @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
                                     <table class="table table-sm">
                                         <thead>
                                         <tr>
-                                            <th>#</th>
                                             <th>Consultant</th>
                                             <th>Position</th>
                                             <th>{{$hourly?'Billing Rate':'Pay Rate'}}</th>
@@ -223,7 +223,6 @@
                                         <tbody>
                                         @foreach($engagement->arrangements as $arrangement)
                                             <tr>
-                                                <th scope="row">{{$loop->index+1}}</th>
                                                 <td>{{$arrangement->consultant->fullname()}}</td>
                                                 <td> {{$arrangement->position->name}}</td>
                                                 <td>
@@ -231,7 +230,8 @@
                                                         ${{$arrangement->billing_rate}}
                                                     @endcan
                                                 </td>
-                                                <td>  @can('view',$arrangement)
+                                                <td>
+                                                    @can('view',$arrangement)
                                                         {{$hourly? $formatter->format($arrangement->firm_share):'-'}}
                                                     @endcan
                                                 </td>
@@ -299,7 +299,6 @@
                 update = false;
                 //modal initialization
                 initModal(false);
-                $('#submit-modal').text('Build');
                 $('#engagementModal').modal('toggle');
             });
 
@@ -334,7 +333,6 @@
             });
             $('.eng-edit').on('click', function () {
                 initModal(true);
-                $('#submit-modal').html('Update');
                 $.get({
                     url: '/engagement/' + $(this).attr('data-id') + '/edit',
                     success: function (data) {
@@ -346,6 +344,7 @@
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
+                        $('#submit-modal').attr('disabled', data.status === "0");
                         if (data.paying_cycle !== "0") {
                             $('#bill-pay-head').html('Pay Rate');
                             $('#billing_amount').attr('disabled', false);
@@ -461,6 +460,11 @@
                 $('#cycle-select').selectpicker('val', 0);
                 $('#bill-pay-head').html('Billing Rate');
                 $('#billing_amount').val('').attr('disabled', true);
+                $('#submit-modal').text('Build');
+                $('#engagementModalLabel').find('span').text('Setup A New Engagement');
+            }else{
+                $('#submit-modal').html('Update');
+                $('#engagementModalLabel').find('span').text('Update Engagement')
             }
         }
 
@@ -476,11 +480,14 @@
 
     </script>
 @endsection
-
 @section('special-css')
     <style>
-        .member-table {
-            margin-top: -4.0%;
+        .arrangement-table {
+            margin-top: -3.8%;
+        }
+
+        .engagement-table {
+            margin-bottom: -1.2em;
         }
 
         .table td, .table th {
@@ -491,7 +498,7 @@
             color: red;
         }
 
-        .panel-subtitle strong {
+        .panel-subtitle > strong{
             color: #27b2ff;
         }
 
@@ -511,5 +518,18 @@
         td > i.Closed {
             color: Grey;
         }
+
+        #members-table tr td:nth-child(3) input {
+            width: 100px;
+        }
+
+        #members-table tr td:nth-child(4) input {
+            width: 70px;
+        }
+
+        .arrangement-table tbody tr td:nth-last-child(-n+2) {
+            width: 20%;
+        }
+
     </style>
 @endsection
