@@ -111,7 +111,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="modal-footer"  style="margin-top: -0.7em">
+                            <div class="modal-footer" style="margin-top: -0.7em">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button class="btn btn-primary" id="report-update" type="submit"
                                         data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing"><i
@@ -130,46 +130,37 @@
                         <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
                     <div class="panel-body col-md-9">
-                        <div class="form-inline pull-right" style="font-family:FontAwesome;">
-                            <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="fit" id="client-engagements"
+                        <div class="form-inline pull-right form-group-sm" style="font-family:FontAwesome;">
+                            <select class="selectpicker show-tick form-control form-control-sm" data-width="fit" id="client-engagements"
+                                    data-live-search="true">
+                                <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
+                                </option>
+                                @foreach($clientIds as $cid=>$engagements)
+                                    <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
+                                        @foreach($engagements as $eng)
+                                            <option value="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                            @if($admin)
+                                <select class="selectpicker show-tick form-control form-control-sm" data-width="fit" id="consultant-select"
                                         data-live-search="true">
-                                    <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
-                                    </option>
-                                    @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                                            @foreach($engagements as $eng)
-                                                <option value="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
-                                            @endforeach
-                                        </optgroup>
+                                    <option value="" data-icon="glyphicon-user" selected>Consultant</option>
+                                    @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                        <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
                                     @endforeach
                                 </select>
-                            </div>
-                            @if($admin)
-                                <div class="form-group">
-                                    <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
-                                            data-live-search="true">
-                                        <option value="" data-icon="glyphicon-user" selected>Consultant</option>
-                                        @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                                            <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
                             @endif
-                            <div class="form-group">
-                                <input class="date-picker form-control" id="start-date"
-                                       placeholder="&#xf073; Start Day"
-                                       value="{{Request('start')}}"
-                                       type="text"/>
-                            </div>
+                            <input class="date-picker form-control" id="start-date"
+                                   placeholder="&#xf073; Start Day"
+                                   value="{{Request('start')}}"
+                                   type="text"/>
                             <span>-</span>
-                            <div class="form-group">
-                                <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
-                                       value="{{Request('end')}}" type="text"/>
-                            </div>
-                            <div class="form-group">
-                                <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
-                            </div>
+                            <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
+                                   value="{{Request('end')}}" type="text"/>
+                            <a href="javascript:void(0)" type="button" class="btn btn-info"
+                               id="filter-button">Filter</a>
                         </div>
                     </div>
                 </div>
