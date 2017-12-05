@@ -131,7 +131,7 @@
                                     @endif
                                 </div>
                             </div>
-                            <div class="modal-footer"  style="margin-top: -0.7em">
+                            <div class="modal-footer" style="margin-top: -0.7em">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button class="btn btn-primary" id="report-update" type="submit"
                                         data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing"></button>
@@ -155,47 +155,8 @@
                     </div>
 
                     <div class="panel-body col-md-9">
-                        <div class="form-inline pull-right" style="font-family:FontAwesome;">
-                            <div class="form-group">
-                                <select class="selectpicker show-tick" data-width="fit" id="client-engagements"
-                                        data-live-search="true">
-                                    <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
-                                    </option>
-                                    @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                                            @foreach($engagements as $eng)
-                                                <option value="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
-                            @if($admin)
-                                <div class="form-group">
-                                    <select class="selectpicker show-tick" data-width="fit" id="consultant-select"
-                                            data-live-search="true">
-                                        <option value="" data-icon="glyphicon-user" selected>Consultant</option>
-                                        @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                                            <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            @endif
-                            <div class="form-group">
-                                <input class="date-picker form-control" id="start-date"
-                                       placeholder="&#xf073; Start Day"
-                                       value="{{Request('start')}}"
-                                       type="text"/>
-                            </div>
-                            <span>-</span>
-                            <div class="form-group">
-                                <input class="date-picker form-control" id="end-date" placeholder="&#xf073; End Day"
-                                       value="{{Request('end')}}" type="text"/>
-                            </div>
-                            <div class="form-group">
-                                <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
-                            </div>
-                        </div>
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
+                        @endcomponent
                     </div>
                 </div>
                 <div class="panel-body no-padding">
@@ -248,7 +209,7 @@
                                     @endif
                                 </td>
                                 <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
-                                <td class="operation"><a href=" javascript:editExpense({{$expense->id}})"><i
+                                <td class=" operation"><a href=" javascript:editExpense({{$expense->id}})"><i
                                                 class="fa fa-pencil-square-o"></i></a><a
                                             href="javascript:deleteExpense({{$expense->id}})"><i
                                                 class="fa fa-times"></i></a></td>
@@ -394,9 +355,9 @@
                     if (data.review_state === "0") $("input[name=review_state]").prop('checked', false);
                     $('#expense-feedback').val(data.feedback);
                     @else
-                        if (data.review_state !== "0" && data.feedback !== null)
-                            $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
-                        else $('#feedback-info').removeClass('alert alert-success').text('');
+                    if (data.review_state !== "0" && data.feedback !== null)
+                        $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
+                    else $('#feedback-info').removeClass('alert alert-success').text('');
                     @endif
 
                 },
