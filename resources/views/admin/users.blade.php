@@ -30,14 +30,22 @@
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
                                 <td><select name="user_role" class="selectpicker show-tick" data-width="auto">
-                                        <option value="0"
-                                                {{!$user->isVerified()?"selected":""}}  data-content="<span class='label label-danger'>Unrecognized</span>"></option>
-                                        <option value="1"
-                                                {{$user->isNormalUser()?"selected":""}} data-content="<span class='label label-success'>Normal User</span>"></option>
-                                        <option value="2"
-                                                {{$user->isManager()?"selected":""}} data-content="<span class='label label-info'>General Admin</span>"></option>
-                                        <option value="3"
-                                                {{$user->isSuperAdmin()?"selected":""}} data-content="<span class='label label-warning'>Super Admin</span>"></option>
+                                        <option value="0" @if(!$user->isVerified()) selected
+                                                data-content="<span class='label label-danger'>Unrecognized</span>"@endif>
+                                            Unrecognized
+                                        </option>
+                                        <option value="1" @if($user->isNormalUser()) selected
+                                                data-content="<span class='label label-success'>Normal User</span>"@endif>
+                                            Normal User
+                                        </option>
+                                        <option value="2" @if($user->isManager()) selected
+                                                data-content="<span class='label label-info'>General Admin</span>"@endif>
+                                            General Admin
+                                        </option>
+                                        <option value="3" @if($user->isSuperAdmin()) selected
+                                                data-content="<span class='label label-warning'>Super Admin</span>"@endif>
+                                            Super Admin
+                                        </option>
                                     </select></td>
                                 <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a>
                                 </td>
@@ -52,8 +60,8 @@
 @endsection
 @section('my-js')
     <script>
-        var previous;
         $(function () {
+            var previous;
             toastr.options = {
                 "positionClass": "toast-top-right",
                 "preventDuplicates": false,
@@ -105,8 +113,13 @@
                     url: '/admin/user',
                     data: {_token: "{{csrf_token()}}", action: 'update', uid: uid, role: role},
                     success: function (feedback) {
-                        if (feedback.code == 7) {
+                        if (feedback.code === 7) {
                             toastr.success('Update user success!');
+                            var v = select.val();
+                            var style = v == "0" ? "danger'>Unrecognized</span>" : v == "1" ? "success'>Normal User</span>" : v == "2" ? "info'>General Admin</span>" : v == "3" ? "warning'>Super Admin</span>" : "default'";
+                            select.find(':selected').data('content', "<span class='label label-" + style);
+                            select.find('option[value=' + previous + ']').data('content', '');
+                            select.selectpicker('refresh');
                         } else {
                             toastr.warning('Update failed, no authorization.');
                             select.selectpicker('val', previous);
@@ -123,10 +136,8 @@
                 $(this).selectpicker('refresh');
             });
         });
-
     </script>
 @endsection
-
 @section('special-css')
     <style>
         td a {

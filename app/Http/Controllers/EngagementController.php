@@ -132,7 +132,7 @@ class EngagementController extends Controller
                     }
                     $arrangement->makeHidden(['engagement','created_at','updated_at','deleted_at']);
                 }
-                return $eng;
+                return $eng->makeHidden(['created_at','updated_at','deleted_at']);
             }
         } else {
             return "Illegal Request!";
