@@ -71,8 +71,7 @@
                 "timeOut": "4000",
                 "extendedTimeOut": "900"
             };
-            $('#' +
-                '').on('change', function () {
+            $('#client-engagement').on('change', function () {
                 var select = $(this);
                 $.ajax({
                     type: "get",
