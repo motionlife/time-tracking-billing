@@ -3,7 +3,6 @@
     @php $admin = Request::is('admin/hour'); @endphp
     <div class="main-content">
         <div class="container-fluid">
-            {{--Begin of Modal--}}
             <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
                  data-backdrop="static" data-keyboard="false"
                  aria-hidden="true">
@@ -35,14 +34,13 @@
                     </div>
                 </div>
             </div>
-            {{--END OF MODAL--}}
             <div class="panel panel-headline">
                 <div class="row">
-                    <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">{{$admin?'Reported Hour Pool':'Time Reporting History'}}</h3>
+                    <div class="panel-heading col-md-2">
+                        <h3 class="panel-title">{{$admin?'Hour Pool':'Time History'}}</h3>
                         <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
-                    <div class="panel-body col-md-9">
+                    <div class="panel-body col-md-10">
                         @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
                         @endcomponent
                     </div>
@@ -137,13 +135,12 @@
                 $.get({
                     url: '/hour/' + hid + '/edit',
                     success: function (data) {
-                        //update modal
                         $('#income-estimate').attr({"data-br": data.billing_rate, "data-fs": data.firm_share});
                         $('#client-engagement').attr('disabled', true)
                             .empty().append('<option selected>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
-                        $('#task-id').selectpicker('val', data.task_id);//.selectpicker('refresh');
+                        $('#task-id').selectpicker('val', data.task_id);
                         $('#report-date').datepicker('setDate', data.report_date);
                         $('#billable-hours').val(data.billable_hours).trigger("change");
                         $('#non-billable-hours').val(data.non_billable_hours);
@@ -179,7 +176,7 @@
                             url: "/hour/" + td.attr('data-id'),
                             data: {_token: "{{csrf_token()}}", _method: 'delete'},
                             success: function (data) {
-                                if (data.message == 'succeed') {//remove item from the list
+                                if (data.message == 'succeed') {
                                     td.parent().fadeOut(1000, function () {
                                         $(this).remove();
                                     });
@@ -199,7 +196,6 @@
                     type: "POST",
                     url: "/hour/" + hid,
                     data: {
-                        //currently engagement and client are not allowed to be updated!!!
                         _token: token,
                         _method: 'put',
                         report_date: $('#report-date').val(),
@@ -214,7 +210,6 @@
                     },
                     dataType: 'json',
                     success: function (feedback) {
-                        //notify the user
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been updated!');
                             tr.find('td:nth-child(4)').html(feedback.record.task);
@@ -235,15 +230,12 @@
                         }
                     },
                     error: function (feedback) {
-                        //notify the user
                         toastr.error('Oh NOooooooo...' + feedback.message);
                     },
                     beforeSend: function () {
-                        //spinner begin to spin
                         $("#report-update").button('loading');
                     },
                     complete: function () {
-                        //button spinner stop
                         $("#report-update").button('reset');
                         $('#hourModal').modal('toggle');
                     }

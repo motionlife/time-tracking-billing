@@ -2,7 +2,6 @@
 @section('content')
     @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
     <div class="main-content">
-        {{--Begin of Modal--}}
         @if($manage)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
                  aria-labelledby="engagementModalLabel" data-backdrop="static" data-keyboard="false"
@@ -95,7 +94,7 @@
                                         <tbody id="members-table">
                                         <tr>
                                             <td>
-                                                <select class="selectpicker cid" data-width="120px"
+                                                <select class="selectpicker cid" data-width="120px"  data-dropup-auto="false"
                                                         data-live-search="true"
                                                         disabled required>
                                                     @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
@@ -104,7 +103,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <select class="selectpicker pid" data-width="140px" required>
+                                                <select class="selectpicker pid" data-width="140px" required  data-dropup-auto="false">
                                                     @foreach(\newlifecfo\Models\Templates\Position::all() as $position)
                                                         <option value="{{$position->id}}" {{$position->name=="CFO_Lead"?"selected":""}}>{{$position->name}}</option>
                                                     @endforeach
@@ -133,7 +132,6 @@
                 </div>
             </div>
         @endif
-        {{--END OF MODAL--}}
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
@@ -146,6 +144,7 @@
                             <a href="javascript:void(0)" class="btn btn-success" id="build-engagement"><i
                                         class="fa fa-cubes">&nbsp;
                                     Build</i></a>
+                            <i>&nbsp;</i>
                         @endif
                         <select class="selectpicker show-tick" data-width="fit" id="client-filter"
                                 data-live-search="true">
@@ -254,7 +253,6 @@
         $(function () {
             var update;
             var eid;
-            $.fn.selectpicker.Constructor.DEFAULTS.dropupAuto = false;
             toastr.options = {
                 "positionClass": "toast-top-right",
                 "timeOut": "3000"
@@ -297,7 +295,6 @@
             });
             $('#build-engagement').on('click', function () {
                 update = false;
-                //modal initialization
                 initModal(false);
                 $('#engagementModal').modal('toggle');
             });
@@ -318,7 +315,7 @@
                             url: "/engagement/" + id,
                             data: {_token: "{{csrf_token()}}", _method: 'delete'},
                             success: function (data) {
-                                if (data.message == 'succeed') {//remove item from the list
+                                if (data.message == 'succeed') {
                                     anchor.parent().parent().parent().parent().fadeOut(700, function () {
                                         $(this).remove();
                                     });
@@ -336,7 +333,6 @@
                 $.get({
                     url: '/engagement/' + $(this).attr('data-id') + '/edit',
                     success: function (data) {
-                        //update modal
                         $('#engagement-name').val(data.name);
                         $('#client-select').selectpicker('val', data.client_id);
                         $('#leader_id').selectpicker('val', data.leader_id);
@@ -403,11 +399,9 @@
                         toastr.error('Oh NOooooooo...' + feedback.message);
                     },
                     beforeSend: function (jqXHR, settings) {
-                        //spinner begin to spin
                         $("#submit-modal").button('loading');
                     },
                     complete: function () {
-                        //button spinner stop
                         $("#submit-modal").button('reset');
                         $('#engagementModal').modal('toggle');
                     }
@@ -452,7 +446,6 @@
         });
 
         function initModal(update) {
-            //$('#billing_amount').val('').attr('disabled', true);
             var tb = $("#members-table");
             tb.find("tr:not(:first-child)").remove();
             tb.find("tr.selectpicker").selectpicker('refresh');
@@ -482,6 +475,10 @@
 @endsection
 @section('special-css')
     <style>
+        tbody .bootstrap-select .btn {
+           padding-left: 2em;
+        }
+
         .arrangement-table {
             margin-top: -3.8%;
         }

@@ -160,7 +160,6 @@
     <script>
         $(function () {
             var data, options;
-            // headline charts
             data = {
                 labels: [
                     @foreach($data['last_earn'] as $day=>$earn)
@@ -188,7 +187,6 @@
             };
             new Chartist.Line('#semi-month-char', data, options);
 
-            //Monthly income charts
             data = {
                 labels: [@foreach($data['dates']['mon'] as $key=>$month)
                     '{{$key}}',

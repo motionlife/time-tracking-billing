@@ -21,7 +21,7 @@
                 </form>
                 <div class="navbar-btn navbar-btn-right">
                     <a class="btn btn-success" href="{{route('hour.create')}}" title="Report Your Time"><i
-                                class="fa fa-calendar" aria-hidden="true"></i> <span>REPORT TIME</span></a>
+                                class="fa fa-calendar" aria-hidden="true"></i>&nbsp;<span>REPORT TIME</span></a>
                 </div>
                 <div id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right">
@@ -65,7 +65,6 @@
                                 <li><a href="/profile"><i class="lnr lnr-user"></i> <span>My Profile</span></a></li>
                                 <li><a href="#"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
                                 <li><a href="#"><i class="lnr lnr-cog"></i> <span>Settings</span></a></li>
-                                {{--<li><a href="#"><i class="lnr lnr-exit"></i> <span>Logout</span></a></li>--}}
                                 <li>
                                     <a href="{{ route('logout') }}"
                                        onclick="event.preventDefault();

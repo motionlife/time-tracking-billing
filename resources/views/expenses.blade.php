@@ -3,7 +3,6 @@
     @php $admin = Request::is('admin/expense'); @endphp
     <div class="main-content" xmlns:javascript="https://www.w3.org/1999/xhtml">
         <div class="container-fluid">
-            {{--Begin of Modal--}}
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
                  aria-hidden="true" data-backdrop="static" data-keyboard="false">
                 <div class="modal-dialog" role="document">
@@ -135,19 +134,17 @@
                     </div>
                 </div>
             </div>
-            {{--END OF MODAL--}}
-
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-2">
-                        <h3 class="panel-title">{{$admin?'Reported Expense Pool':'Expense History'}}</h3>
+                        <h3 class="panel-title">{{$admin?'Expense Pool':'Expense History'}}</h3>
                         <p class="panel-subtitle">{{$expenses->total()}} results</p>
                     </div>
                     <div class="panel-body col-md-10">
                         @if(!$admin)
                             <a class="btn btn-success" id="add-expense" href="javascript:void(0)"
                                title="New Expense"><i class="fa fa-plus" aria-hidden="true"></i>
-                                <span>Add New</span></a>
+                                <i>&nbsp;Add New</i></a>
                         @endif
                         @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
                         @endcomponent
@@ -193,6 +190,7 @@
                                             <a href="#" data-featherlight="/{{$receipt->filename}}"><i
                                                         class="fa fa-file-image-o" aria-hidden="true"></i></a>
                                         @endif
+                                        <i>&nbsp;</i>
                                     @endforeach
                                 </td>
                                 <td>
@@ -222,7 +220,7 @@
 @section('my-js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.10/featherlight.min.js"></script>
     <script>
-        var update;//boolean indicate whether user intend to update or report new
+        var update;
         var expid;
         var tr;
         $(function () {
@@ -246,7 +244,6 @@
                     autoclose: true
                 }
             );
-            //user want add a new record
             $('#add-expense').on('click', function () {
                 $('#expenseModal').modal('toggle');
                 $('#client-engagement').html($('#client-engagements').html()).selectpicker('refresh');
@@ -258,7 +255,6 @@
                 update = false;
             });
 
-            //update or store => server side update or create Eloquent model
             $('#expense-form').on('submit', function (e) {
                 e.preventDefault();
                 if (!$('#client-engagement').selectpicker('val')) {
@@ -289,12 +285,11 @@
                                 @if(!$admin)tr.find('td:nth-child(8)').html(feedback.record.description);
                                 @endif
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
-                                tr.addClass('update-highlight');//flash to show user that data already been updated
+                                tr.addClass('update-highlight');
                                 setTimeout(function () {
                                     tr.removeClass('update-highlight');
                                 }, 2100);
                             } else {
-                                //prepend it at the top of the list
                                 toastr.success('Success! Expense has been created!');
                                 $('<tr><th scope="row">*</th><td>' + feedback.data.cname + '</td><td>' + feedback.data.ename + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
                                     .prependTo('#main-table').hide().fadeIn(1500);
@@ -308,11 +303,9 @@
                         toastr.error('Oh NOooooooo...' + feedback.message);
                     },
                     beforeSend: function () {
-                        //spinner begin to spin
                         $("#report-update").button('loading');
                     },
                     complete: function () {
-                        //button spinner stop
                         $("#report-update").button('reset');
                         $('#expenseModal').modal('toggle');
                     }
@@ -320,7 +313,6 @@
             });
         });
 
-        //fill the for form to let user EDIT the record
         function editExpense(id) {
             $('#report-update').html('Update');
             update = true;
@@ -328,7 +320,6 @@
             $.get({
                 url: '/expense/' + id + '/edit',
                 success: function (data) {
-                    //set the form in modal
                     $('#client-engagement').html('<option selected>' + data.ename + '</option>').selectpicker('refresh');
                     $('#input-report-date').datepicker('setDate', data.report_date);
                     $('#input-company-paid').val(data.company_paid);
@@ -339,7 +330,7 @@
                     $('#input-car-rental').val(data.car_rental);
                     $('#input-mileage-cost').val(data.mileage_cost);
                     $('#input-other').val(data.other);
-                    $('#input-receipts').val('');//Current didn't want them to modify already uploaded receipts
+                    $('#input-receipts').val('');
                     $('#description').val(data.description);
                     $('#expense-total').val(data.total);
                     $('#report-update').attr('disabled', data.review_state !== "0");
@@ -360,7 +351,6 @@
             $('#expenseModal').modal('toggle');
         }
 
-        //delete the record
         function deleteExpense(id) {
             swal({
                     title: "Are you sure?",
@@ -375,7 +365,7 @@
                         url: "/expense/" + id,
                         data: {_token: "{{csrf_token()}}", _method: 'delete'},
                         success: function (data) {
-                            if (data.message == 'succeed') {//remove item from the list
+                            if (data.message == 'succeed') {
                                 $('a[href*="deleteExpense(' + id + ')"]').parent().parent().fadeOut(777, function () {
                                     $(this).remove();
                                 });

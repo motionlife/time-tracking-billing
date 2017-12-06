@@ -13,6 +13,7 @@
         @endforeach
     </select>
     @if($admin)
+        <i>&nbsp;</i>
         <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
                 id="consultant-select"
                 data-live-search="true">
@@ -22,6 +23,7 @@
             @endforeach
         </select>
     @endif
+    <i>&nbsp;</i>
     <input class="date-picker form-control" id="start-date" size="10"
            placeholder="&#xf073; Start Day"
            value="{{Request('start')}}"
@@ -29,6 +31,7 @@
     <span>-</span>
     <input class="date-picker form-control" id="end-date" size="10" placeholder="&#xf073; End Day"
            value="{{Request('end')}}" type="text"/>
+    <i>&nbsp;</i>
     <a href="javascript:void(0)" type="button" class="btn btn-info"
        id="filter-button">Filter</a>
 </div>

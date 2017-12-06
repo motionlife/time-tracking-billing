@@ -71,10 +71,10 @@
                 "timeOut": "4000",
                 "extendedTimeOut": "900"
             };
-            $('#client-engagement').on('change', function () {
+            $('#' +
+                '').on('change', function () {
                 var select = $(this);
                 $.ajax({
-                    //fetch the corresponding position for him and add option to position option
                     type: "get",
                     url: "/hour/create",
                     data: {eid: select.selectpicker('val'), fetch: 'position'},
@@ -84,7 +84,6 @@
                             pos.append("<option value=" + arr.position.id + " data-br=" + arr.br + " data-fs=" + arr.fs + ">" + arr.position.name + "</option>");
                         });
                         pos.selectpicker('refresh');
-                        //also store the billing rate and firm share
                     }
                 });
             });
@@ -116,13 +115,10 @@
                     },
                     dataType: 'json',
                     success: function (feedback) {
-                        //notify the user
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been saved!');
-                            //clear some data for the user
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
-                            //update today's board
                             $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>'
                                 + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>'
                                 + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">'
@@ -135,15 +131,12 @@
                         }
                     },
                     error: function (feedback) {
-                        //notify the user
                         toastr.error('Oh Noooooooo..' + feedback.message);
                     },
                     beforeSend: function () {
-                        //spinner begin to spin
                         $("#report-button").button('loading');
                     },
                     complete: function () {
-                        //button spinner stop
                         $("#report-button").button('reset');
                     }
                 });
@@ -173,7 +166,7 @@
                         url: "/hour/" + hid,
                         data: {_token: "{{csrf_token()}}", _method: 'delete'},
                         success: function (data) {
-                            if (data.message == 'succeed') {//remove item from the list
+                            if (data.message == 'succeed') {
                                 li.fadeOut(1000, function () {
                                     $(this).remove();
                                 });

@@ -29,7 +29,7 @@
                                 <td>{{$user->last_name}}</td>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->getType()}}</td>
-                                <td><select name="user_role" class="selectpicker show-tick" data-width="auto">
+                                <td><select name="user_role" class="selectpicker show-tick" data-width="fit">
                                         <option value="0" @if(!$user->isVerified()) selected
                                                 data-content="<span class='label label-danger'>Unrecognized</span>"@endif>
                                             Unrecognized
@@ -89,7 +89,6 @@
                             success: function (feedback) {
                                 if (feedback.code == 7) {
                                     toastr.success('Delete user success!');
-                                    //remove item
                                     tr.fadeOut(700, function () {
                                         $(this).remove();
                                     });
@@ -116,8 +115,8 @@
                         if (feedback.code === 7) {
                             toastr.success('Update user success!');
                             var v = select.val();
-                            var style = v == "0" ? "danger'>Unrecognized</span>" : v == "1" ? "success'>Normal User</span>" : v == "2" ? "info'>General Admin</span>" : v == "3" ? "warning'>Super Admin</span>" : "default'";
-                            select.find(':selected').data('content', "<span class='label label-" + style);
+                            var style = v == "0" ? "danger'>Unrecognized" : v == "1" ? "success'>Normal User" : v == "2" ? "info'>General Admin" : v == "3" ? "warning'>Super Admin" : "default'";
+                            select.find(':selected').data('content', "<span class='label label-" + style+"</span>");
                             select.find('option[value=' + previous + ']').data('content', '');
                             select.selectpicker('refresh');
                         } else {
@@ -142,6 +141,10 @@
     <style>
         td a {
             color: red;
+        }
+        .bootstrap-select .btn {
+            border-style: dashed;
+            margin-bottom:2px;
         }
     </style>
 @endsection
