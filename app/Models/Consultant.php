@@ -58,12 +58,6 @@ class Consultant extends Model
         return $this->hasMany(Engagement::class, 'leader_id');
     }
 
-    public function my_lead_engagements($start = null, $cid = null)
-    {
-        $filered = $this->lead_engagements()->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC');
-        return isset($cid) ? $filered->where('client_id', $cid)->get() : $filered->get();
-    }
-
     public function justCreatedHourReports($start = null, $end = null, $amount=null)
     {
         return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])

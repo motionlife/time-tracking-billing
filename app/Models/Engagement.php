@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use newlifecfo\User;
@@ -79,7 +80,7 @@ class Engagement extends Model
 
     public function isPending()
     {
-        return $this->state()=='Pending';
+        return $this->state() == 'Pending';
     }
 
 
@@ -122,5 +123,12 @@ class Engagement extends Model
     public function incomeForBuzDev($start = '1970-01-01', $end = '2038-01-19')
     {
         return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
+    }
+
+    public static function getBySCL($start = null, $cid = null, $leader = null)
+    {
+        $filered = (isset($leader) ? $leader->lead_engagements : self::all())
+            ->where('start_date', '>=', $start ?Carbon::parse($start): '1970-01-01')->sortByDesc('created_at');
+        return isset($cid) ? $filered->where('client_id', $cid): $filered;
     }
 }

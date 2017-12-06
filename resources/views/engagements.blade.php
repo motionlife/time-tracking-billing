@@ -149,9 +149,9 @@
                         <select class="selectpicker show-tick" data-width="fit" id="client-filter"
                                 data-live-search="true">
                             <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
-                            @foreach($cids as $cid)
-                                <option value="{{$cid}}"
-                                        data-content="<strong>{{\newlifecfo\Models\Client::find($cid)->name}}</strong>" {{Request('cid')==$cid?'selected':''}}></option>
+                            @foreach($clients as $client)
+                                <option value="{{$client['id']}}"
+                                        data-content="<strong>{{$client['name']}}</strong>" {{Request('cid')==$client['id']?'selected':''}}></option>
                             @endforeach
                         </select>
                         <input class="date-picker form-control" size=10 id="start-date-filter"
@@ -267,7 +267,7 @@
             $('#start-date').datepicker('setDate', new Date());
             $('#filter-button').on('click', function () {
                 var cid = $('#client-filter').selectpicker('val');
-                window.location.href = '/engagement{{$manage?'/create':''}}?cid=' + (cid ? cid : '') +
+                window.location.href = '?cid=' + (cid ? cid : '') +
                     '&start=' + $('#start-date-filter').val();
             });
             $('#client-select').on('change', function () {
@@ -475,11 +475,6 @@
 @endsection
 @section('special-css')
     <style>
-        tbody .bootstrap-select .btn {
-           padding-left: 2em;
-            background-color: #000;
-        }
-
         .arrangement-table {
             margin-top: -3.8%;
         }

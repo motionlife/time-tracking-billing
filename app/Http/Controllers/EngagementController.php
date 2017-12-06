@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Engagement;
-use newlifecfo\User;
 
 class EngagementController extends Controller
 {
@@ -29,27 +28,31 @@ class EngagementController extends Controller
         //
         $consultant = Auth::user()->consultant;
         return view('engagements', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
-            'cids' => $consultant->myEngagements()->pluck('client_id')->unique()
+            'clients' => $consultant->lead_engagements->map(function ($item, $key) {
+                return $item->client;
+            })->unique()
         ]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
+     * Show the form for creating a new resources
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request)
     {
-        //
         if ($request->ajax()) {
             //return the business development info to the request
             if ($request->get('fetch') == 'business')
                 return Client::find($request->get('cid'))->whoDevelopedMe();
         }
         $consultant = Auth::user()->consultant;
-        return view('engagements', ['engagements' => $consultant->my_lead_engagements($request->get('start'), $request->get('cid')),
-            'leader' => $consultant, 'cids' => $consultant->lead_engagements->pluck('client_id')->unique()]);
+        return view('engagements', [
+            'engagements' => Engagement::getBySCL($request->get('start'), $request->get('cid'), $consultant),
+            'leader' => $consultant,
+            'clients' => $consultant->lead_engagements->map(function ($item, $key) {
+                return $item->client;
+            })->unique()]);
     }
 
     /**
@@ -130,9 +133,9 @@ class EngagementController extends Controller
                         $arrangement->billing_rate = '';
                         $arrangement->firm_share = '';
                     }
-                    $arrangement->makeHidden(['engagement','created_at','updated_at','deleted_at']);
+                    $arrangement->makeHidden(['engagement', 'created_at', 'updated_at', 'deleted_at']);
                 }
-                return $eng->makeHidden(['created_at','updated_at','deleted_at']);
+                return $eng->makeHidden(['created_at', 'updated_at', 'deleted_at']);
             }
         } else {
             return "Illegal Request!";
