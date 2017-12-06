@@ -67,7 +67,7 @@ class HourPolicy
     public function delete(User $user, Hour $hour)
     {
         //
-        return ($hour->arrangement->consultant_id = $user->consultant->id && $hour->isPending())
-            || $user->isSupervisor();
+        return ($hour->arrangement->consultant_id = $user->consultant->id || $user->isSupervisor()) && $hour->unfinalized();
+        //|| $user->isSupervisor();
     }
 }

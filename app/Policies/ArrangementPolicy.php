@@ -31,8 +31,8 @@ class ArrangementPolicy
         //
         $consultant = $user->consultant;
         $engagement = $arrangement->engagement;
-        return $user->isManager() || $consultant->id == $arrangement->consultant_id ||
-            ($engagement->state() == 'Pending' && $engagement->leader_id == $consultant->id);
+        return $user->isSupervisor() || $consultant->id == $arrangement->consultant_id ||
+            ($engagement->isPending() && $engagement->leader_id == $consultant->id);
     }
 
     /**

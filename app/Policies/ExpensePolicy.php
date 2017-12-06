@@ -28,7 +28,7 @@ class ExpensePolicy
     public function view(User $user, Expense $expense)
     {
         //
-        return $expense->arrangement->consultant_id == $user->consultant->id || $user->isManager();
+        return $expense->arrangement->consultant_id == $user->consultant->id || $user->isSupervisor();
     }
 
     /**
@@ -52,7 +52,7 @@ class ExpensePolicy
     public function update(User $user, Expense $expense)
     {
         return ($expense->arrangement->consultant_id = $user->consultant->id && $expense->unfinalized())
-            || $user->isManager();
+            || $user->isSupervisor();
     }
 
     /**
@@ -64,6 +64,6 @@ class ExpensePolicy
      */
     public function delete(User $user, Expense $expense)
     {
-        return $expense->isPending()||$user->isManager();
+        return ($expense->arrangement->consultant_id = $user->consultant->id || $user->isSupervisor()) && $expense->unfinalized();
     }
 }

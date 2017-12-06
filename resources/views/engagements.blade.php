@@ -477,6 +477,7 @@
     <style>
         tbody .bootstrap-select .btn {
            padding-left: 2em;
+            background-color: #000;
         }
 
         .arrangement-table {

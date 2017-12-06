@@ -84,7 +84,7 @@ class EngagementPolicy
         //Only the leader can DELETE a pending engagement, to which no one had reported hours
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return ($user->isManager() || $consultant->id == $engagement->leader_id) && $engagement->state() == 'Pending';
+            return ($user->isManager() || $consultant->id == $engagement->leader_id) && $engagement->isPending();
         }
         return false;
     }

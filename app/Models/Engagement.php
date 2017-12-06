@@ -77,6 +77,12 @@ class Engagement extends Model
         return 'Unknown';
     }
 
+    public function isPending()
+    {
+        return $this->state()=='Pending';
+    }
+
+
     public function state()
     {
         switch ($this->status) {
