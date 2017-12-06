@@ -120,9 +120,16 @@ class AdminController extends Controller
 
     private function grantEngagement($request)
     {
+        $engagements = Engagement::getBySCL($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')));
         return view('engagements', [
-            'engagements' => Engagement::getBySCL($request->get('start'), $request->get('cid')),
-            'clients' => Client::all()]);
+            'engagements' => $engagements,
+            'clients' => $engagements->map(function ($item, $key) {
+                return $item->client;
+            })->unique(),
+            'leaders' => Engagement::all()->map(function ($item, $key) {
+                return $item->leader;
+            })->unique(),
+        ]);
     }
 
 }

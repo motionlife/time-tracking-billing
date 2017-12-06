@@ -125,10 +125,12 @@ class Engagement extends Model
         return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
     }
 
-    public static function getBySCL($start = null, $cid = null, $leader = null)
+    public static function getBySCL($start = null, $cid = null, $leader = null, $consultant = null)
     {
-        $filered = (isset($leader) ? $leader->lead_engagements : self::all())
-            ->where('start_date', '>=', $start ?Carbon::parse($start): '1970-01-01')->sortByDesc('created_at');
-        return isset($cid) ? $filered->where('client_id', $cid): $filered;
+        $collection1 = (isset($leader) ? $leader->lead_engagements : self::all())
+            ->where('start_date', '>=', $start ? Carbon::parse($start)->toDateString('Y-m-d') : '1970-01-01')
+            ->sortByDesc('created_at');
+        $collection2 = (isset($cid) ? $collection1->where('client_id', $cid) : $collection1);
+        return isset($consultant) ? $collection2->whereIn('id', $consultant->arrangements()->pluck('engagement_id')) : $collection2;
     }
 }

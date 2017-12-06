@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use newlifecfo\Models\Templates\Contact;
@@ -58,23 +59,16 @@ class Consultant extends Model
         return $this->hasMany(Engagement::class, 'leader_id');
     }
 
-    public function justCreatedHourReports($start = null, $end = null, $amount=null)
+    public function justCreatedHourReports($start = null, $end = null, $amount = null)
     {
         return Hour::whereBetween('created_at', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
             ->whereIn('arrangement_id', $this->arrangements()->pluck('id'))->orderBy('created_at', 'DESC')->take($amount)->get();
     }
 
-    public function myEngagements($start = null, $cid = null)
-    {
-        $eids = $this->arrangements()->pluck('engagement_id');
-        return isset($cid) ? Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->where('client_id', $cid)->orderBy('created_at', 'DESC')->get() :
-            Engagement::whereIn('id', $eids)->where('start_date', '>=', $start ?: '1970-01-01')->orderBy('created_at', 'DESC')->get();
-    }
-
     public function getMyArrInfoByEid($eid)
     {
         return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($arr) {
-            return ['position'=>$arr->position,'br'=>$arr->billing_rate,'fs'=>$arr->firm_share];
+            return ['position' => $arr->position, 'br' => $arr->billing_rate, 'fs' => $arr->firm_share];
         });
     }
 

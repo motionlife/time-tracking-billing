@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
+use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 
 class EngagementController extends Controller
@@ -25,12 +26,16 @@ class EngagementController extends Controller
      */
     public function index(Request $request)
     {
-        //
+
         $consultant = Auth::user()->consultant;
-        return view('engagements', ['engagements' => $consultant->myEngagements($request->get('start'), $request->get('cid')),
-            'clients' => $consultant->lead_engagements->map(function ($item, $key) {
+        $engagements = Engagement::getBySCL($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant);
+        return view('engagements', ['engagements' => $engagements,
+            'clients' => $engagements->map(function ($item, $key) {
                 return $item->client;
-            })->unique()
+            })->unique(),
+            'leaders' => Engagement::all()->map(function ($item, $key) {
+                return $item->leader;
+            })->unique(),
         ]);
     }
 

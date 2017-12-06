@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
+    @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader);$admin = Request::is('admin/engagement'); @endphp
     <div class="main-content">
         @if($manage)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
@@ -94,7 +94,8 @@
                                         <tbody id="members-table">
                                         <tr>
                                             <td>
-                                                <select class="selectpicker cid" data-width="120px"  data-dropup-auto="false"
+                                                <select class="selectpicker cid" data-width="120px"
+                                                        data-dropup-auto="false"
                                                         data-live-search="true"
                                                         disabled required>
                                                     @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
@@ -103,7 +104,8 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <select class="selectpicker pid" data-width="140px" required  data-dropup-auto="false">
+                                                <select class="selectpicker pid" data-width="140px" required
+                                                        data-dropup-auto="false">
                                                     @foreach(\newlifecfo\Models\Templates\Position::all() as $position)
                                                         <option value="{{$position->id}}" {{$position->name=="CFO_Lead"?"selected":""}}>{{$position->name}}</option>
                                                     @endforeach
@@ -135,7 +137,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-4">
-                    <h3 class="page-title" style="margin: auto;">{{$manage?'Engagements I lead':'Engagements I\'m in'}}
+                    <h3 class="page-title"
+                        style="margin: auto;">{{$manage?'Engagements I lead':($admin?'Engagement Pool':'Engagements I\'m in')}}
                         (total {{$engagements->count()}})</h3>
                 </div>
                 <div class="col-md-8">
@@ -154,6 +157,15 @@
                                         data-content="<strong>{{$client['name']}}</strong>" {{Request('cid')==$client['id']?'selected':''}}></option>
                             @endforeach
                         </select>
+                        @if(!$manage)
+                            <select class="selectpicker show-tick" data-width="fit" id="leader-filter"
+                                    data-live-search="true">
+                                <option value="" data-icon="glyphicon glyphicon-user" selected>Leader</option>
+                                @foreach($leaders as $leader)
+                                    <option value="{{$leader->id}}" {{Request('lid')==$leader->id?'selected':''}}>{{$leader->fullname()}}</option>
+                                @endforeach
+                            </select>
+                        @endif
                         <input class="date-picker form-control" size=10 id="start-date-filter"
                                placeholder="&#xf073; Start after"
                                value="{{Request('start')}}"
@@ -267,8 +279,11 @@
             $('#start-date').datepicker('setDate', new Date());
             $('#filter-button').on('click', function () {
                 var cid = $('#client-filter').selectpicker('val');
-                window.location.href = '?cid=' + (cid ? cid : '') +
-                    '&start=' + $('#start-date-filter').val();
+                var lid = '';
+                @if(!$manage) lid = $('#leader-filter').selectpicker('val');
+                @endif
+                    window.location.href = '?cid=' + (cid ? cid : '') +
+                    '&start=' + $('#start-date-filter').val() + '&lid=' + lid;
             });
             $('#client-select').on('change', function () {
                 $.get({
@@ -455,7 +470,7 @@
                 $('#billing_amount').val('').attr('disabled', true);
                 $('#submit-modal').text('Build');
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
-            }else{
+            } else {
                 $('#submit-modal').html('Update');
                 $('#engagementModalLabel').find('span').text('Update Engagement')
             }
@@ -491,7 +506,7 @@
             color: red;
         }
 
-        .panel-subtitle > strong{
+        .panel-subtitle > strong {
             color: #27b2ff;
         }
 
