@@ -59,12 +59,9 @@ class ExpenseController extends Controller
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
             $eng = Engagement::find($eid);
-            if (!$eng) {
-                $feedback['code'] = 0;
-                $feedback['message'] = 'Engagement not found.';
-            } else if ($eng->state() == 'closed') {
+            if (!$eng || !$eng->isActive()) {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
+                $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
             } else {
                 $arr = $consultant->getMyArrangementByEidPid($eid);
                 if (!$arr) {

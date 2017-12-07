@@ -71,19 +71,16 @@ class HoursController extends Controller
             //business logic validation is important
             //1. check the if the reported engagement is his valid engagement
             $eng = Engagement::find($eid);
-            if (!$eng) {
-                $feedback['code'] = 0;
-                $feedback['message'] = 'Engagement not found.';
-            } else if ($eng->state() == 'closed') {
+            if (!$eng || !$eng->isActive()) {
                 $feedback['code'] = 1;
-                $feedback['message'] = 'Non-active Engagement!!!, has it been closed or still pending? Please contact supervisor.';
+                $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
             } else {
                 $arr = $consultant->getMyArrangementByEidPid($eid, $pid);
                 if (!$arr) {
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid','review_state']));
+                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid', 'review_state']));
                     if ($hour->save()) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'success';
@@ -137,8 +134,8 @@ class HoursController extends Controller
                 $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
                 return json_encode(['ename' => $arr->engagement->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
                     'billable_hours' => number_format($hour->billable_hours, 1), 'non_billable_hours' => number_format($hour->non_billable_hours, 1),
-                    'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name,'feedback'=>$hour->feedback,
-                    'billing_rate' => $arr->billing_rate, 'firm_share' => $arr->firm_share,'cname'=>$arr->consultant->fullname()
+                    'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name, 'feedback' => $hour->feedback,
+                    'billing_rate' => $arr->billing_rate, 'firm_share' => $arr->firm_share, 'cname' => $arr->consultant->fullname()
                 ]);
             }
             //else illegal request!
@@ -160,7 +157,7 @@ class HoursController extends Controller
         if ($request->ajax()) {
             $hour = Hour::find($id);
             if ($user->can('update', $hour)) {
-                if ($hour->update($user->isSupervisor()? $request->all():$request->except(['review_state']))) {
+                if ($hour->update($user->isSupervisor() ? $request->all() : $request->except(['review_state']))) {
                     $feedback['code'] = 7;
                     $feedback['message'] = 'Record Update Success';
                     $feedback['record'] = ['ename' => str_limit($hour->arrangement->engagement->name, 19),
