@@ -67,11 +67,13 @@
             </div>
             <div class="row daily-weekly-view">
                 <div class="panel panel-headline">
-                    <div class="panel-heading">
-                        <div class="input-group" style="width: 30%;">
-                            <span class="input-group-addon"><i
-                                        class="fa fa-calendar-check-o"></i>&nbsp; Report Week</span>
-                            <input id="week-picker" placeholder="select week" class="form-control" type="text">
+                    <div class="input-group" style="width: auto;">
+                        <span class="input-group-btn"><button class="btn btn-primary" type="button"
+                                                                  id="week-picker"><i
+                                            class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
+                        <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
+                            Week
+                            <span>{{\Carbon\Carbon::now()->weekOfYear}}</span>,&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->format('M d, Y').' - '.\Carbon\Carbon::now()->endOfWeek()->format('M d, Y')}}</strong>
                         </div>
                     </div>
                     <div class="panel-body" id="hours-roll">
@@ -212,19 +214,17 @@
                 height: '220px'
             });
             $('#week-picker').datepicker({
-                format: 'mm/dd/yyyy',
                 todayHighlight: true,
                 autoclose: true,
                 calendarWeeks: true
             }).datepicker('setDate', new Date()).on('show', function () {
-                 $('.datepicker tr td.cw').parent().hover(function(e) {
-                     $(this).css("background-color",e.type === "mouseenter"?"#47cef7":"transparent");
-                 });
-            }).on('changeDate',function (e) {
-                var value = $(this).val();
-                var firstDate = moment(value, "MM-DD-YYYY").day(0).format("MM-DD-YYYY");
-                var lastDate =  moment(value, "MM-DD-YYYY").day(6).format("MM-DD-YYYY");
-                $('#week-picker').val(firstDate + " - " + lastDate);
+                $('.datepicker tr td.cw').parent().hover(function (e) {
+                    $(this).css("background-color", e.type === "mouseenter" ? "#47cef7" : "transparent");
+                });
+            }).on('changeDate', function (e) {
+                var firstDate = moment(e.date).day(0).format("M DD, YYYY");
+                var lastDate = moment(e.date).day(6).format("M DD, YYYY");
+                $('#week-info').find('strong').empty().text(firstDate + " - " + lastDate);
             });
         });
 
