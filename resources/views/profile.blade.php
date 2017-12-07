@@ -5,7 +5,6 @@
         <hr>
         <div class="row">
         @php $user = \Illuminate\Support\Facades\Auth::user(); @endphp
-        <!-- edit form column -->
             <div class="col-md-6 personal-info">
                 <div class="alert alert-success alert-dismissible">
                     <a class="panel-close close" data-dismiss="alert">×</a>

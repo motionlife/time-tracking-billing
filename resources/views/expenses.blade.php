@@ -98,7 +98,7 @@
                                     <br>
                                     <textarea id="description" class="form-control" name="description"
                                               placeholder="description"
-                                              rows="4"></textarea>
+                                              rows="3"></textarea>
                                     <br>
                                     @if($admin)
                                         <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">

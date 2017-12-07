@@ -27,7 +27,7 @@
                                 <th>{{$loop->index + 1}}</th>
                                 <td>{{$user->first_name}}</td>
                                 <td>{{$user->last_name}}</td>
-                                <td>{{$user->email}}</td>
+                                <td><a href="mailto:{{$user->email}}"><i class="fa fa-envelope" aria-hidden="true">&nbsp;{{$user->email}}</i></a></td>
                                 <td>{{$user->getType()}}</td>
                                 <td><select name="user_role" class="selectpicker show-tick" data-width="fit">
                                         <option value="0" @if(!$user->isVerified()) selected
@@ -71,7 +71,7 @@
                 "timeOut": "2000",
                 "extendedTimeOut": "700"
             };
-            $('tr a').on('click', function () {
+            $('td:last-child a').on('click', function () {
                 var tr = $(this).parent().parent();
                 var uid = tr.attr('data-id');
                 swal({
@@ -139,7 +139,7 @@
 @endsection
 @section('special-css')
     <style>
-        td a {
+        td:last-child a {
             color: red;
         }
         .bootstrap-select .btn {

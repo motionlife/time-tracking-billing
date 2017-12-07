@@ -1,6 +1,5 @@
 @extends('layouts.html')
 
-<!-- WRAPPER -->
 <div id="wrapper">
     <div class="vertical-align-wrap">
         <div class="vertical-align-middle">
@@ -61,4 +60,4 @@
         </div>
     </div>
 </div>
-<!-- END WRAPPER -->
+

@@ -3,7 +3,6 @@
 @section('content')
     <div class="main-content">
         <div class="container-fluid">
-            <!-- OVERVIEW -->
             <div class="panel panel-headline">
                 <div class="panel-heading">
                     <h3 class="panel-title">Semi-monthly Overview</h3>
@@ -84,10 +83,8 @@
                     </div>
                 </div>
             </div>
-            <!-- END OVERVIEW -->
             <div class="row">
                 <div class="col-md-6">
-                    <!-- RECENT REPORTING -->
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="panel-title">Recent Reporting</h3>
@@ -133,10 +130,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- END RECENT REPORTING -->
                 </div>
                 <div class="col-md-6">
-                    <!-- MULTI CHARTS -->
                     <div class="panel">
                         <div class="panel-heading">
                             <h3 class="panel-title">Yearly Income vs. Hours</h3>
@@ -150,7 +145,6 @@
                             <div id="income-hours-chart" class="ct-chart"></div>
                         </div>
                     </div>
-                    <!-- END MULTI CHARTS -->
                 </div>
             </div>
         </div>

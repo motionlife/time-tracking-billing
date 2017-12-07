@@ -1,6 +1,6 @@
 <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-    <select id="client-engagement" class="selectpicker show-tick" data-width="auto"
+    <select id="client-engagement" class="selectpicker show-tick" data-width="auto" data-dropup-auto="false"
             data-live-search="true" name="eid" title="Select the engagements your want report to" required>
         @if(isset($clientIds))
             @foreach($clientIds as $cid=>$engagements)
@@ -27,7 +27,7 @@
 <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
     <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
-            data-width="auto" name="task_id"
+            data-width="auto" name="task_id" data-dropup-auto="false"
             title="Please select one of the tasks your did" required>
         @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
             <?php $gname = $tgroup->name?>
@@ -62,7 +62,7 @@
 </div>
 <br>
 <textarea id="description" class="form-control" name="description" placeholder="description"
-          rows="5"></textarea>
+          rows="3"></textarea>
 <br>
 @if(isset($admin))
     @if($admin)

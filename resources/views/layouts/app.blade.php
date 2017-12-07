@@ -1,8 +1,6 @@
 @extends('layouts.html')
 @section('wrapper')
-    <!-- WRAPPER -->
     <div id="wrapper">
-        <!-- NAVBAR -->
         <nav class="navbar navbar-default navbar-fixed-top">
             <div class="brand">
                 <a href="/"><img src="/img/logo-dark.png" alt="Klorofil Logo"
@@ -83,8 +81,6 @@
                 </div>
             </div>
         </nav>
-        <!-- END NAVBAR -->
-        <!-- LEFT SIDEBAR -->
         <div id="sidebar-nav" class="sidebar">
             <div class="sidebar-scroll">
                 <nav>
@@ -166,14 +162,9 @@
                 </nav>
             </div>
         </div>
-        <!-- END LEFT SIDEBAR -->
-        <!-- MAIN -->
         <div class="main">
-            <!-- MAIN CONTENT -->
         @yield('content')
-        <!-- END MAIN CONTENT -->
         </div>
-        <!-- END MAIN -->
         <div class="clearfix"></div>
         <footer>
             <div class="container-fluid">
@@ -181,5 +172,4 @@
             </div>
         </footer>
     </div>
-    <!-- END WRAPPER -->
 @endsection

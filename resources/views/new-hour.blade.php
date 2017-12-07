@@ -1,60 +1,113 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="panel panel-headline">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Working Time Report</h3>
-                        <p class="panel-subtitle">Consultant: {{Auth::user()->fullName()}}</p>
-                    </div>
-                    <form method="POST" id="hour-form" action="/hour">
-                        <div class="panel-body">
-                           @component('components.hour-form',['clientIds'=>$clientIds])
-                            @endcomponent
-                        </div>
-                        <div class="panel-footer">
-                            <button class="btn btn-primary" id="report-button" type="submit"
-                                    data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit
-                            </button>
-                        </div>
-                    </form>
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row" style="margin-bottom: -2.4em;">
+                <div class="col-md-3">
+                    <h3 class="page-title">Working Time Report</h3>
+                </div>
+                <div class="col-md-9">
+                    <a href="javascript:void(0)" class="btn btn-default"
+                       id="day-week">Daily&nbsp;<i class="fa fa-refresh" aria-hidden="true">&nbsp;Weekly</i></a>
                 </div>
             </div>
-            <div class="col-md-4">
-                <!-- TIMELINE -->
-                <div class="panel panel-scrolling">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Today's Reports</h3>
-                        <p class="panel-subtitle">{{$hours->count()?$hours->count()." reports":"No report today"}}</p>
-                        <div class="right">
-                            <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i>
-                            </button>
-                            <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+            <hr>
+            <div class="row daily-weekly-view" style="display: none">
+                <div class="col-md-8">
+                    <div class="panel panel-headline">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Consultant: {{Auth::user()->fullname()}}</h3>
                         </div>
-                    </div>
-                    <div class="panel-body">
-                        <ul class="list-unstyled activity-list" id="today-board">
-                            @foreach($hours as $hour)
-                                <li>
-                                    <?php $eng = $hour->arrangement->engagement ?>
-                                    <div class="pull-left avatar">
-                                        <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours,1)}}</strong></a>
-                                    </div>
-                                    <p> billable hours reported for the work of
-                                        <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}
-                                            <a href="javascript:deleteTodaysReport({{$hour->id}});"><i
-                                                        class="fa fa-times pull-right"></i></a></span>
-
-                                    </p>
-
-                                </li>
-                            @endforeach
-                        </ul>
-                        <a type="button" href="/hour" class="btn btn-primary btn-bottom center-block">See All</a>
+                        <form method="POST" id="hour-form" action="/hour">
+                            <div class="panel-body">
+                                @component('components.hour-form',['clientIds'=>$clientIds])
+                                @endcomponent
+                            </div>
+                            <div class="panel-footer">
+                                <button class="btn btn-primary" id="report-button" type="submit"
+                                        data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <!-- END TIMELINE -->
+                <div class="col-md-4">
+                    <div class="panel panel-scrolling">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Today's Reports</h3>
+                            <p class="panel-subtitle">{{$hours->count()?$hours->count()." reports":"No report today"}}</p>
+                            <div class="right">
+                                <button type="button" class="btn-toggle-collapse"><i class="lnr lnr-chevron-up"></i>
+                                </button>
+                                <button type="button" class="btn-remove"><i class="lnr lnr-cross"></i></button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="list-unstyled activity-list" id="today-board">
+                                @foreach($hours as $hour)
+                                    <li>
+                                        <?php $eng = $hour->arrangement->engagement ?>
+                                        <div class="pull-left avatar">
+                                            <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours,1)}}</strong></a>
+                                        </div>
+                                        <p> billable hours reported for the work of
+                                            <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span
+                                                    class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}
+                                                <a href="javascript:deleteTodaysReport({{$hour->id}});"><i
+                                                            class="fa fa-times pull-right"></i></a></span>
+
+                                        </p>
+                                    </li>
+                                @endforeach
+                            </ul>
+                            <a type="button" href="/hour" class="btn btn-primary btn-bottom center-block">See All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row daily-weekly-view" >
+                <div class="panel panel-headline">
+                    <div class="panel-heading form-inline">
+                        <label title="Week">
+                            Select Week: <input class="form-control" type="week">
+                        </label>
+                    </div>
+                    <div class="panel-body" id="hours-roll">
+                        <table class="table table-responsive">
+                            <thead>
+                            <tr>
+                                <th>Engagement / Task</th>
+                                <th>Mon</th>
+                                <th>Tue</th>
+                                <th>Wes</th>
+                                <th>Thu</th>
+                                <th>Fri</th>
+                                <th>Sat</th>
+                                <th>Sun</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">#</th>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-footer">
+                        <a href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus" aria-hidden="true">&nbsp;Add
+                                Row</i></a>
+                        <i>&nbsp;</i>
+                        <a href="javascript:void(0)" class="btn btn-primary">Submit</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -86,7 +139,9 @@
                     }
                 });
             });
-            $('#position').on('change',function(){$('#billable-hours').trigger("change");});
+            $('#position').on('change', function () {
+                $('#billable-hours').trigger("change");
+            });
             $('#billable-hours').on('change', function () {
                 var opt = $('#position').find(':selected');
                 var br = opt.attr('data-br');
@@ -94,8 +149,6 @@
                 var bh = $(this).val();
                 $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
             });
-
-
             $('#hour-form').on('submit', function (e) {
                 var eid = $('#client-engagement').selectpicker('val');
                 var token = "{{ csrf_token() }}";
@@ -141,12 +194,19 @@
                 });
                 e.preventDefault();
             });
-
             $('#report-date').datepicker({
                 format: 'mm/dd/yyyy',
                 todayHighlight: true,
                 autoclose: true
             }).datepicker('setDate', new Date());
+
+            $('#day-week').on('click', function () {
+                $('.daily-weekly-view').slideToggle();
+            });
+            $('#hours-roll').slimScroll({
+                height: '220px'
+            });
+
         });
 
         function deleteTodaysReport(hid) {
