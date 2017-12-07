@@ -32,7 +32,7 @@ class EngagementPolicy
         //
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return $engagement->arrangements()->pluck('consultant_id')->contains($consultant->id);
+            return $engagement->arrangements()->pluck('consultant_id')->contains($consultant->id) || $user->isSupervisor();
         }
         return false;
     }
@@ -61,15 +61,19 @@ class EngagementPolicy
         //active state, the team leader can only add member to it, which shall pass the policy of arrangement
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return $user->isManager() || ($consultant->id == $engagement->leader_id && $engagement->state() == 'Pending');
+            return $user->isSupervisor() || ($consultant->id == $engagement->leader_id && $engagement->isPending());
         }
         return false;
     }
 
-    public function activate(User $user, Engagement $engagement)
+    public function changeStatus(User $user, Engagement $engagement)
     {
-        return $user->isManager() && $engagement->state() != 'Active';
-        //only manager can activate the engagement.(change the state)
+        if ($engagement->isPending()) {
+            return $user->isSupervisor();
+        } else if ($engagement->isActive()) {
+            return $user->isSuperAdmin();
+        }
+        return false;
     }
 
     /**
@@ -84,21 +88,8 @@ class EngagementPolicy
         //Only the leader can DELETE a pending engagement, to which no one had reported hours
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return ($user->isManager() || $consultant->id == $engagement->leader_id) && $engagement->isPending();
+            return ($user->isSupervisor() || $consultant->id == $engagement->leader_id) && $engagement->isPending();
         }
         return false;
-    }
-
-    /**
-     * Determine whether the user can close the engagement.
-     *
-     * @param  \newlifecfo\User $user
-     * @param  \newlifecfo\Engagement $engagement
-     * @return mixed
-     */
-    public function close(User $user, Engagement $engagement)
-    {
-        //Policy: Only the leader can change a engagement's state to close--SOFT DELETE
-        return $user->isManager() && $engagement->state() == 'Active';
     }
 }

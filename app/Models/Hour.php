@@ -58,7 +58,8 @@ class Hour extends Model
     public static function recentReports($start = null, $end = null, $eid = null, $consultant = null)
     {
         $arrangements = isset($consultant) ? $consultant->arrangements() : Arrangement::all();
-
+        //todo: consider inconsistent problem caused by deleted arrangement (use soft-delete or status)
+        //$arrangements = isset($consultant) ? $consultant->arrangements()->withTrashed() : Arrangement::withTrashed();
         $aids = isset($eid) ? $arrangements->where('engagement_id', $eid)->pluck('id') : $arrangements->pluck('id');
 
         if ($start || $end)

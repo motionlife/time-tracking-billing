@@ -141,6 +141,8 @@ class EngagementController extends Controller
                     $arrangement->makeHidden(['engagement', 'created_at', 'updated_at', 'deleted_at']);
                 }
                 return $eng->makeHidden(['created_at', 'updated_at', 'deleted_at']);
+            } else {
+                return 'cannot view engagement';
             }
         } else {
             return "Illegal Request!";
@@ -160,18 +162,13 @@ class EngagementController extends Controller
         $user = Auth::user();
         $feedback = [];
         if ($request->ajax()) {
-            //business logic validation is important
-            //1. check the if the reported engagement is his valid engagement
             $eng = Engagement::find($id);
             if ($user->can('update', $eng)) {
-                //should not let normal user update their own status!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if ($eng->update(['client_id' => $request->get('client_id'),
                     'name' => $request->get('name'), 'start_date' => $request->get('start_date'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
                     'cycle_billing' => $request->get('cycle_billing') ?: 0
                 ])) {
-                    //only manager or superAdmin can touch the status
-                    if ($user->can('activate', $eng)) $eng->update(['status' => $request->get('status') ?: 1]);
                     if ($this->updateArrangements($request, $eng)) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'Record Update Success';
@@ -179,6 +176,16 @@ class EngagementController extends Controller
                         $feedback['code'] = 6;
                         $feedback['message'] = 'Updating arrangements failed, engagement update rollback';
                     }
+                    //only manager or superAdmin can touch the status
+                    $status = $request->get('status');
+                    if ($user->can('changeStatus', $eng) && is_numeric($status)) {
+                        $eng->update(['status' => $status]);
+                    }
+                    else {
+                        $feedback['code'] = 5;
+                        $feedback['message'] = 'Status updating failed, no authorization';
+                    }
+
                 } else {
                     $feedback['code'] = 4;
                     $feedback['message'] = 'unknown error during updating';

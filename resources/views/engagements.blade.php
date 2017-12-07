@@ -2,7 +2,7 @@
 @section('content')
     @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader);$admin = Request::is('admin/engagement'); @endphp
     <div class="main-content">
-        @if($manage)
+        @if($manage||$admin)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
                  aria-labelledby="engagementModalLabel" data-backdrop="static" data-keyboard="false"
                  aria-hidden="true">
@@ -37,7 +37,9 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-male" aria-hidden="true"></i>&nbsp; Leader:</span>
                                         <select class="selectpicker" name="leader_id" id="leader_id" disabled>
-                                            <option value="{{$leader->id}}" selected>{{$leader->fullname()}}</option>
+                                            @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                                <option value="{{$consultant->id}}" {{($manage&&$consultant->id==$leader->id)?'selected':''}}>{{$consultant->fullname()}}</option>
+                                            @endforeach
                                         </select>
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar"></i>&nbsp; Start Date</span>
@@ -97,9 +99,9 @@
                                                 <select class="selectpicker cid" data-width="120px"
                                                         data-dropup-auto="false"
                                                         data-live-search="true"
-                                                        disabled required>
+                                                        required>
                                                     @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                                                        <option value="{{$consultant->id}}" {{$leader->id==$consultant->id?"selected":""}}>{{$consultant->fullname()}}</option>
+                                                        <option value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -107,7 +109,7 @@
                                                 <select class="selectpicker pid" data-width="140px" required
                                                         data-dropup-auto="false">
                                                     @foreach(\newlifecfo\Models\Templates\Position::all() as $position)
-                                                        <option value="{{$position->id}}" {{$position->name=="CFO_Lead"?"selected":""}}>{{$position->name}}</option>
+                                                        <option value="{{$position->id}}">{{$position->name}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -123,6 +125,29 @@
                                     </table>
                                 </div>
                             </div>
+                            @if($admin)
+                                <div class="row"
+                                     style="width:95%;border-style: dotted;color:#33c0ff;padding: .2em .2em .2em .2em;margin-left: 1.1em">
+                                    <div class="col-md-4">
+                                        <label class="fancy-radio">
+                                            <input name="status" value="1" type="radio">
+                                            <span><i></i>Pending</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fancy-radio">
+                                            <input name="status" value="0" type="radio">
+                                            <span><i></i>Active</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fancy-radio">
+                                            <input name="status" value="2" type="radio">
+                                            <span><i></i>Closed</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                 <button class="btn btn-primary" id="submit-modal" type="submit"
@@ -183,7 +208,7 @@
                             <div class="panel">
                                 <div class="panel-heading engagement-table">
                                     <h3 class="panel-title">Name: <strong>{{$engagement->name}}</strong>
-                                        @if($manage)
+                                        @if($manage||$admin)
                                             <div class="pull-right">
                                                 <a href="javascript:void(0)" class="eng-edit"
                                                    data-id="{{$engagement->id}}"><i
@@ -220,37 +245,39 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="panel-body slim-scroll arrangement-table">
-                                    @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
-                                    <table class="table table-sm">
-                                        <thead>
-                                        <tr>
-                                            <th>Consultant</th>
-                                            <th>Position</th>
-                                            <th>{{$hourly?'Billing Rate':'Pay Rate'}}</th>
-                                            <th>Firm Share</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($engagement->arrangements as $arrangement)
+                                @if(!$admin)
+                                    <div class="panel-body slim-scroll arrangement-table">
+                                        @php $hourly = $engagement->clientBilledType() == 'Hourly'; @endphp
+                                        <table class="table table-sm">
+                                            <thead>
                                             <tr>
-                                                <td>{{$arrangement->consultant->fullname()}}</td>
-                                                <td> {{$arrangement->position->name}}</td>
-                                                <td>
-                                                    @can('view',$arrangement)
-                                                        ${{$arrangement->billing_rate}}
-                                                    @endcan
-                                                </td>
-                                                <td>
-                                                    @can('view',$arrangement)
-                                                        {{$hourly? $formatter->format($arrangement->firm_share):'-'}}
-                                                    @endcan
-                                                </td>
+                                                <th>Consultant</th>
+                                                <th>Position</th>
+                                                <th>{{$hourly?'Billing Rate':'Pay Rate'}}</th>
+                                                <th>Firm Share</th>
                                             </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($engagement->arrangements as $arrangement)
+                                                <tr>
+                                                    <td>{{$arrangement->consultant->fullname()}}</td>
+                                                    <td> {{$arrangement->position->name}}</td>
+                                                    <td>
+                                                        @can('view',$arrangement)
+                                                            ${{$arrangement->billing_rate}}
+                                                        @endcan
+                                                    </td>
+                                                    <td>
+                                                        @can('view',$arrangement)
+                                                            {{$hourly? $formatter->format($arrangement->firm_share):'-'}}
+                                                        @endcan
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         @if($loop->index%2==1||$loop->last)
@@ -285,6 +312,11 @@
                     window.location.href = '?cid=' + (cid ? cid : '') +
                     '&start=' + $('#start-date-filter').val() + '&lid=' + lid;
             });
+            @if($admin)
+            $('input[type=radio][name=status]').change(function () {
+                $('#submit-modal').attr('disabled', false);
+            });
+            @endif
             $('#client-select').on('change', function () {
                 $.get({
                     url: '/engagement/create?fetch=business&cid=' + $(this).selectpicker('val'),
@@ -355,7 +387,10 @@
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
-                        $('#submit-modal').attr('disabled', data.status === "0");
+                        $('#submit-modal').attr('disabled',@if($admin) false    @else data.status ==0   @endif  );
+                        @if($admin)
+                        $("input[name=status][value=" + data.status + "]").prop('checked', true);
+                        @endif
                         if (data.paying_cycle !== "0") {
                             $('#bill-pay-head').html('Pay Rate');
                             $('#billing_amount').attr('disabled', false);
@@ -403,9 +438,12 @@
                     dataType: 'json',
                     success: function (feedback) {
                         if (feedback.code == 7) {
-                            toastr.success('Success! Engagement has been ' + update ? 'updated!' : 'created!');
+                            toastr.success(update ? feedback.message : 'Engagement has been created!');
                             setTimeout(location.reload.bind(location), 1000);
-                        } else {
+                        }else if(feedback.code == 5){
+                            toastr.warning(feedback.message);
+                        }
+                        else {
                             toastr.error('Error! Saving failed, code: ' + feedback.code +
                                 ', message: ' + feedback.message);
                         }
@@ -468,7 +506,7 @@
                 $('#cycle-select').selectpicker('val', 0);
                 $('#bill-pay-head').html('Billing Rate');
                 $('#billing_amount').val('').attr('disabled', true);
-                $('#submit-modal').text('Build');
+                $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
             } else {
                 $('#submit-modal').html('Update');

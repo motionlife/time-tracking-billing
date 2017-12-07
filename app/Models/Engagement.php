@@ -83,6 +83,15 @@ class Engagement extends Model
         return $this->state() == 'Pending';
     }
 
+    public function isActive()
+    {
+        return $this->state()=='Active';
+    }
+
+    public function isClosed()
+    {
+        return $this->state()=='Closed';
+    }
 
     public function state()
     {
