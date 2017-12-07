@@ -2,7 +2,7 @@
 @section('content')
     <div class="main-content">
         <div class="container-fluid">
-            @php $users = \newlifecfo\User::all(); @endphp
+            @php $users = \newlifecfo\User::all()->sortByDesc('created_at'); @endphp
             <div class="panel panel-headline">
                 <div class="panel-title">
                     <h3>Registered Users</h3>
