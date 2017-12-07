@@ -65,12 +65,14 @@
                     </div>
                 </div>
             </div>
-            <div class="row daily-weekly-view" >
+            <div class="row daily-weekly-view">
                 <div class="panel panel-headline">
-                    <div class="panel-heading form-inline">
-                        <label title="Week">
-                            Select Week: <input class="form-control" type="week">
-                        </label>
+                    <div class="panel-heading">
+                        <div class="input-group" style="width: 30%;">
+                            <span class="input-group-addon"><i
+                                        class="fa fa-calendar-check-o"></i>&nbsp; Report Week</span>
+                            <input id="week-picker" placeholder="select week" class="form-control" type="text">
+                        </div>
                     </div>
                     <div class="panel-body" id="hours-roll">
                         <table class="table table-responsive">
@@ -84,20 +86,21 @@
                                 <th>Fri</th>
                                 <th>Sat</th>
                                 <th>Sun</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <th scope="row">#</th>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                    <td><input class='form-control input-sm' type='text' size="4"/></td>
-
-                                </tr>
+                            <tr>
+                                <th scope="row">#</th>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><input class='form-control input-sm' type='text' size="4"/></td>
+                                <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -113,6 +116,7 @@
     </div>
 @endsection
 @section('my-js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.3/moment.min.js"></script>
     <script>
         $(function () {
             toastr.options = {
@@ -197,7 +201,8 @@
             $('#report-date').datepicker({
                 format: 'mm/dd/yyyy',
                 todayHighlight: true,
-                autoclose: true
+                autoclose: true,
+                orientation: 'bottom'
             }).datepicker('setDate', new Date());
 
             $('#day-week').on('click', function () {
@@ -206,7 +211,21 @@
             $('#hours-roll').slimScroll({
                 height: '220px'
             });
-
+            $('#week-picker').datepicker({
+                format: 'mm/dd/yyyy',
+                todayHighlight: true,
+                autoclose: true,
+                calendarWeeks: true
+            }).datepicker('setDate', new Date()).on('show', function () {
+                 $('.datepicker tr td.cw').parent().hover(function(e) {
+                     $(this).css("background-color",e.type === "mouseenter"?"#47cef7":"transparent");
+                 });
+            }).on('changeDate',function (e) {
+                var value = $(this).val();
+                var firstDate = moment(value, "MM-DD-YYYY").day(0).format("MM-DD-YYYY");
+                var lastDate =  moment(value, "MM-DD-YYYY").day(6).format("MM-DD-YYYY");
+                $('#week-picker').val(firstDate + " - " + lastDate);
+            });
         });
 
         function deleteTodaysReport(hid) {
