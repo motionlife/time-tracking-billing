@@ -64,6 +64,7 @@ class ExpenseSeeder extends Seeder
                             'office_supply' => $this->number($line[16]),
                             'mileage_cost' => $this->number($line[18]),
                             'other' => $this->number($line[19]),
+                            'review_state'=>1,
                             'description' => $line[21]]);
                         if ($line[20]) {
                             Receipt::Create(['expense_id' => $exp->id, 'filename' => $line[20]]);
