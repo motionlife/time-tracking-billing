@@ -76,7 +76,7 @@ class ExpenseSeeder extends Seeder
                             Hour::Create([
                                 'arrangement_id' => $arr->id,
                                 'task_id' => $this->get_task_id($line[5], $line[6]),
-                                'report_date' => $line[4],
+                                'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
                                 'billable_hours' => $bh,
                                 'non_billable_hours' => $nbh,
                                 'description' => $line[10],
