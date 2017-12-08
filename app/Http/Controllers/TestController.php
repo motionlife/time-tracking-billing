@@ -98,7 +98,7 @@ class TestController extends Controller
         if (($handle = fopen(__DIR__ . '\..\..\..\database\seeds\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
                 if (str_contains($line[0], 'Total')) {
-                    array_push($out, $this->number($line[12]));
+                    $out[preg_replace('/\W\w+\s*(\W*)$/', '$1', $line[0])]=$this->number($line[12]);
                 }
             }
         }

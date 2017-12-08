@@ -27,7 +27,7 @@
                         <td>{{$result[$i]['totalbh']}}</td>
                         <td>{{$result[$i]['totalnbh']}}</td>
                         <td><strong>${{number_format($result[$i]['totalpay'],2)}}</strong></td>
-                        <td>{{$result[$i]['totalpay']?'$'.number_format($csv[$j++],2):''}}</td>
+                        <td>{{$result[$i]['totalpay']?'$'.number_format($csv[$consul->fullname()],2):''}}</td>
                         <td>${{number_format($result[$i]['totalexpense'],2)}}</td>
                     </tr>
                 @endforeach
