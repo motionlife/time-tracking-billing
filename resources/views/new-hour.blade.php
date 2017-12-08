@@ -8,7 +8,7 @@
                 </div>
                 <div class="col-md-9">
                     <a href="javascript:void(0)" class="btn btn-default"
-                       id="day-week">Daily&nbsp;<i class="fa fa-refresh" aria-hidden="true">&nbsp;Weekly</i></a>
+                       id="day-week">Daily&nbsp;<i class="fa fa-arrows-h" aria-hidden="true">&nbsp;Weekly</i></a>
                 </div>
             </div>
             <hr>
@@ -67,13 +67,13 @@
             </div>
             <div class="row daily-weekly-view">
                 <div class="panel panel-headline">
-                    <div class="input-group" style="width: auto;">
+                    <div class="input-group">
                         <span class="input-group-btn"><button class="btn btn-primary" type="button"
-                                                                  id="week-picker"><i
-                                            class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
+                                                              id="week-picker"><i
+                                        class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
                         <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
                             Week
-                            <span>{{\Carbon\Carbon::now()->weekOfYear}}</span>,&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->format('M d, Y').' - '.\Carbon\Carbon::now()->endOfWeek()->format('M d, Y')}}</strong>
+                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong>
                         </div>
                     </div>
                     <div class="panel-body" id="hours-roll">
@@ -81,37 +81,88 @@
                             <thead>
                             <tr>
                                 <th>Engagement / Task</th>
-                                <th>Mon</th>
-                                <th>Tue</th>
-                                <th>Wes</th>
-                                <th>Thu</th>
-                                <th>Fri</th>
-                                <th>Sat</th>
-                                <th>Sun</th>
-                                <th></th>
+                                @for($i=0;$i<7;$i++)
+                                    @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
+                                    <th>{{substr($date->addDay($i)->format('l'),0,3)}}<span>{{$date->format('M d')}}</span></th>
+                                @endfor
+                                    <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <th scope="row">#</th>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><input class='form-control input-sm' type='text' size="4"/></td>
-                                <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a></td>
-                            </tr>
+
                             </tbody>
                         </table>
                     </div>
                     <div class="panel-footer">
-                        <a href="javascript:void(0)" class="btn btn-info"><i class="fa fa-plus" aria-hidden="true">&nbsp;Add
+                        <a href="javascript:void(0)" id="add-row-btn" class="btn btn-info"><i class="fa fa-plus" aria-hidden="true">&nbsp;Add
                                 Row</i></a>
                         <i>&nbsp;</i>
                         <a href="javascript:void(0)" class="btn btn-primary">Submit</a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="row-template" style="display:none;">
+        <tr>
+            <th scope="row"></th>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><input class='form-control input-sm' type='text' size="4"/></td>
+            <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+        </tr>
+    </div>
+    <div class="modal fade" id="engtaskModal" tabindex="-1" role="dialog" aria-labelledby="engtaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="engtaskModalLabel">Select engagement and task</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group form-group-sm">
+                        <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp;Engagement:</span>
+                        <select id="client-engagement-addrow" class="selectpicker show-tick form-control form-control-sm" data-width="100%" data-dropup-auto="false"
+                                data-live-search="true" name="eid" title="Select the engagements" required>
+                            @if(isset($clientIds))
+                                @foreach($clientIds as $cid=>$engagements)
+                                    <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
+                                        @foreach($engagements as $eng)
+                                            <option value="{{$eng[0]}}">{{$eng[1]}}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            @endif
+                        </select>
+                        <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Position:</span>
+                        <select class="selectpicker form-control form-control-sm" id="position-addrow" name="pid" data-width="100%"
+                                required></select>
+                    </div>
+                    <br>
+                    <div class="input-group form-group-sm">
+                        <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
+                        <select id="task-id-addrow" class="selectpicker show-sub-text form-control form-control-sm" data-live-search="true"
+                                data-width="100%" name="task_id" data-dropup-auto="false"
+                                title="Select your task" required>
+                            @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
+                                <?php $gname = $tgroup->name?>
+                                @foreach($tgroup->tasks as $task)
+                                    <option value="{{$task->id}}"
+                                            data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
+                                @endforeach
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add</button>
                 </div>
             </div>
         </div>
@@ -130,14 +181,14 @@
                 "timeOut": "4000",
                 "extendedTimeOut": "900"
             };
-            $('#client-engagement').on('change', function () {
+            $('#client-engagement,#client-engagement-addrow').on('change', function () {
                 var select = $(this);
                 $.ajax({
                     type: "get",
                     url: "/hour/create",
                     data: {eid: select.selectpicker('val'), fetch: 'position'},
                     success: function (data) {
-                        var pos = $('#position').empty();
+                        var pos = $('#position,#position-addrow').empty();
                         $(data).each(function (i, arr) {
                             pos.append("<option value=" + arr.position.id + " data-br=" + arr.br + " data-fs=" + arr.fs + ">" + arr.position.name + "</option>");
                         });
@@ -222,9 +273,19 @@
                     $(this).css("background-color", e.type === "mouseenter" ? "#47cef7" : "transparent");
                 });
             }).on('changeDate', function (e) {
-                var firstDate = moment(e.date).day(0).format("M DD, YYYY");
-                var lastDate = moment(e.date).day(6).format("M DD, YYYY");
-                $('#week-info').find('strong').empty().text(firstDate + " - " + lastDate);
+                var weekinfo = $('#week-info');
+                var md = moment(e.date);
+                var span = $('#hours-roll').find('tr span');
+                var firstDate = md.day(0).format("MM/DD/YYYY");
+                var lastDate = md.day(6).format("MM/DD/YYYY");
+                weekinfo.find('strong').empty().text(firstDate + " - " + lastDate);
+                weekinfo.find('span').empty().text(md.week());
+                for (var i = 0; i < 7; i++) {
+                    span.eq(i).empty().text(md.day(i).format("MMM DD"));
+                }
+            });
+            $('#add-row-btn').on('click',function () {
+                $('#engtaskModal').modal('toggle');
             });
         });
 
@@ -261,4 +322,11 @@
 @endsection
 
 @section('special-css')
+    <style>
+        #hours-roll th span{
+            color: #4bb3ff;
+            font-weight: lighter;
+            margin-left: .7em;
+        }
+    </style>
 @endsection
