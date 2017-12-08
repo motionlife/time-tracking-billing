@@ -12,7 +12,7 @@
                 </div>
             </div>
             <hr>
-            <div class="row daily-weekly-view" style="display: none">
+            <div class="row daily-weekly-view">
                 <div class="col-md-8">
                     <div class="panel panel-headline">
                         <div class="panel-heading">
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row daily-weekly-view">
+            <div class="row daily-weekly-view" style="display: none">
                 <div class="panel panel-headline">
                     <div class="input-group">
                         <span class="input-group-btn"><button class="btn btn-primary" type="button"
@@ -73,98 +73,114 @@
                                         class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
                         <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
                             Week
-                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong>
+                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong><i class="pull-right">Input Billable Hours</i>
                         </div>
                     </div>
+                    <form id="matrix">
                     <div class="panel-body" id="hours-roll">
                         <table class="table table-responsive">
                             <thead>
                             <tr>
-                                <th>Engagement / Task</th>
+                                <th>Engagement(client)<br><i>Task description</i></th>
                                 @for($i=0;$i<7;$i++)
                                     @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
-                                    <th>{{substr($date->addDay($i)->format('l'),0,3)}}<span>{{$date->format('M d')}}</span></th>
+                                    <th>{{substr($date->addDay($i)->format('l'),0,3)}}
+                                        <br><span data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span></th>
                                 @endfor
-                                    <th></th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
-
                             </tbody>
                         </table>
                     </div>
                     <div class="panel-footer">
-                        <a href="javascript:void(0)" id="add-row-btn" class="btn btn-info"><i class="fa fa-plus" aria-hidden="true">&nbsp;Add
+                        <a href="javascript:void(0)" id="show-row-modal" class="btn btn-info"><i class="fa fa-plus"
+                                                                                                 aria-hidden="true">&nbsp;Add
                                 Row</i></a>
                         <i>&nbsp;</i>
-                        <a href="javascript:void(0)" class="btn btn-primary">Submit</a>
+                        <button type="submit" id="matrix-submit" class="btn btn-primary"
+                           disabled="true"
+                                data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit</button>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
     <div id="row-template" style="display:none;">
-        <tr>
-            <th scope="row"></th>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><input class='form-control input-sm' type='text' size="4"/></td>
-            <td><a href="javascript:void(0)"><i class="fa fa-times" aria-hidden="true"></i></a></td>
-        </tr>
+        <table>
+            <tbody>
+            <tr>
+                <th scope="row"><span></span>(<span></span>)<br><span></span></th>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
+                <td><a href="javascript:void(0)" class="deletable-row"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="modal fade" id="engtaskModal" tabindex="-1" role="dialog" aria-labelledby="engtaskModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="engtaskModalLabel">Select engagement and task</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="input-group form-group-sm">
-                        <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp;Engagement:</span>
-                        <select id="client-engagement-addrow" class="selectpicker show-tick form-control form-control-sm" data-width="100%" data-dropup-auto="false"
-                                data-live-search="true" name="eid" title="Select the engagements" required>
-                            @if(isset($clientIds))
-                                @foreach($clientIds as $cid=>$engagements)
-                                    <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                                        @foreach($engagements as $eng)
-                                            <option value="{{$eng[0]}}">{{$eng[1]}}</option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                            @endif
-                        </select>
-                        <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Position:</span>
-                        <select class="selectpicker form-control form-control-sm" id="position-addrow" name="pid" data-width="100%"
-                                required></select>
+    <div class="modal fade" id="engtaskModal" tabindex="-1" role="dialog" aria-labelledby="engtaskModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="validation-form">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="engtaskModalLabel">Select engagement and task</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                    <br>
-                    <div class="input-group form-group-sm">
-                        <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
-                        <select id="task-id-addrow" class="selectpicker show-sub-text form-control form-control-sm" data-live-search="true"
-                                data-width="100%" name="task_id" data-dropup-auto="false"
-                                title="Select your task" required>
-                            @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
-                                <?php $gname = $tgroup->name?>
-                                @foreach($tgroup->tasks as $task)
-                                    <option value="{{$task->id}}"
-                                            data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
+                    <div class="modal-body">
+                        <div class="input-group form-group-sm">
+                            <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp;Engagement:</span>
+                            <select id="client-engagement-addrow"
+                                    class="selectpicker show-tick form-control form-control-sm" data-width="100%"
+                                    data-dropup-auto="false"
+                                    data-live-search="true" name="eid" title="Select the engagements" required>
+                                @if(isset($clientIds))
+                                    @foreach($clientIds as $cid=>$engagements)
+                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name}}">
+                                            @foreach($engagements as $eng)
+                                                <option value="{{$eng[0]}}">{{$eng[1]}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                @endif
+                            </select>
+                            <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Position:</span>
+                            <select class="selectpicker form-control form-control-sm" id="position-addrow" name="pid"
+                                    data-width="100%"
+                                    required></select>
+                        </div>
+                        <br>
+                        <div class="input-group form-group-sm">
+                            <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
+                            <select id="task-id-addrow" class="selectpicker show-sub-text form-control form-control-sm"
+                                    data-live-search="true"
+                                    data-width="100%" name="task_id" data-dropup-auto="false"
+                                    title="Select your task" required>
+                                @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
+                                    <?php $gname = $tgroup->name?>
+                                    @foreach($tgroup->tasks as $task)
+                                        <option value="{{$task->id}}" data-task="{{$task->description}}"
+                                                data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
+                                    @endforeach
                                 @endforeach
-                            @endforeach
-                        </select>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="add-row-btn">Add</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Add</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 @endsection
@@ -262,7 +278,7 @@
                 $('.daily-weekly-view').slideToggle();
             });
             $('#hours-roll').slimScroll({
-                height: '220px'
+                height: '420px'
             });
             $('#week-picker').datepicker({
                 todayHighlight: true,
@@ -275,17 +291,88 @@
             }).on('changeDate', function (e) {
                 var weekinfo = $('#week-info');
                 var md = moment(e.date);
-                var span = $('#hours-roll').find('tr span');
+                var spans = $('#hours-roll').find('thead tr span');
                 var firstDate = md.day(0).format("MM/DD/YYYY");
                 var lastDate = md.day(6).format("MM/DD/YYYY");
                 weekinfo.find('strong').empty().text(firstDate + " - " + lastDate);
                 weekinfo.find('span').empty().text(md.week());
                 for (var i = 0; i < 7; i++) {
-                    span.eq(i).empty().text(md.day(i).format("MMM DD"));
+                    var weekday = md.day(i);
+                    spans.eq(i).empty().text(weekday.format("MMM DD"));
+                    spans.eq(i).data('date', weekday.format('YYYY-MM-DD'));
                 }
             });
-            $('#add-row-btn').on('click',function () {
+            $('#show-row-modal').on('click', function () {
                 $('#engtaskModal').modal('toggle');
+            });
+            $('#validation-form').on('submit', function (e) {
+                var tr = $('#row-template').find('tr').clone().appendTo($('#hours-roll').find('tbody'));
+                var engoption = $("#client-engagement-addrow").find("option:selected");
+                var task = $("#task-id-addrow").find("option:selected");
+                tr.data('eid', engoption.val());
+                tr.data('pid', $('#position-addrow').val());
+                tr.data('tid', task.val());
+                tr.find('th span:first-child').text(engoption.text())
+                    .next().text(engoption.parent().attr('label'))
+                    .next().next().text(task.data('task'));
+                $('#engtaskModal').modal('toggle');
+                $('#matrix-submit').attr('disabled', false);
+                e.preventDefault();
+            });
+
+            $('#matrix').on('submit', function (e) {
+                var data = [];
+                data.push({name: '_token', value: "{{csrf_token()}}"},{name:'week',value:1});
+                var spans = $('#hours-roll').find('thead tr span');
+                $('#hours-roll').find('tbody tr').each(function (i, r) {
+                    var eid = $(this).data('eid');
+                    var pid = $(this).data('pid');
+                    var tid = $(this).data('tid');
+                    var inputs = $(r).find('td input');
+                    spans.each(function (j, d) {
+                        var bh = inputs.eq(j).val();
+                        if (bh) {
+                            var date = $(d).data('date');
+                            data.push({
+                                name: 'hours[]',
+                                value: [eid, pid, tid, date, bh]
+                            });
+                        }
+                    });
+                });
+                if(data[2])
+                $.ajax({
+                    type: "POST",
+                    url: "/hour",
+                    data: data,
+                    dataType: 'json',
+                    success: function (feedback) {
+                        if (feedback.code == 7) {
+                            toastr.success('Success! Report has been saved!');
+                            $('#hours-roll').find('tbody tr input').val('');
+                        } else {
+                            toastr.error('Error! Saving record failed, code: ' + feedback.code +
+                                ', message: ' + feedback.message);
+                        }
+                    },
+                    error: function (feedback) {
+                        toastr.error('Oh Noooooooo..' + feedback.message);
+                    },
+                    beforeSend: function () {
+                        $("#matrix-submit").button('loading');
+                    },
+                    complete: function () {
+                        $("#matrix-submit").button('reset');
+                    }
+                });
+                e.preventDefault();
+            });
+
+            $(document).on('click', '.deletable-row', function () {
+                $(this).parent().parent().fadeOut(300, function () {
+                    $(this).remove();
+                    if (!$('#hours-roll').find('tbody tr').length) $('#matrix-submit').attr('disabled', true);
+                });
             });
         });
 
@@ -323,10 +410,32 @@
 
 @section('special-css')
     <style>
-        #hours-roll th span{
+        #hours-roll thead span {
             color: #4bb3ff;
+            font-weight: normal;
+        }
+
+        tbody tr td a {
+            color: red;
+        }
+
+        tbody tr th span:nth-child(2) {
+            color: #287eff;
             font-weight: lighter;
-            margin-left: .7em;
+        }
+
+        #week-info {
+            font-size: 1.1em;
+        }
+
+        #hours-roll thead th:first-child i, tbody tr th span:last-child {
+            font-weight: lighter;
+            font-size: small;
+            color: rgba(128, 128, 128, 0.53);
+        }
+
+        tbody tr input[type=number] {
+            max-width: 77px;
         }
     </style>
 @endsection

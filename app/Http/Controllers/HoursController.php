@@ -68,28 +68,53 @@ class HoursController extends Controller
         $eid = $request->get('eid');
         $pid = $request->get('pid');
         if ($request->ajax()) {
-            //business logic validation is important
-            //1. check the if the reported engagement is his valid engagement
-            $eng = Engagement::find($eid);
-            if (!$eng || !$eng->isActive()) {
-                $feedback['code'] = 1;
-                $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
-            } else {
-                $arr = $consultant->getMyArrangementByEidPid($eid, $pid);
-                if (!$arr) {
-                    $feedback['code'] = 2;
-                    $feedback['message'] = 'You are not in this engagement';
-                } else {
-                    $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid', 'review_state']));
-                    if ($hour->save()) {
-                        $feedback['code'] = 7;
-                        $feedback['message'] = 'success';
-                        $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
-                            'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
-                            'ename' => $eng->name, 'cname' => $eng->client->name, 'hid' => $hour->id];
+            if ($request->get('week') == "1") {
+                $hs = $request->get('hours');
+                foreach ($hs as $h) {
+                    $data = explode(',', $h);
+                    $eng = Engagement::find($data[0]);
+                    if (!$eng || !$eng->isActive()) {
+                        $feedback['code'] = 1;
+                        $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
                     } else {
-                        $feedback['code'] = 3;
-                        $feedback['message'] = 'unknown error happened while saving';
+                        $arr = $consultant->getMyArrangementByEidPid($data[0], $data[1]);
+                        if (!$arr) {
+                            $feedback['code'] = 2;
+                            $feedback['message'] = 'You are not in this engagement';
+                        } else {
+                            $hour = Hour::create(['arrangement_id' => $arr->id, 'task_id' => $data[2], 'report_date' => $data[3], 'billable_hours' => $data[4]]);
+                            if ($hour) {
+                                $feedback['code'] = 7;
+                                $feedback['message'] = 'success';
+                            } else {
+                                $feedback['code'] = 3;
+                                $feedback['message'] = 'unknown error happened while saving';
+                            }
+                        }
+                    }
+                }
+            } else {
+                $eng = Engagement::find($eid);
+                if (!$eng || !$eng->isActive()) {
+                    $feedback['code'] = 1;
+                    $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
+                } else {
+                    $arr = $consultant->getMyArrangementByEidPid($eid, $pid);
+                    if (!$arr) {
+                        $feedback['code'] = 2;
+                        $feedback['message'] = 'You are not in this engagement';
+                    } else {
+                        $hour = (new Hour(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'pid', 'review_state']));
+                        if ($hour->save()) {
+                            $feedback['code'] = 7;
+                            $feedback['message'] = 'success';
+                            $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
+                                'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
+                                'ename' => $eng->name, 'cname' => $eng->client->name, 'hid' => $hour->id];
+                        } else {
+                            $feedback['code'] = 3;
+                            $feedback['message'] = 'unknown error happened while saving';
+                        }
                     }
                 }
             }
