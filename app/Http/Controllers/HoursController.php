@@ -68,21 +68,20 @@ class HoursController extends Controller
         $eid = $request->get('eid');
         $pid = $request->get('pid');
         if ($request->ajax()) {
-            if ($request->get('week') == "1") {
-                $hs = $request->get('hours');
-                foreach ($hs as $h) {
-                    $data = explode(',', $h);
-                    $eng = Engagement::find($data[0]);
+            if ($request->get('week')) {
+                $items = json_decode($request->get('json'),true);
+                foreach ($items as $item) {
+                    $eng = Engagement::find($item['eid']);
                     if (!$eng || !$eng->isActive()) {
                         $feedback['code'] = 1;
                         $feedback['message'] = 'Non-active Engagement!, has it been closed or still pending? Please contact supervisor.';
                     } else {
-                        $arr = $consultant->getMyArrangementByEidPid($data[0], $data[1]);
+                        $arr = $consultant->getMyArrangementByEidPid($item['eid'], $item['pid']);
                         if (!$arr) {
                             $feedback['code'] = 2;
                             $feedback['message'] = 'You are not in this engagement';
                         } else {
-                            $hour = Hour::create(['arrangement_id' => $arr->id, 'task_id' => $data[2], 'report_date' => $data[3], 'billable_hours' => $data[4]]);
+                            $hour = Hour::create(['arrangement_id' => $arr->id, 'task_id' => $item['tid'], 'report_date' => $item['date'], 'billable_hours' => $item['bh'], 'description' => isset($item['desc'])?$item['desc']:'']);
                             if ($hour) {
                                 $feedback['code'] = 7;
                                 $feedback['message'] = 'success';

@@ -61,8 +61,8 @@
     <input type="text" id="income-estimate" disabled value="" class="form-control" data-br="" data-fs="">
 </div>
 <br>
-<textarea id="description" class="form-control" name="description" placeholder="description"
-          rows="3"></textarea>
+<textarea id="description" class="form-control notebook" name="description" placeholder="description"
+          rows="4"></textarea>
 <br>
 @if(isset($admin))
     @if($admin)

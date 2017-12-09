@@ -12,7 +12,7 @@
                 </div>
             </div>
             <hr>
-            <div class="row daily-weekly-view">
+            <div class="row daily-weekly-view" style="display: none">
                 <div class="col-md-8">
                     <div class="panel panel-headline">
                         <div class="panel-heading">
@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row daily-weekly-view" style="display: none">
+            <div class="row daily-weekly-view">
                 <div class="panel panel-headline">
                     <div class="input-group">
                         <span class="input-group-btn"><button class="btn btn-primary" type="button"
@@ -73,36 +73,40 @@
                                         class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
                         <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
                             Week
-                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong><i class="pull-right">Input Billable Hours</i>
+                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong><i
+                                    class="pull-right">Input Billable Hours</i>
                         </div>
                     </div>
                     <form id="matrix">
-                    <div class="panel-body" id="hours-roll">
-                        <table class="table table-responsive">
-                            <thead>
-                            <tr>
-                                <th>Engagement(client)<br><i>Task description</i></th>
-                                @for($i=0;$i<7;$i++)
-                                    @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
-                                    <th>{{substr($date->addDay($i)->format('l'),0,3)}}
-                                        <br><span data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span></th>
-                                @endfor
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="panel-footer">
-                        <a href="javascript:void(0)" id="show-row-modal" class="btn btn-info"><i class="fa fa-plus"
-                                                                                                 aria-hidden="true">&nbsp;Add
-                                Row</i></a>
-                        <i>&nbsp;</i>
-                        <button type="submit" id="matrix-submit" class="btn btn-primary"
-                           disabled="true"
-                                data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit</button>
-                    </div>
+                        <div class="panel-body" id="hours-roll">
+                            <table class="table table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Engagement(client)<br><i>Task description</i></th>
+                                    @for($i=0;$i<7;$i++)
+                                        @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
+                                        <th>{{substr($date->addDay($i)->format('l'),0,3)}}
+                                            <br><span
+                                                    data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
+                                        </th>
+                                    @endfor
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="panel-footer">
+                            <a href="javascript:void(0)" id="show-row-modal" class="btn btn-info"><i class="fa fa-plus"
+                                                                                                     aria-hidden="true">&nbsp;Add
+                                    Row</i></a>
+                            <i>&nbsp;</i>
+                            <button type="submit" id="matrix-submit" class="btn btn-primary"
+                                    disabled="true"
+                                    data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -113,14 +117,13 @@
             <tbody>
             <tr>
                 <th scope="row"><span></span>(<span></span>)<br><span></span></th>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><input class='form-control input-sm' type='number' min="0" max="24"/></td>
-                <td><a href="javascript:void(0)" class="deletable-row"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                @for($i=0;$i<7;$i++)
+                    <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
+                        <a href="javascript:void(0);" title="Add description" ref="popover"><i
+                                    class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
+                @endfor
+                <td><a href="javascript:void(0)" class="deletable-row"><i class="fa fa-times"
+                                                                          aria-hidden="true"></i></a></td>
             </tr>
             </tbody>
         </table>
@@ -273,7 +276,6 @@
                 autoclose: true,
                 orientation: 'bottom'
             }).datepicker('setDate', new Date());
-
             $('#day-week').on('click', function () {
                 $('.daily-weekly-view').slideToggle();
             });
@@ -319,60 +321,93 @@
                 $('#matrix-submit').attr('disabled', false);
                 e.preventDefault();
             });
-
             $('#matrix').on('submit', function (e) {
-                var data = [];
-                data.push({name: '_token', value: "{{csrf_token()}}"},{name:'week',value:1});
+                var data = [], json = [];
+                data.push({name: '_token', value: "{{csrf_token()}}"}, {name: 'week', value: true});
                 var spans = $('#hours-roll').find('thead tr span');
                 $('#hours-roll').find('tbody tr').each(function (i, r) {
                     var eid = $(this).data('eid');
                     var pid = $(this).data('pid');
                     var tid = $(this).data('tid');
                     var inputs = $(r).find('td input');
+                    var anchors = $(r).find('td a');
                     spans.each(function (j, d) {
                         var bh = inputs.eq(j).val();
+                        var desc = anchors.eq(j).data('desc');
                         if (bh) {
                             var date = $(d).data('date');
-                            data.push({
-                                name: 'hours[]',
-                                value: [eid, pid, tid, date, bh]
+                            json.push({
+                                'eid': eid,
+                                'pid': pid,
+                                'tid': tid,
+                                'date': date,
+                                'bh': bh,
+                                'desc': desc
                             });
                         }
                     });
                 });
-                if(data[2])
-                $.ajax({
-                    type: "POST",
-                    url: "/hour",
-                    data: data,
-                    dataType: 'json',
-                    success: function (feedback) {
-                        if (feedback.code == 7) {
-                            toastr.success('Success! Report has been saved!');
-                            $('#hours-roll').find('tbody tr input').val('');
-                        } else {
-                            toastr.error('Error! Saving record failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message);
+                data.push({name: 'json', value: JSON.stringify(json)});
+                if (json.length)
+                    $.ajax({
+                        type: "POST",
+                        url: "/hour",
+                        data: data,
+                        dataType: 'json',
+                        success: function (feedback) {
+                            if (feedback.code == 7) {
+                                toastr.success('Success! Report has been saved!');
+                                var td = $('#hours-roll').find('tbody tr td');
+                                td.find('input').val('');
+                                td.find('a[ref="popover"]').data('desc', '').find('i').removeClass("fa-sticky-note").addClass("fa-sticky-note-o");
+                            } else {
+                                toastr.error('Error! Saving record failed, code: ' + feedback.code +
+                                    ', message: ' + feedback.message);
+                            }
+                        },
+                        error: function (feedback) {
+                            toastr.error('Oh Noooooooo..' + feedback.message);
+                        },
+                        beforeSend: function () {
+                            $("#matrix-submit").button('loading');
+                        },
+                        complete: function () {
+                            $("#matrix-submit").button('reset');
                         }
-                    },
-                    error: function (feedback) {
-                        toastr.error('Oh Noooooooo..' + feedback.message);
-                    },
-                    beforeSend: function () {
-                        $("#matrix-submit").button('loading');
-                    },
-                    complete: function () {
-                        $("#matrix-submit").button('reset');
-                    }
-                });
+                    });
                 e.preventDefault();
             });
-
             $(document).on('click', '.deletable-row', function () {
                 $(this).parent().parent().fadeOut(300, function () {
                     $(this).remove();
                     if (!$('#hours-roll').find('tbody tr').length) $('#matrix-submit').attr('disabled', true);
                 });
+            });
+            var focuseda;
+            $('.main-content').popover({
+                placement: 'bottom',
+                container: '.main-content',
+                selector: '[ref="popover"]',
+                html: true,
+                content: function () {
+                    focuseda = $(this);
+                    var content = focuseda.data("desc") === undefined ? '' : focuseda.data("desc");
+                    return '<textarea class="notebook" id="notebook" rows="8" cols="70">' + content + '</textarea>';
+                }
+            }).on('click', function (e) {
+                $('[ref="popover"]').each(function () {
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                    }
+                });
+            });
+            $(document).on('change', '#notebook', function (e) {
+                focuseda.data('desc', e.target.value);
+                if (e.target.value) {
+                    focuseda.find('i').removeClass("fa-sticky-note-o").addClass("fa-sticky-note");
+                } else {
+                    focuseda.find('i').removeClass("fa-sticky-note").addClass("fa-sticky-note-o");
+                }
             });
         });
 
@@ -415,11 +450,11 @@
             font-weight: normal;
         }
 
-        tbody tr td a {
+        .deletable-row {
             color: red;
         }
 
-        tbody tr th span:nth-child(2) {
+        #hours-roll tbody tr th span:nth-child(2) {
             color: #287eff;
             font-weight: lighter;
         }
@@ -434,8 +469,16 @@
             color: rgba(128, 128, 128, 0.53);
         }
 
-        tbody tr input[type=number] {
-            max-width: 77px;
+        #hours-roll tbody tr input[type=number] {
+            display: inline-block;
+            width: 78%;
         }
+
+        #hours-roll tbody tr a {
+            width: 19%;
+            display: inline-block;
+            margin-left: .1em;
+        }
+
     </style>
 @endsection
