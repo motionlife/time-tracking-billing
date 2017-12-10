@@ -223,7 +223,7 @@
                 var br = opt.attr('data-br');
                 var fs = opt.attr('data-fs');
                 var bh = $(this).val();
-                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
+                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
                 var eid = $('#client-engagement').selectpicker('val');
@@ -479,6 +479,8 @@
             display: inline-block;
             margin-left: .1em;
         }
-
+        #hours-roll tbody tr input{
+            font-weight: bold;
+        }
     </style>
 @endsection

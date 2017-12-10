@@ -176,8 +176,7 @@
                 fullWidth: true,
                 axisX: {
                     showGrid: false
-                },
-                lineSmooth: true,
+                }
             };
             new Chartist.Line('#semi-month-char', data, options);
 
@@ -199,7 +198,6 @@
             };
             options = {
                 fullWidth: true,
-                lineSmooth: true,
                 height: "270px",
                 low: 0,
                 high: 'auto',

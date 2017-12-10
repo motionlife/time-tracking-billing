@@ -126,7 +126,7 @@
                 var br = income.attr('data-br');
                 var fs = income.attr('data-fs');
                 var bh = $(this).val();
-                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + bh * br * (1 - fs));
+                income.val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
 
             $('td a:nth-child(1)').on('click', function () {

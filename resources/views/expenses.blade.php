@@ -332,7 +332,7 @@
                     $('#input-other').val(data.other);
                     $('#input-receipts').val('');
                     $('#description').val(data.description);
-                    $('#expense-total').val(data.total);
+                    $('#expense-total').val(parseFloat(data.total).toFixed(2));
                     $('#report-update').attr('disabled', data.review_state !== "0");
                     $('#consultant-name').text(data.cname);
                     @if($admin)
@@ -376,7 +376,6 @@
                         },
                         error: function (data) {
                             toastr.warning('Failed! Fail to delete the record!' + data);
-                            console.log(data);
                         },
                         dataType: 'json'
                     });
@@ -385,13 +384,13 @@
         }
 
         function updateTotal() {
-            total = 0;
+            var total = 0;
             $('.input-numbers').each(function (i, n) {
                 var num = parseFloat($(n).val());
                 num = isNaN(num) ? 0 : num;
                 total += num;
             });
-            $('#expense-total').val(total);
+            $('#expense-total').val(total.toFixed(2));
         }
 
         function outputLink(receipts) {
