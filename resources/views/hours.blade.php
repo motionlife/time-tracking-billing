@@ -107,12 +107,6 @@
                 "positionClass": "toast-top-right",
                 "timeOut": "3000"
             };
-            $('#filter-button').on('click', function () {
-                var eid = $('#client-engagements').selectpicker('val');
-                var conid = $('#consultant-select').selectpicker('val');
-                window.location.href = 'hour?eid=' + (eid ? eid : '') + '&conid=' + (conid ? conid : '') +
-                    '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
-            });
             $('.date-picker').datepicker(
                 {
                     format: 'mm/dd/yyyy',

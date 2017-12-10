@@ -23,6 +23,16 @@
             @endforeach
         </select>
     @endif
+    @if(isset($payroll))
+        <i>&nbsp;</i>
+        <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
+                id="state-select"
+                data-live-search="true">
+            <option value="" data-icon="glyphicon-flag" selected>Status</option>
+            <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
+            <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
+        </select>
+    @endif
     <i>&nbsp;</i>
     <input class="date-picker form-control" id="start-date" size="10"
            placeholder="&#xf073; Start Day"
@@ -32,6 +42,16 @@
     <input class="date-picker form-control" id="end-date" size="10" placeholder="&#xf073; End Day"
            value="{{Request('end')}}" type="text"/>
     <i>&nbsp;</i>
-    <a href="javascript:void(0)" type="button" class="btn btn-info"
-       id="filter-button">Filter</a>
+    <a href="javascript:filter_resource();" type="button" class="btn btn-info"
+       id="filter-button">{{isset($payroll)?'View':'Filter'}}</a>
+    <script>
+        function filter_resource() {
+            var eid = $('#client-engagements').val();
+            var conid = $('#consultant-select').val();
+            var state = $('#state-select').val();
+            var resource = "{{Request::is('hour')||Request::is('admin/hour')?'hour':(Request::is('expense')||Request::is('admin/expense')?'expense':'payroll')}}";
+            window.location.href = resource + '?eid=' + (eid ? eid : '') + '&conid=' + (conid===undefined ?'':conid) +
+                '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val() + '&state=' + (state===undefined?'':state);
+        }
+    </script>
 </div>

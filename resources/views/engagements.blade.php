@@ -501,13 +501,15 @@
         function initModal(update) {
             var tb = $("#members-table");
             tb.find("tr:not(:first-child)").remove();
-            tb.find("tr.selectpicker").selectpicker('refresh');
+            tb.find("tr .selectpicker").selectpicker('refresh');
             if (!update) {
                 $('#cycle-select').selectpicker('val', 0);
                 $('#bill-pay-head').html('Billing Rate');
                 $('#billing_amount').val('').attr('disabled', true);
                 $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
+                tb.find('select').first().selectpicker('val',$('#leader_id').val());
+                tb.find('select').last().selectpicker('val',8);
             } else {
                 $('#submit-modal').html('Update');
                 $('#engagementModalLabel').find('span').text('Update Engagement')

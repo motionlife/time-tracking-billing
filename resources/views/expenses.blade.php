@@ -35,7 +35,7 @@
                                                placeholder="mm/dd/yyyy"
                                                name="report_date" type="text" required/>
                                         <span class="input-group-addon"><i class="fa fa-calendar-check-o"
-                                                                           aria-hidden="true"></i>&nbsp;Company Paid:</span>
+                                                                           aria-hidden="true"></i>&nbsp;Company Paid<a href="javascript:void(0)" title="Expense already paid by New Lif CFO?"><i class="fa fa-info-circle" aria-hidden="true"></i></a>:</span>
                                         <select class="selectpicker" id="input-company-paid" name="company_paid"
                                                 data-width="auto">
                                             <option value="1">Yes</option>
@@ -71,7 +71,8 @@
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
                                                step="0.01" min="0">
-                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost:$</span>
+                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost<a href="javascript:void(0)" title="number of mileage * $0.54"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+                                            :$</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
                                                name="mileage_cost"
                                                type="number" step="0.01" min="0" placeholder="numbers only">
@@ -230,12 +231,6 @@
             };
             $('.input-numbers').on('change', function () {
                 updateTotal();
-            });
-            $('#filter-button').on('click', function () {
-                var eid = $('#client-engagements').selectpicker('val');
-                var conid = $('#consultant-select').selectpicker('val');
-                window.location.href = 'expense?eid=' + (eid ? eid : '') + '&conid=' + (conid ? conid : '') +
-                    '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             });
             $('.date-picker').datepicker(
                 {
