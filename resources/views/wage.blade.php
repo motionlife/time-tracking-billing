@@ -214,7 +214,6 @@
 
     </script>
 @endsection
-
 @section('special-css')
     <style>
         .tab-content tr td:nth-child(5) {

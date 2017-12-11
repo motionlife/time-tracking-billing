@@ -43,7 +43,7 @@
     <input class="date-picker form-control" id="end-date" size="10" placeholder="&#xf073; End Day"
            value="{{Request('end')}}" type="text"/>
     <i>&nbsp;</i>
-    <a href="javascript:filter_resource();" type="button" class="btn btn-info"
+    <a href="javascript:filter_resource();" type="button" class="btn btn-info btn-sm"
        id="filter-button">{{isset($payroll)?'View':'Filter'}}</a>
     <script>
         function filter_resource() {
