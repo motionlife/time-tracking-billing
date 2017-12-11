@@ -28,7 +28,7 @@ class EngagementController extends Controller
     {
 
         $consultant = Auth::user()->consultant;
-        $engagements = Engagement::getBySCL($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant);
+        $engagements = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant,$request->get('status'));
         return view('engagements', ['engagements' => $engagements,
             'clients' => $engagements->map(function ($item, $key) {
                 return $item->client;
@@ -53,7 +53,7 @@ class EngagementController extends Controller
         }
         $consultant = Auth::user()->consultant;
         return view('engagements', [
-            'engagements' => Engagement::getBySCL($request->get('start'), $request->get('cid'), $consultant),
+            'engagements' => Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant,null,$request->get('status')),
             'leader' => $consultant,
             'clients' => $consultant->lead_engagements->map(function ($item, $key) {
                 return $item->client;

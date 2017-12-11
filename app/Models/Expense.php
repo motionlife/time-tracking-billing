@@ -47,23 +47,25 @@ class Expense extends Model
         }
     }
 
-    public static function recentReports($start = null, $end = null, $eid = null, $consultant = null)
+    public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null)
     {
         $arrangements = isset($consultant) ? $consultant->arrangements() : Arrangement::all();
         //todo: consider inconsistent problem caused by deleted arrangement (use soft-delete or status)
         $aids = isset($eid) ? $arrangements->where('engagement_id', $eid)->pluck('id') : $arrangements->pluck('id');
 
         if ($start || $end)
-            return self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
+            $qbuilder = self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC');
         else
-            return self::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC')->get();
+            $qbuilder = self::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC');
+        return isset($status) ? $qbuilder->where('review_state', $status)->get() : $qbuilder->get();
     }
 
     public function isPending()
     {
         return $this->getStatus()[0] == 'Pending';
     }
+
     public function unfinalized()
     {
         return ($this->getStatus()[0] == 'Pending' || $this->getStatus()[0] == 'Modified');

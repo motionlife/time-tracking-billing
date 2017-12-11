@@ -26,7 +26,7 @@ class HoursController extends Controller
     {
         $consultant = Auth::user()->consultant;
         $hours = $this->paginate(Hour::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant), 25);
+            $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
         return view('hours', ['hours' => $hours,
             'clientIds' => Engagement::groupedByClient($consultant)]);
     }

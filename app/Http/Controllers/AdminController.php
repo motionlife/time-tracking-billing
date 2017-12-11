@@ -103,7 +103,7 @@ class AdminController extends Controller
     {
         $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
         $hours = $this->paginate(Hour::recentReports($request->get('start'), $request->get('end'),
-            $request->get('eid'), $consultant), 25);
+            $request->get('eid'), $consultant,$request->get('state')), 25);
 
         return view('hours', ['hours' => $hours,
             'clientIds' => Engagement::groupedByClient()]);
@@ -113,14 +113,14 @@ class AdminController extends Controller
     {
         $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant), 25);
+            $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
         return view('expenses', ['expenses' => $expenses,
             'clientIds' => Engagement::groupedByClient()]);
     }
 
     private function grantEngagement($request)
     {
-        $engagements = Engagement::getBySCL($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')));
+        $engagements = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')),null,$request->get('status'));
         return view('engagements', [
             'engagements' => $engagements,
             'clients' => $engagements->map(function ($item, $key) {

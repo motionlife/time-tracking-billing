@@ -107,10 +107,12 @@ class Engagement extends Model
         }
         return 'Unknown';
     }
+
     public function getStatusLabel()
     {
-        return $this->isActive()?'success':($this->isClosed()?'default':'warning');
+        return $this->isActive() ? 'success' : ($this->isClosed() ? 'default' : 'warning');
     }
+
     public function clientLaborBills($start = null, $end = null)
     {
         //For monthly labor billing, detail not implemented yet...
@@ -151,12 +153,13 @@ class Engagement extends Model
         return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19') * $this->buz_dev_share : 0;
     }
 
-    public static function getBySCL($start = null, $cid = null, $leader = null, $consultant = null)
+    public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
     {
         $collection1 = (isset($leader) ? $leader->lead_engagements : self::all())
             ->where('start_date', '>=', $start ? Carbon::parse($start)->toDateString('Y-m-d') : '1970-01-01')
             ->sortByDesc('created_at');
         $collection2 = (isset($cid) ? $collection1->where('client_id', $cid) : $collection1);
-        return isset($consultant) ? $collection2->whereIn('id', $consultant->arrangements()->pluck('engagement_id')) : $collection2;
+        $collection3 = isset($status) ? $collection2->where('status', $status) : $collection2;
+        return isset($consultant) ? $collection3->whereIn('id', $consultant->arrangements()->pluck('engagement_id')) : $collection3;
     }
 }

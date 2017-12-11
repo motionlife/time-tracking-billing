@@ -26,8 +26,8 @@ class PayrollController extends Controller
         $user = Auth::user();
         //todo: authenticate consultant
         $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : $user->consultant;
-        $hourReports = Hour::recentReports($start, $end, $eid, $consultant);
-        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant);
+        $hourReports = Hour::recentReports($start, $end, $eid, $consultant,$request->get('state'));
+        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant,$request->get('state'));
 
         $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
         $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));

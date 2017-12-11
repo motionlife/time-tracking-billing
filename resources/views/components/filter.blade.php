@@ -1,5 +1,6 @@
 <div class="form-inline pull-right form-group-sm" id="filter-template" style="font-family:FontAwesome;">
-    <a href="javascript:reset_select();" class="btn btn-default form-control form-control-sm" title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+    <a href="javascript:reset_select();" class="btn btn-default form-control form-control-sm"
+       title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
             id="client-engagements"
@@ -25,16 +26,14 @@
             @endforeach
         </select>
     @endif
-    @if(isset($payroll))
-        <i>&nbsp;</i>
-        <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-                id="state-select"
-                data-live-search="true">
-            <option value="" data-icon="glyphicon-flag" selected>Status</option>
-            <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
-            <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
-        </select>
-    @endif
+    <i>&nbsp;</i>
+    <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
+            id="state-select"
+            data-live-search="true">
+        <option value="" data-icon="glyphicon-flag" selected>Status</option>
+        <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
+        <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
+    </select>
     <i>&nbsp;</i>
     <input class="date-picker form-control" id="start-date" size="10"
            placeholder="&#xf073; Start Day"
@@ -48,15 +47,18 @@
        id="filter-button">{{isset($payroll)?'View':'Filter'}}</a>
     <script>
         function filter_resource() {
-            var eid = $('#client-engagements').val();
-            var conid = $('#consultant-select').val();
-            var state = $('#state-select').val();
+            var query = '?eid=' + $('#client-engagements').selectpicker('val') +
+                '&state=' + $('#state-select').selectpicker('val') +
+                '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
+            @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
+                    @endif
             var resource = "{{Request::is('hour')||Request::is('admin/hour')?'hour':(Request::is('expense')||Request::is('admin/expense')?'expense':'payroll')}}";
-            window.location.href = resource + '?eid=' + (eid ? eid : '') + '&conid=' + (conid===undefined ?'':conid) +
-                '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val() + '&state=' + (state===undefined?'':state);
+            window.location.href = resource + query;
+
         }
+
         function reset_select() {
-            $('#filter-template').find('select.selectpicker').selectpicker('val','');
+            $('#filter-template').find('select.selectpicker').selectpicker('val', '');
             $('#filter-template').find('.date-picker').val("").datepicker("update");
             filter_resource();
         }

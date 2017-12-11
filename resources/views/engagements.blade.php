@@ -174,8 +174,9 @@
                                     Build</i></a>
                             <i>&nbsp;</i>
                         @endif
-                            <a href="#" type="button" class="btn btn-default reset-btn" title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
-                            <select class="selectpicker show-tick" data-width="fit" id="client-filter"
+                        <a href="#" type="button" class="btn btn-default reset-btn" title="Reset all condition"><i
+                                    class="fa fa-refresh" aria-hidden="true"></i></a>
+                        <select class="selectpicker show-tick" data-width="fit" id="client-filter"
                                 data-live-search="true">
                             <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
                             @foreach($clients as $client)
@@ -192,6 +193,14 @@
                                 @endforeach
                             </select>
                         @endif
+                        <select class="selectpicker form-control" data-width="fit"
+                                id="status-select"
+                                data-live-search="true">
+                            <option value="" data-icon="glyphicon-flag" selected>Status</option>
+                            <option value="0" {{Request('status')=="0"?'selected':''}}>Active</option>
+                            <option value="1" {{Request('status')=="1"?'selected':''}}>Pending</option>
+                            <option value="2" {{Request('status')=="2"?'selected':''}}>Closed</option>
+                        </select>
                         <input class="date-picker form-control" size=10 id="start-date-filter"
                                placeholder="&#xf073; Start after"
                                value="{{Request('start')}}"
@@ -306,15 +315,15 @@
             );
             $('#start-date').datepicker('setDate', new Date());
             $('#filter-button').on('click', function () {
-                var cid = $('#client-filter').selectpicker('val');
-                var lid = '';
-                @if(!$manage) lid = $('#leader-filter').selectpicker('val');
+                var query = '?cid=' + $('#client-filter').selectpicker('val')
+                    + '&start=' + $('#start-date-filter').val()
+                    + '&status=' + $('#status-select').selectpicker('val');
+                @if(!$manage) query += '&lid=' + $('#leader-filter').selectpicker('val');
                 @endif
-                    window.location.href = '?cid=' + (cid ? cid : '') +
-                    '&start=' + $('#start-date-filter').val() + '&lid=' + lid;
+                    window.location.href = query;
             });
-            $('#filter-selection').find('a.reset-btn').on('click',function () {
-                $('#filter-selection').find('select.selectpicker').selectpicker('val','');
+            $('#filter-selection').find('a.reset-btn').on('click', function () {
+                $('#filter-selection').find('select.selectpicker').selectpicker('val', '');
                 $('#filter-selection').find('.date-picker').val("").datepicker("update");
                 $('#filter-button').trigger('click');
             });
@@ -393,7 +402,8 @@
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
-                        $('#submit-modal').attr('disabled',@if($admin) false    @else data.status ==0   @endif  );
+                        $('#submit-modal').attr('disabled', @if($admin) false
+                        @else data.status == 0   @endif  );
                         @if($admin)
                         $("input[name=status][value=" + data.status + "]").prop('checked', true);
                         @endif
@@ -446,7 +456,7 @@
                         if (feedback.code == 7) {
                             toastr.success(update ? feedback.message : 'Engagement has been created!');
                             setTimeout(location.reload.bind(location), 1000);
-                        }else if(feedback.code == 5){
+                        } else if (feedback.code == 5) {
                             toastr.warning(feedback.message);
                         }
                         else {
@@ -514,8 +524,8 @@
                 $('#billing_amount').val('').attr('disabled', true);
                 $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
-                tb.find('select').first().selectpicker('val',$('#leader_id').val());
-                tb.find('select').last().selectpicker('val',8);
+                tb.find('select').first().selectpicker('val', $('#leader_id').val());
+                tb.find('select').last().selectpicker('val', 8);
             } else {
                 $('#submit-modal').html('Update');
                 $('#engagementModalLabel').find('span').text('Update Engagement')

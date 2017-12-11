@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    @php $admin = false; @endphp
+    @php $admin = true; @endphp
     <div class="main-content">
         <div class="container-fluid">
             <div class="panel panel-headline">
@@ -11,7 +11,7 @@
                             Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}</p>
                     </div>
                     <div class="panel-body col-md-9">
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'payroll'=>true])
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
                         @endcomponent
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                                             <tr>
                                                 <th scope="row">{{$loop->index+$offset}}</th>
                                                 <td>{{str_limit($eng->client->name,30)}}</td>
-                                                <td><a href="?eid={{$eng->id}}">{{str_limit($eng->name,30)}}</a></td>
+                                                <td><a href="{{route('payroll',array_add(Request::except('eid'),'eid',$eng->id))}}">{{str_limit($eng->name,30)}}</a></td>
                                                 <td>{{$hour->report_date}}</td>
                                                 <td>{{number_format($hour->billable_hours,1)}}</td>
                                                 <td>
@@ -217,7 +217,7 @@
 
 @section('special-css')
     <style>
-        tr td:nth-child(5) {
+        .tab-content tr td:nth-child(5) {
             font-weight: bold;
         }
 
@@ -226,14 +226,14 @@
         }
 
         #tab-left1 tr td:nth-child(6) {
-            font-weight: 600;
+            font-weight: bold;
             font-size: 14px;
         }
         #total-income-tag{
             font-weight: normal;
         }
-        #tab-left1 tr td:last-child{
-            font-weight: normal;
+        #tab-left3 tr td:last-child{
+            font-weight: bold;
         }
     </style>
 @endsection
