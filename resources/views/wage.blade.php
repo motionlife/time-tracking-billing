@@ -230,10 +230,10 @@
             font-size: 14px;
         }
         #total-income-tag{
-            font-weight: 550;
+            font-weight: normal;
         }
         #tab-left1 tr td:last-child{
-            font-weight: 580;
+            font-weight: normal;
         }
     </style>
 @endsection
