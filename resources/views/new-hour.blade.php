@@ -410,7 +410,6 @@
                 }
             });
         });
-
         function deleteTodaysReport(hid) {
             var li = $('a[href*="deleteTodaysReport(' + hid + ')"]').parent().parent().parent();
             swal({
@@ -470,17 +469,15 @@
         }
 
         #hours-roll tbody tr input[type=number] {
-            display: inline-block;
             width: 78%;
+            display: inline-block;
+            font-weight: bold;
         }
 
         #hours-roll tbody tr a {
             width: 19%;
             display: inline-block;
             margin-left: .1em;
-        }
-        #hours-roll tbody tr input{
-            font-weight: bold;
         }
     </style>
 @endsection

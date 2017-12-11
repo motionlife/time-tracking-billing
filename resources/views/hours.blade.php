@@ -73,7 +73,7 @@
                                 <td>{{str_limit($eng->client->name,19)}}</td>
                                 <td>{{str_limit($eng->name,19)}}</td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
-                                <td><strong>{{number_format($hour->billable_hours,1)}}</strong></td>
+                                <td>{{number_format($hour->billable_hours,1)}}</td>
                                 <td>{{$hour->report_date}}</td>
                                 <td>
                                     @if($admin)
@@ -82,10 +82,8 @@
                                         {{str_limit($hour->description,29)}}
                                     @endif
                                 </td>
-                                <td><span class="label label-{!!$hour->getStatus()[1].'">'.$hour->getStatus()[0]!!}</span></td>
-                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i
-                                                class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"><i
-                                                class="fa fa-times"></i></a></td>
+                                <td><span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span></td>
+                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"><i class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -242,6 +240,10 @@
         td a:nth-child(2) {
             color: red;
             margin-left: 1.5em;
+        }
+        .panel tr td:nth-child(5){
+            text-indent: 1.2em;
+            font-weight: bold;
         }
     </style>
 @endsection

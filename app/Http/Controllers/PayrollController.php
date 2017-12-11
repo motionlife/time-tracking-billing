@@ -19,43 +19,54 @@ class PayrollController extends Controller
 
     public function index(Request $request)
     {
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $eid = $request->get('eid');
         //todo: let user select multiple engagements
         $user = Auth::user();
-        $consultant = $request->get('conid')?Consultant::find($request->get('conid')):$user->consultant;
-        $hourReports = Hour::recentReports($request->get('start'), $request->get('end'), $request->get('eid'), $consultant);
-        $expenseReports = Expense::recentReports($request->get('start'), $request->get('end'), $request->get('eid'), $consultant);
+        //todo: authenticate consultant
+        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : $user->consultant;
+        $hourReports = Hour::recentReports($start, $end, $eid, $consultant);
+        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant);
 
-        $hourIncome = $this->getHourIncome($hourReports);
-        $expenseIncome = $this->getExpenseIncome($expenseReports);
-
-        $hours = $this->paginate($hourReports, 25);
-        $expenses = $this->paginate($expenseReports, 25);
+        $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
+        $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
 
         return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
             'hours' => $hours, 'expenses' => $expenses,
-            'hourIncome' => $hourIncome, 'expenseIncome' => $expenseIncome,
+            'income' => $this->getIncome($consultant, $start, $end, $eid),
+            'buz_devs' => $this->getBuzDev($consultant, $start, $end, $eid),
         ]);
     }
 
-    private function getHourIncome($hourReports)
+    private function getIncome(Consultant $consultant, $start, $end, $eid)
     {
-        $total = 0;
-        foreach ($hourReports as $report) {
-            $billable_hours = $report->billable_hours;
-            if ($billable_hours) {
-                $arr = $report->arrangement;
-                $total += $billable_hours * $arr->billing_rate * (1 - $arr->firm_share);
+        $total_bh = 0;
+        $total_ex = 0;
+        foreach ($consultant->arrangements as $arr) {
+            if (!isset($eid) || $arr->engagement_id == $eid) {
+                $total_bh += $arr->hoursIncomeForConsultant($start, $end);
+                $total_ex += $arr->reportedExpenses($start, $end);
             }
         }
-        return $total;
+        return [$total_bh, $total_ex];
     }
 
-    private function getExpenseIncome($expenseReports)
+    private function getBuzDev(Consultant $consultant, $start, $end, $eid)
     {
         $total = 0;
-        foreach ($expenseReports as $report) {
-            $total += $report->total();
+        $engs = [];
+        foreach ($consultant->dev_clients as $dev_client) {
+            foreach ($dev_client->engagements as $engagement) {
+                if (!isset($eid) || $engagement->id == $eid) {
+                    $devs = $engagement->incomeForBuzDev($start, $end);
+                    if ($devs) {
+                        array_push($engs, [$engagement, $devs]);
+                        $total += $devs;
+                    }
+                }
+            }
         }
-        return $total;
+        return ['total' => $total, 'engs' => $engs];
     }
 }

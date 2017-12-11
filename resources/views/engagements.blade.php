@@ -167,14 +167,15 @@
                         (total {{$engagements->count()}})</h3>
                 </div>
                 <div class="col-md-8">
-                    <div class="form-inline pull-right" style="font-family:FontAwesome;">
+                    <div class="form-inline pull-right" style="font-family:FontAwesome;" id="filter-selection">
                         @if($manage)
                             <a href="javascript:void(0)" class="btn btn-success" id="build-engagement"><i
                                         class="fa fa-cubes">&nbsp;
                                     Build</i></a>
                             <i>&nbsp;</i>
                         @endif
-                        <select class="selectpicker show-tick" data-width="fit" id="client-filter"
+                            <a href="#" type="button" class="btn btn-default reset-btn" title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                            <select class="selectpicker show-tick" data-width="fit" id="client-filter"
                                 data-live-search="true">
                             <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
                             @foreach($clients as $client)
@@ -311,6 +312,11 @@
                 @endif
                     window.location.href = '?cid=' + (cid ? cid : '') +
                     '&start=' + $('#start-date-filter').val() + '&lid=' + lid;
+            });
+            $('#filter-selection').find('a.reset-btn').on('click',function () {
+                $('#filter-selection').find('select.selectpicker').selectpicker('val','');
+                $('#filter-selection').find('.date-picker').val("").datepicker("update");
+                $('#filter-button').trigger('click');
             });
             @if($admin)
             $('input[type=radio][name=status]').change(function () {

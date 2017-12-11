@@ -181,7 +181,7 @@
                                 <td>{{str_limit($eng->name,22)}}</td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
                                 <td>{{$expense->report_date}}</td>
-                                <td><strong>${{number_format($expense->total(),2)}}</strong></td>
+                                <td>${{number_format($expense->total(),2)}}</td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)
                                         @if(str_contains($receipt->filename,'pdf'))
@@ -201,11 +201,8 @@
                                         {{str_limit($expense->description,37)}}
                                     @endif
                                 </td>
-                                <td><span class="label label-{!!$expense->getStatus()[1].'">'.$expense->getStatus()[0]!!}</span></td>
-                                <td><a href=" javascript:editExpense({{$expense->id}})"><i
-                                                class="fa fa-pencil-square-o"></i></a><a
-                                            href="javascript:deleteExpense({{$expense->id}})"><i
-                                                class="fa fa-times"></i></a></td>
+                                <td><span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span></td>
+                                <td><a href=" javascript:editExpense({{$expense->id}})"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense({{$expense->id}})"><i class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -405,6 +402,9 @@
         td:last-child a:nth-child(2) {
             color: red;
             margin-left: 1.5em;
+        }
+        .panel tr td:nth-child(6){
+            font-weight: bold;
         }
     </style>
 @endsection()

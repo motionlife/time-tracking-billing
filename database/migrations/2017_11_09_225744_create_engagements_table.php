@@ -26,7 +26,7 @@ class CreateEngagementsTable extends Migration
                 ->comment('0=>open,1=>pending');
             //indicate how the client gonna pay, ie. paying cycle type
             $table->unsignedTinyInteger('paying_cycle')->default(0)
-                ->comment('0=/hourly,1=/15-day,2=/month,3=/year,4=engagement fixed,..');
+                ->comment('0=/hourly,1=/monthly,2=/semi-monthly,3=/year,4=engagement fixed,..');
             //billing amount to client every term/cycle
             $table->decimal('cycle_billing', 15, 2)->default(0)
                 ->comment('not given when paying_cycle is hourly');

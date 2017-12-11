@@ -31,7 +31,6 @@ class Engagement extends Model
         return $this->belongsTo(Client::class);
     }
 
-
     public static function groupedByClient($consultant = null)
     {
         if (isset($consultant)) $eids = $consultant->arrangements()->pluck('engagement_id');
@@ -85,12 +84,12 @@ class Engagement extends Model
 
     public function isActive()
     {
-        return $this->state()=='Active';
+        return $this->state() == 'Active';
     }
 
     public function isClosed()
     {
-        return $this->state()=='Closed';
+        return $this->state() == 'Closed';
     }
 
     public function state()
@@ -108,19 +107,37 @@ class Engagement extends Model
         }
         return 'Unknown';
     }
-
-    public function clientLaborBills($start = '1970-01-01', $end = '2038-01-19')
+    public function getStatusLabel()
+    {
+        return $this->isActive()?'success':($this->isClosed()?'default':'warning');
+    }
+    public function clientLaborBills($start = null, $end = null)
     {
         //For monthly labor billing, detail not implemented yet...
-        if ($this->paying_cycle != 0) return $this->cycle_billing;
-        $total = 0;
-        foreach ($this->arrangements as $arr) {
-            $total += $arr->hoursBillToClient($start, $end);
+        //todo: dealing with different client-billing type
+        if ($this->paying_cycle != 0) {
+            $start = Carbon::parse($start ?: $this->start_date);
+            $end = $end ? Carbon::parse($end) : Carbon::now();
+            $days = $start->diffInDays($end);
+            if ($this->paying_cycle == 1) {
+                return $this->cycle_billing / 30 * $days;
+            } else if ($this->paying_cycle == 2) {
+                return $this->cycle_billing / 15 * $days;
+            } else if ($this->paying_cycle == 3 && $this->isClosed()) {
+                return $this->cycle_billing;
+            } else {
+                return 0;
+            }
+        } else {
+            $total = 0;
+            foreach ($this->arrangements as $arr) {
+                $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19');
+            }
+            return $total;
         }
-        return $total;
     }
 
-    public function clientExpenseBills($start = '1970-01-01', $end = '2038-01-19')
+    public function clientExpenseBills($start = '1970-01-01', $end = null)
     {
         $total = 0;
         foreach ($this->arrangements as $arr) {
@@ -129,9 +146,9 @@ class Engagement extends Model
         return $total;
     }
 
-    public function incomeForBuzDev($start = '1970-01-01', $end = '2038-01-19')
+    public function incomeForBuzDev($start = null, $end = null)
     {
-        return $this->buz_dev_share ? $this->clientLaborBills($start, $end) * $this->buz_dev_share : 0;
+        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19') * $this->buz_dev_share : 0;
     }
 
     public static function getBySCL($start = null, $cid = null, $leader = null, $consultant = null)

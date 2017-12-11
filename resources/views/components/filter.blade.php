@@ -1,4 +1,6 @@
-<div class="form-inline pull-right form-group-sm" style="font-family:FontAwesome;">
+<div class="form-inline pull-right form-group-sm" id="filter-template" style="font-family:FontAwesome;">
+    <a href="javascript:reset_select();" class="btn btn-default form-control form-control-sm" title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
+    <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
             id="client-engagements"
             data-live-search="true">
@@ -52,6 +54,11 @@
             var resource = "{{Request::is('hour')||Request::is('admin/hour')?'hour':(Request::is('expense')||Request::is('admin/expense')?'expense':'payroll')}}";
             window.location.href = resource + '?eid=' + (eid ? eid : '') + '&conid=' + (conid===undefined ?'':conid) +
                 '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val() + '&state=' + (state===undefined?'':state);
+        }
+        function reset_select() {
+            $('#filter-template').find('select.selectpicker').selectpicker('val','');
+            $('#filter-template').find('.date-picker').val("").datepicker("update");
+            filter_resource();
         }
     </script>
 </div>
