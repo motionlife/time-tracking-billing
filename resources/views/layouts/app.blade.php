@@ -145,7 +145,7 @@
                                         <li><a href="/admin/engagement"
                                                class="{{Request::is('admin/engagement')?'active':''}}">Grant
                                                 Engagements</a></li>
-                                        <li><a href="/admin/bp" class="{{Request::is('admin/bp')?'active':''}}">Billing&Payroll</a></li>
+                                        <li><a href="/admin/bp" class="{{Request::is('admin/bp')||Request::is('admin/payroll')?'active':''}}">Billing&Payroll</a></li>
                                         <li><a href="/admin/user" class="{{Request::is('admin/user') ?'active':''}}">Users</a>
                                         </li>
                                         <li><a href="/admin/client"
