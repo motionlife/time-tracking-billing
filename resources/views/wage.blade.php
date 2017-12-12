@@ -281,8 +281,8 @@
         }
 
         #summary tr td:nth-last-child(-n+3){
-            font-weight: bold;
-            font-size: 1em;
+            font-weight: 600;
+            font-size: 1.1em;
         }
     </style>
 @endsection
