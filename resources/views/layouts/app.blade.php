@@ -157,8 +157,6 @@
                                 </div>
                             </li>
                         @endif
-                        <li><a href="/test" class="{{Request::is('test') ?'active':''}}"><i class="lnr lnr-code"></i>
-                                <span>Dev Test</span></a></li>
                     </ul>
                 </nav>
             </div>
