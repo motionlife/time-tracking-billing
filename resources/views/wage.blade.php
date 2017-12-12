@@ -209,7 +209,7 @@
                     </div>
                 @else
                     <div class="panel-body">
-                        <table class="table">
+                        <table class="table table-hover">
                             <thead>
                             <tr>
                                 <th>#</th>
