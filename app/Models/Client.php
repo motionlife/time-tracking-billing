@@ -83,12 +83,12 @@ class Client extends Model
         return $this->hasMany(Engagement::class);
     }
 
-    public function laborBills($start = '1970-01-01', $end = '2038-01-19')
+    public function laborBills($start = '1970-01-01', $end = '2038-01-19',$state=null)
     {
         //only those engagements that bill client hourly
         $total = 0;
         foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientLaborBills($start, $end);
+            $total += $engagement->clientLaborBills($start, $end,$state);
         }
         return $total;
     }

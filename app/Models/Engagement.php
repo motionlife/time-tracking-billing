@@ -113,7 +113,7 @@ class Engagement extends Model
         return $this->isActive() ? 'success' : ($this->isClosed() ? 'default' : 'warning');
     }
 
-    public function clientLaborBills($start = null, $end = null)
+    public function clientLaborBills($start = null, $end = null,$state = null)
     {
         //For monthly labor billing, detail not implemented yet...
         //todo: dealing with different client-billing type
@@ -133,24 +133,24 @@ class Engagement extends Model
         } else {
             $total = 0;
             foreach ($this->arrangements as $arr) {
-                $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19');
+                $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19',$state);
             }
             return $total;
         }
     }
 
-    public function clientExpenseBills($start = '1970-01-01', $end = null)
+    public function clientExpenseBills($start = '1970-01-01', $end = null,$state)
     {
         $total = 0;
         foreach ($this->arrangements as $arr) {
-            $total += $arr->reportedExpenses($start, $end);
+            $total += $arr->reportedExpenses($start, $end,$state);
         }
         return $total;
     }
 
-    public function incomeForBuzDev($start = null, $end = null)
+    public function incomeForBuzDev($start = null, $end = null,$state=null)
     {
-        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19') * $this->buz_dev_share : 0;
+        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19',$state) * $this->buz_dev_share : 0;
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)

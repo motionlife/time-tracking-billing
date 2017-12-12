@@ -50,9 +50,10 @@ class Arrangement extends Model
         return $this->hasMany(Expense::class);
     }
 
-    public function reportedExpenses($start = null, $end = null)
+    public function reportedExpenses($start = null, $end = null,$state = null)
     {
-        return $this->expenses()->whereBetween('report_date', [$start?:'1970-01-01', $end?:'2038-01-19'])->get()
+        return (isset($state) ? $this->expenses()->where('review_state', $state) : $this->expenses())
+            ->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])->get()
             ->sum(function ($exp) {
                 return $exp->total();
             });
@@ -81,9 +82,11 @@ class Arrangement extends Model
             });
     }
 
-    public function reportedHours($start = null, $end = null, $billable = true)
+    public function reportedHours($start = null, $end = null, $billable = true, $state = null)
     {
-        return $this->hours()->whereBetween('report_date', [$start?:'1970-01-01', $end?:'2038-01-19'])->sum($billable ? 'billable_hours' : 'non_billable_hours');
+        return (isset($state) ? $this->hours()->where('review_state', $state) : $this->hours())
+            ->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+            ->sum($billable ? 'billable_hours' : 'non_billable_hours');
     }
 
     public function monthlyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19', $th = true)
@@ -102,14 +105,14 @@ class Arrangement extends Model
             });
     }
 
-    public function hoursBillToClient($start = null, $end = null)
+    public function hoursBillToClient($start = null, $end = null, $state = null)
     {
-        return $this->billing_rate ? $this->reportedHours($start ?: '1970-01-01', $end ?: '2038-01-19') * $this->billing_rate : 0;
+        return $this->billing_rate ? $this->reportedHours($start ?: '1970-01-01', $end ?: '2038-01-19',true, $state) * $this->billing_rate : 0;
     }
 
-    public function hoursIncomeForConsultant($start = null, $end = null)
+    public function hoursIncomeForConsultant($start = null, $end = null, $state=null)
     {
-        return $this->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19') * (1 - $this->firm_share);
+        return $this->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19', $state) * (1 - $this->firm_share);
     }
 
 }
