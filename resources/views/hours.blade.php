@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    @php $admin = Request::is('admin/hour'); @endphp
     <div class="main-content">
         <div class="container-fluid">
             <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
@@ -41,7 +40,7 @@
                         <p class="panel-subtitle">{{$hours->total()}} results</p>
                     </div>
                     <div class="panel-body col-md-10">
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'hour'])
                         @endcomponent
                     </div>
                 </div>
@@ -71,7 +70,7 @@
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->client->name,19)}}</td>
-                                <td>{{str_limit($eng->name,19)}}</td>
+                                <td><a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a></td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td>{{number_format($hour->billable_hours,1)}}</td>
                                 <td>{{$hour->report_date}}</td>
@@ -121,7 +120,7 @@
                 income.val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
 
-            $('td a:nth-child(1)').on('click', function () {
+            $('tr td:last-child a:nth-child(1)').on('click', function () {
                 tr = $(this).parent().parent();
                 hid = $(this).parent().attr('data-id');
                 $.get({
@@ -153,7 +152,7 @@
                 });
                 $('#hourModal').modal('toggle');
             });
-            $('td a:nth-child(2)').on('click', function () {
+            $('tr td:last-child a:nth-child(2)').on('click', function () {
                 var td = $(this).parent();
                 swal({
                         title: "Are you sure?",
@@ -237,7 +236,7 @@
         });
     </script>
     <style>
-        td a:nth-child(2) {
+        tr td:last-child a:nth-child(2) {
             color: red;
             margin-left: 1.5em;
         }

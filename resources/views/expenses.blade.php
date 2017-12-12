@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    @php $admin = Request::is('admin/expense'); @endphp
     <div class="main-content" xmlns:javascript="https://www.w3.org/1999/xhtml">
         <div class="container-fluid">
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
@@ -147,7 +146,7 @@
                                title="New Expense"><i class="fa fa-plus" aria-hidden="true"></i>
                                 <i>&nbsp;Add New</i></a>
                         @endif
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'expense'])
                         @endcomponent
                     </div>
                 </div>
@@ -178,7 +177,7 @@
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->client->name,22)}}</td>
-                                <td>{{str_limit($eng->name,22)}}</td>
+                                <td><a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a></td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
                                 <td>{{$expense->report_date}}</td>
                                 <td>${{number_format($expense->total(),2)}}</td>

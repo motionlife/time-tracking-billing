@@ -17,17 +17,16 @@ class PayrollController extends Controller
         $this->middleware('verifiedConsultant');
     }
 
-    public function index(Request $request)
+    public function index(Request $request, $isAdmin = false)
     {
         $start = $request->get('start');
         $end = $request->get('end');
         $eid = $request->get('eid');
         //todo: let user select multiple engagements
         $user = Auth::user();
-        //todo: authenticate consultant
-        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : $user->consultant;
-        $hourReports = Hour::recentReports($start, $end, $eid, $consultant,$request->get('state'));
-        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant,$request->get('state'));
+        $consultant = $isAdmin && $request->get('conid') ? Consultant::find($request->get('conid')) : $user->consultant;
+        $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $request->get('state'));
+        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $request->get('state'));
 
         $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
         $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
@@ -36,6 +35,7 @@ class PayrollController extends Controller
             'hours' => $hours, 'expenses' => $expenses,
             'income' => $this->getIncome($consultant, $start, $end, $eid),
             'buz_devs' => $this->getBuzDev($consultant, $start, $end, $eid),
+            'admin'=>$isAdmin
         ]);
     }
 

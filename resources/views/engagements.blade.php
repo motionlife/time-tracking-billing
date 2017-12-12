@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader);$admin = Request::is('admin/engagement'); @endphp
+    @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
     <div class="main-content">
         @if($manage||$admin)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"

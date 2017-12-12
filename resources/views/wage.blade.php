@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    @php $admin = true; @endphp
     <div class="main-content">
         <div class="container-fluid">
             <div class="panel panel-headline">
@@ -11,7 +10,7 @@
                             Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}</p>
                     </div>
                     <div class="panel-body col-md-9">
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin])
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'payroll'])
                         @endcomponent
                     </div>
                 </div>

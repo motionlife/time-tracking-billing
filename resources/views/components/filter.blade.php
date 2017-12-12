@@ -52,11 +52,9 @@
                 '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
                     @endif
-            var resource = "{{Request::is('hour')||Request::is('admin/hour')?'hour':(Request::is('expense')||Request::is('admin/expense')?'expense':'payroll')}}";
-            window.location.href = resource + query;
+            window.location.href = "{{$target}}" + query;
 
         }
-
         function reset_select() {
             $('#filter-template').find('select.selectpicker').selectpicker('val', '');
             $('#filter-template').find('.date-picker').val("").datepicker("update");

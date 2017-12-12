@@ -4,11 +4,6 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use newlifecfo\Models\Client;
-use newlifecfo\Models\Consultant;
-use newlifecfo\Models\Engagement;
-use newlifecfo\Models\Expense;
-use newlifecfo\Models\Hour;
 use newlifecfo\User;
 
 class AdminController extends Controller
@@ -29,6 +24,8 @@ class AdminController extends Controller
                 return $this->expenseEndorsement($request);
             case 'engagement':
                 return $this->grantEngagement($request);
+            case 'bp':
+                return $this->viewBp($request);
             case 'user':
                 return $this->userAdmin($request);
             case 'client':
@@ -101,35 +98,22 @@ class AdminController extends Controller
 
     private function hourEndorsement($request)
     {
-        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
-        $hours = $this->paginate(Hour::recentReports($request->get('start'), $request->get('end'),
-            $request->get('eid'), $consultant,$request->get('state')), 25);
-
-        return view('hours', ['hours' => $hours,
-            'clientIds' => Engagement::groupedByClient()]);
+        return app(HoursController::class)->index($request, true);
     }
 
     private function expenseEndorsement($request)
     {
-        $consultant = $request->get('conid') ? Consultant::find($request->get('conid')) : null;
-        $expenses = $this->paginate(Expense::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
-        return view('expenses', ['expenses' => $expenses,
-            'clientIds' => Engagement::groupedByClient()]);
+        return app(ExpenseController::class)->index($request, true);
     }
 
     private function grantEngagement($request)
     {
-        $engagements = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')),null,$request->get('status'));
-        return view('engagements', [
-            'engagements' => $engagements,
-            'clients' => $engagements->map(function ($item, $key) {
-                return $item->client;
-            })->unique(),
-            'leaders' => Engagement::all()->map(function ($item, $key) {
-                return $item->leader;
-            })->unique(),
-        ]);
+        return app(EngagementController::class)->index($request, true);
+    }
+
+    private function viewBp($request)
+    {
+        return app(PayrollController::class)->index($request, true);
     }
 
 }

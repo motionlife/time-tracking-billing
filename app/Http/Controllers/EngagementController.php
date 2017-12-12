@@ -22,13 +22,13 @@ class EngagementController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
+     * @param bool $isAdmin
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $isAdmin = false)
     {
-
-        $consultant = Auth::user()->consultant;
-        $engagements = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant,$request->get('status'));
+        $consultant = $isAdmin ? null : Auth::user()->consultant;
+        $engagements = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status'));
         return view('engagements', ['engagements' => $engagements,
             'clients' => $engagements->map(function ($item, $key) {
                 return $item->client;
@@ -36,6 +36,7 @@ class EngagementController extends Controller
             'leaders' => Engagement::all()->map(function ($item, $key) {
                 return $item->leader;
             })->unique(),
+            'admin'=>$isAdmin
         ]);
     }
 
@@ -53,11 +54,11 @@ class EngagementController extends Controller
         }
         $consultant = Auth::user()->consultant;
         return view('engagements', [
-            'engagements' => Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant,null,$request->get('status')),
+            'engagements' => Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status')),
             'leader' => $consultant,
             'clients' => $consultant->lead_engagements->map(function ($item, $key) {
                 return $item->client;
-            })->unique()]);
+            })->unique(),'admin'=>false]);
     }
 
     /**
@@ -180,8 +181,7 @@ class EngagementController extends Controller
                     $status = $request->get('status');
                     if ($user->can('changeStatus', $eng) && is_numeric($status)) {
                         $eng->update(['status' => $status]);
-                    }
-                    else {
+                    } else {
                         $feedback['code'] = 5;
                         $feedback['message'] = 'Status updating failed, no authorization';
                     }

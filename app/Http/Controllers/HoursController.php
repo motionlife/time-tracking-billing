@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Hour;
 
@@ -22,13 +23,15 @@ class HoursController extends Controller
     }
 
 
-    public function index(Request $request)
+    public function index(Request $request, $isAdmin = false)
     {
-        $consultant = Auth::user()->consultant;
+        $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
         $hours = $this->paginate(Hour::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
+            $request->get('end'), $request->get('eid'), $consultant, $request->get('state')), 25);
         return view('hours', ['hours' => $hours,
-            'clientIds' => Engagement::groupedByClient($consultant)]);
+            'clientIds' => Engagement::groupedByClient($consultant),
+            'admin'=>$isAdmin
+            ]);
     }
 
     /**
@@ -69,7 +72,7 @@ class HoursController extends Controller
         $pid = $request->get('pid');
         if ($request->ajax()) {
             if ($request->get('week')) {
-                $items = json_decode($request->get('json'),true);
+                $items = json_decode($request->get('json'), true);
                 foreach ($items as $item) {
                     $eng = Engagement::find($item['eid']);
                     if (!$eng || !$eng->isActive()) {
@@ -81,7 +84,7 @@ class HoursController extends Controller
                             $feedback['code'] = 2;
                             $feedback['message'] = 'You are not in this engagement';
                         } else {
-                            $hour = Hour::create(['arrangement_id' => $arr->id, 'task_id' => $item['tid'], 'report_date' => $item['date'], 'billable_hours' => $item['bh'], 'description' => isset($item['desc'])?$item['desc']:'']);
+                            $hour = Hour::create(['arrangement_id' => $arr->id, 'task_id' => $item['tid'], 'report_date' => $item['date'], 'billable_hours' => $item['bh'], 'description' => isset($item['desc']) ? $item['desc'] : '']);
                             if ($hour) {
                                 $feedback['code'] = 7;
                                 $feedback['message'] = 'success';

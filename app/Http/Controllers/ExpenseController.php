@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Expense;
 use newlifecfo\Models\Receipt;
@@ -20,15 +21,19 @@ class ExpenseController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
+     * @param bool $admin
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request,$isAdmin = false)
     {
-        $consultant = Auth::user()->consultant;
+        $consultant = $isAdmin?($request->get('conid') ? Consultant::find($request->get('conid')) : null): Auth::user()->consultant;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
             $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
         return view('expenses', ['expenses' => $expenses,
-            'clientIds' => Engagement::groupedByClient($consultant)]);
+            'clientIds' => Engagement::groupedByClient($consultant),
+            'admin'=>$isAdmin
+        ]);
     }
 
 
