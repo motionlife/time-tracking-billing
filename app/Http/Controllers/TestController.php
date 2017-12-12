@@ -21,10 +21,6 @@ class TestController extends Controller
     public function index(Request $request)
     {
 
-//        $eng = Engagement::find($request->get('id'));
-//        if ($this->authorize('activate', $eng))
-//          return 'yes';
-//        return 'no';
         if ($request->get('verify')) {
             $out = [];
             foreach (Consultant::all() as $con) {

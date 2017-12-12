@@ -22,7 +22,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="metric">
-                                <span class="icon"><i class="fa fa-hourglass"></i></span>
+                                <span class="icon"><i class="fa fa-hourglass-start"></i></span>
                                 <p>
                                     <span class="number">{{number_format($data['total_last_nb'],1)}}</span>
                                     <span class="title">Non-billable Hours</span>

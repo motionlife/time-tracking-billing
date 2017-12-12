@@ -24,21 +24,37 @@ class PayrollController extends Controller
         $eid = $request->get('eid');
         //todo: let user select multiple engagements
         $user = Auth::user();
-        $consultant = $isAdmin && $request->get('conid') ? Consultant::find($request->get('conid')) : $user->consultant;
-        $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $request->get('state'));
-        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $request->get('state'));
-
-        $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
-        $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
-
-        return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
-            'hours' => $hours, 'expenses' => $expenses,
-            'income' => $this->getIncome($consultant, $start, $end, $eid),
-            'buz_devs' => $this->getBuzDev($consultant, $start, $end, $eid),
-            'admin'=>$isAdmin
-        ]);
+        $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
+        if ($consultant) {
+            $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $request->get('state'));
+            $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $request->get('state'));
+            $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
+            $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
+            return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
+                'hours' => $hours, 'expenses' => $expenses,
+                'income' => $this->getIncome($consultant, $start, $end, $eid),
+                'buz_devs' => $this->getBuzDev($consultant, $start, $end, $eid),
+                'admin' => $isAdmin,
+                'consultant' => $consultant,
+            ]);
+        } else {
+            $incomes=[];
+            $buz_dev_incomes=[];
+            $consultants = Consultant::all();
+            foreach ($consultants as $consultant) {
+                $incomes[$consultant->id]=$this->getIncome($consultant,$start,$end,$eid);
+                $buz_dev_incomes[$consultant->id]=$this->getBuzDev($consultant, $start, $end, $eid)['total'];
+            }
+            return view('wage',['clientIds' => Engagement::groupedByClient(null),
+                'admin'=>$isAdmin,
+                'consultants'=>$consultants,
+                'incomes'=>$incomes,
+                'buzIncomes'=>$buz_dev_incomes
+            ]);
+        }
     }
 
+    //todo : dealing with status query request
     private function getIncome(Consultant $consultant, $start, $end, $eid)
     {
         $total_bh = 0;

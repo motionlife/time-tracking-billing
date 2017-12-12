@@ -25,6 +25,8 @@ class AdminController extends Controller
             case 'engagement':
                 return $this->grantEngagement($request);
             case 'bp':
+            case 'payroll':
+            case 'billing':
                 return $this->viewBp($request);
             case 'user':
                 return $this->userAdmin($request);
