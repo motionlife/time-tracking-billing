@@ -208,6 +208,7 @@
                     </div>
                 @else
                     <div class="panel-body">
+                        <div class="pull-right excel-button"><a href="{{str_replace_first('/','',route('payroll',array_add(Request::all(),'file','excel'),false))}}" type="button" title="Download excel file"><img src="/img/excel.png" alt=""></a></div>
                         <table class="table table-hover">
                             <thead>
                             <tr>
@@ -224,14 +225,13 @@
                             @foreach($consultants as $consultant)
                                 <tr>
                                     <td>{{$loop->index+1}}</td>
-
                                     <td><a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('conid'),'conid',$consultant->id),false))}}">{{$consultant->fullname()}}</a></td>
-                                    <td>N/A</td>
-                                    <td>N/A</td>
-                                    @php $salary = $incomes[$consultant->id] @endphp
+                                    @php $conid=$consultant->id;$salary = $incomes[$conid]; @endphp
+                                    <td>{{$hrs[$conid][0]}}</td>
+                                    <td>{{$hrs[$conid][1]}}</td>
                                     <td>${{number_format($salary[0],2)}}</td>
                                     <td>${{number_format($salary[1],2)}}</td>
-                                    <td>${{number_format($buzIncomes[$consultant->id],2)}}</td>
+                                    <td>${{number_format($buzIncomes[$conid],2)}}</td>
                                 </tr>
                             @endforeach
                             </tbody>

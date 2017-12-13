@@ -50,31 +50,35 @@ class PayrollController extends Controller
         } else {
             $incomes = [];
             $buz_dev_incomes = [];
+            $hourNumbers = [];
             $consultants = Consultant::all();
             foreach ($consultants as $consultant) {
-                $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state);
+                $id = $consultant->id;
+                $hourNumbers[$id] = [0, 0];
+                $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
                 $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
             }
 
-            if ($file == 'excel') return $this->exportExcel($consultants);
-
-            return view('wage', ['clientIds' => Engagement::groupedByClient(null),
-                'admin' => $isAdmin,
+            $data = ['admin' => $isAdmin,
                 'consultants' => $consultants,
                 'incomes' => $incomes,
-                'buzIncomes' => $buz_dev_incomes
-            ]);
+                'buzIncomes' => $buz_dev_incomes,
+                'hrs' => $hourNumbers,];
+
+            if ($file == 'excel') return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
+
+            return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
         }
     }
 
     //todo : dealing with status query request
-    private function getIncome(Consultant $consultant, $start, $end, $eid, $state)
+    private function getIncome(Consultant $consultant, $start, $end, $eid, $state, &$hrs = null)
     {
         $total_bh = 0;
         $total_ex = 0;
         foreach ($consultant->arrangements as $arr) {
             if (!isset($eid) || $arr->engagement_id == $eid) {
-                $total_bh += $arr->hoursIncomeForConsultant($start, $end, $state);
+                $total_bh += $arr->hoursIncomeForConsultant($start, $end, $state, $hrs);
                 $total_ex += $arr->reportedExpenses($start, $end, $state);
             }
         }
@@ -99,19 +103,43 @@ class PayrollController extends Controller
         return ['total' => $total, 'engs' => $engs];
     }
 
-    private function exportExcel($data)
+    private function exportExcel($data, $all = false)
     {
-        return Excel::create($data['filename'], function ($excel) use ($data) {
+        return $all ? Excel::create($data['filename'], function ($excel) use ($data) {
+            $excel->setTitle('Payroll Overview')
+                ->setCreator('Hao Xiong')
+                ->setCompany('New Life CFO')
+                ->setDescription('All the Payroll under the specified condition(file name)');
+            $excel->sheet('Consultant Payroll', function ($sheet) use ($data) {
+                $sheet->freezeFirstRow()
+                    ->row(1, ['Name', 'Billable Hours', 'Non-billable Hours', 'Hourly Income($)', 'Expense($)', 'Buz Dev Income($)'])
+                    ->setAllBorders('thin')
+                    ->cells('A1:E1', function ($cells) {
+                        $cells->setBackground('#3bd3f9');
+                        $cells->setFontFamily('Calibri');
+                        $cells->setFontWeight('bold');
+                        $cells->setAlignment('center');
+                    });
+                foreach ($data['consultants'] as $i => $consultant) {
+                    $conid = $consultant->id;
+                    $salary = $data['incomes'][$conid];
+                    $sheet->row($i + 2, [
+                        $consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1],
+                        number_format($salary[0],2),number_format($salary[1],2),number_format($data['buzIncomes'][$conid],2)
+                    ]);
+                }
+            });
+        })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
             $excel->setTitle('Payroll Overview')
                 ->setCreator('Hao Xiong')
                 ->setCompany('New Life CFO')
                 ->setDescription('Your Payroll under the specified condition(file name)');
 
-            $excel->sheet('Hourly Income($'.number_format($data['income'][0],2).')', function ($sheet) use ($data) {
+            $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
                 $sheet->freezeFirstRow()
                     ->row(1, ['Client', 'Engagement', 'Report Date', 'Billable Hours', 'Non-billable Hours', 'Income($)', 'Description', 'Status'])
                     ->setAllBorders('thin')
-                    ->cells('A1:H1', function($cells) {
+                    ->cells('A1:H1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
@@ -126,11 +154,11 @@ class PayrollController extends Controller
                 }
             });
 
-            $excel->sheet('Expenses($'.number_format($data['income'][1],2).')', function ($sheet) use ($data) {
+            $excel->sheet('Expenses($' . number_format($data['income'][1], 2) . ')', function ($sheet) use ($data) {
                 $sheet->freezeFirstRow()
-                    ->row(1, ['Client', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)','Car Rental($)','Mileage Cost($)','Other($)','Total($)','Description','Status'])
+                    ->row(1, ['Client', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)', 'Car Rental($)', 'Mileage Cost($)', 'Other($)', 'Total($)', 'Description', 'Status'])
                     ->setAllBorders('thin')
-                    ->cells('A1:N1', function($cells) {
+                    ->cells('A1:N1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
@@ -140,18 +168,18 @@ class PayrollController extends Controller
                     $arr = $expense->arrangement;
                     $eng = $arr->engagement;
                     $sheet->row($i + 2, [
-                        $eng->client->name, $eng->name, $expense->report_date, $expense->company_paid?'Yes':'No', $expense->hotel,$expense->flight,$expense->meal,$expense->office_supply,$expense->car_rental,$expense->mileage_cost,$expense->other,
+                        $eng->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
                         number_format($expense->total(), 2), $expense->description, $expense->getStatus()[0]
                     ]);
                 }
 
             });
 
-            $excel->sheet('Business Dev($'.number_format($data['buz_devs']['total'],2).')', function ($sheet) use ($data) {
+            $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
                 $sheet->freezeFirstRow()
                     ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Earned'])
                     ->setAllBorders('thin')
-                    ->cells('A1:E1', function($cells) {
+                    ->cells('A1:E1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
@@ -159,8 +187,8 @@ class PayrollController extends Controller
                     });
                 foreach ($data['buz_devs']['engs'] as $i => $eng) {
                     $sheet->row($i + 2, [
-                        $eng[0]->client->name, $eng[0]->name,$eng[0]->state(),
-                        number_format($eng[0]->buz_dev_share*100,1),number_format($eng[1],2)
+                        $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
+                        number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1], 2)
                     ]);
                 }
             })->setActiveSheetIndex(0);
@@ -172,6 +200,7 @@ class PayrollController extends Controller
         $eng = Engagement::find($eid);
         $engname = isset($eng) ? '(' . $eng->client->name . ')' . $eng->name : 'ALL';
         $status = isset($state) ? ($state == '1' ? 'Approved' : 'Pending') : 'ALL';
-        return 'PAYROLL_' . $consultant->fullname() . '_START-' . $start . '_END-' . $end . '_STATUS-' . $status . '_ENGAGEMENT-' . $engname;
+        return 'PAYROLL_' . (isset($consultant) ? $consultant->fullname() : 'ALL' ). '_START-' . $start . '_END-' . $end . '_STATUS-' . $status . '_ENGAGEMENT-' . $engname;
     }
+
 }
