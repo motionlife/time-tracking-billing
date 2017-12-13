@@ -114,7 +114,7 @@ class PayrollController extends Controller
                 $sheet->freezeFirstRow()
                     ->row(1, ['Name', 'Billable Hours', 'Non-billable Hours', 'Hourly Income($)', 'Expense($)', 'Buz Dev Income($)'])
                     ->setAllBorders('thin')
-                    ->cells('A1:E1', function ($cells) {
+                    ->cells('A1:F1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
