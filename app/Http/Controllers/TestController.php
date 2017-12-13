@@ -3,6 +3,7 @@
 namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
@@ -19,6 +20,27 @@ class TestController extends Controller
     }
 
     public function index(Request $request)
+    {
+
+        return Excel::create('TestExcelFile', function ($excel) {
+            $excel->setTitle('Payroll Overview')
+                ->setCreator('Hao Xiong')
+                ->setCompany('New Life CFO')
+                ->setDescription('Your Payroll under the specified condition');
+
+            $excel->sheet('simple-sheet', function ($sheet) {
+
+                $sheet->fromArray(array(
+                    array('data1', 'data2'),
+                    array('data3', 'data4')
+                ));
+
+            });
+        })->export('xlsx');
+    }
+
+
+    private function numberTest($request)
     {
 
         if ($request->get('verify')) {
@@ -94,7 +116,7 @@ class TestController extends Controller
         if (($handle = fopen(__DIR__ . '\..\..\..\database\seeds\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
                 if (str_contains($line[0], 'Total')) {
-                    $out[preg_replace('/\W\w+\s*(\W*)$/', '$1', $line[0])]=$this->number($line[12]);
+                    $out[preg_replace('/\W\w+\s*(\W*)$/', '$1', $line[0])] = $this->number($line[12]);
                 }
             }
         }

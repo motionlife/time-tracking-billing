@@ -73,6 +73,7 @@
                                                     class="badge bg-danger">{{sizeof($buz_devs['engs'])}}</span></a>
                                     </li>
                                 </ul>
+                                <div class="pull-right excel-button"><a href="{{str_replace_first('/','',route('payroll',array_add(Request::all(),'file','excel'),false))}}" type="button" title="Download excel file"><img src="/img/excel.png" alt=""></a></div>
                             </div>
                             <div class="tab-content">
                                 <div class="tab-pane fade {{$activeTab=="1"?' in active':''}}" id="tab-left1">
@@ -95,7 +96,6 @@
                                                 @php
                                                     $arr = $hour->arrangement;
                                                     $eng = $arr->engagement;
-                                                    $cname =$arr->consultant->fullname();
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{$loop->index+$offset}}</th>
@@ -139,7 +139,6 @@
                                                 @php
                                                     $arr = $expense->arrangement;
                                                     $eng = $arr->engagement;
-                                                    $cname =$arr->consultant->fullname();
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{$loop->index+$offset}}</th>
@@ -283,6 +282,10 @@
         #summary tr td:nth-last-child(-n+3){
             font-weight: 600;
             font-size: 1.1em;
+        }
+        .excel-button:hover{
+            opacity: 0.5;
+            filter: alpha(opacity=50);
         }
     </style>
 @endsection
