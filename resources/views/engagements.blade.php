@@ -177,8 +177,7 @@
                         <a href="#" type="button" class="btn btn-default reset-btn" title="Reset all condition"><i
                                     class="fa fa-refresh" aria-hidden="true"></i></a>
                         <select class="selectpicker show-tick" data-width="fit" id="client-filter"
-                                data-live-search="true">
-                            <option value="" data-icon="glyphicon glyphicon-leaf" selected>All Clients</option>
+                                data-live-search="true" title="&#xf06c; All Clients">
                             @foreach($clients as $client)
                                 <option value="{{$client['id']}}"
                                         data-content="<strong>{{$client['name']}}</strong>" {{Request('cid')==$client['id']?'selected':''}}></option>
@@ -186,8 +185,7 @@
                         </select>
                         @if(!$manage)
                             <select class="selectpicker show-tick" data-width="fit" id="leader-filter"
-                                    data-live-search="true">
-                                <option value="" data-icon="glyphicon glyphicon-user" selected>Leader</option>
+                                    data-live-search="true" title="&#xf2be; Leader">
                                 @foreach($leaders as $leader)
                                     <option value="{{$leader->id}}" {{Request('lid')==$leader->id?'selected':''}}>{{$leader->fullname()}}</option>
                                 @endforeach
@@ -195,8 +193,7 @@
                         @endif
                         <select class="selectpicker form-control" data-width="fit"
                                 id="status-select"
-                                data-live-search="true">
-                            <option value="" data-icon="glyphicon-flag" selected>Status</option>
+                                data-live-search="true" title="&#xf024; Status">
                             <option value="0" {{Request('status')=="0"?'selected':''}}>Active</option>
                             <option value="1" {{Request('status')=="1"?'selected':''}}>Pending</option>
                             <option value="2" {{Request('status')=="2"?'selected':''}}>Closed</option>

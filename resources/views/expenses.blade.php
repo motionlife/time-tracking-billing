@@ -177,7 +177,7 @@
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->client->name,22)}}</td>
-                                <td><a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a></td>
+                                <td><a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a></td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
                                 <td>{{$expense->report_date}}</td>
                                 <td>${{number_format($expense->total(),2)}}</td>

@@ -22,10 +22,9 @@ class PayrollController extends Controller
     {
         $start = $request->get('start');
         $end = $request->get('end');
-        $eid = $request->get('eid');
+        $eid = explode(',', $request->get('eid'));
         $state = $request->get('state');
         $file = $request->get('file');
-        //todo: let user select multiple engagements
         $user = Auth::user();
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
         if ($consultant) {
@@ -33,8 +32,8 @@ class PayrollController extends Controller
             $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $state);
             $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
             $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
-            $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
             $income = $this->getIncome($consultant, $start, $end, $eid, $state);
+            $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
 
             if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
                 'filename' => $this->filename($consultant, $start, $end, $state, $eid)]);
@@ -77,7 +76,7 @@ class PayrollController extends Controller
         $total_bh = 0;
         $total_ex = 0;
         foreach ($consultant->arrangements as $arr) {
-            if (!isset($eid) || $arr->engagement_id == $eid) {
+            if (!$eid[0] || in_array($arr->engagement_id, $eid)) {
                 $total_bh += $arr->hoursIncomeForConsultant($start, $end, $state, $hrs);
                 $total_ex += $arr->reportedExpenses($start, $end, $state);
             }
@@ -91,7 +90,7 @@ class PayrollController extends Controller
         $engs = [];
         foreach ($consultant->dev_clients as $dev_client) {
             foreach ($dev_client->engagements as $engagement) {
-                if (!isset($eid) || $engagement->id == $eid) {
+                if (!$eid[0] || in_array($engagement->id, $eid)) {
                     $devs = $engagement->incomeForBuzDev($start, $end, $state);
                     if ($devs) {
                         array_push($engs, [$engagement, $devs]);
@@ -125,7 +124,7 @@ class PayrollController extends Controller
                     $salary = $data['incomes'][$conid];
                     $sheet->row($i + 2, [
                         $consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1],
-                        number_format($salary[0],2),number_format($salary[1],2),number_format($data['buzIncomes'][$conid],2)
+                        number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)
                     ]);
                 }
             });
@@ -197,10 +196,10 @@ class PayrollController extends Controller
 
     private function filename($consultant, $start, $end, $state, $eid)
     {
-        $eng = Engagement::find($eid);
-        $engname = isset($eng) ? '(' . $eng->client->name . ')' . $eng->name : 'ALL';
+        $eng = Engagement::find($eid[0]);
+        $engname = $eid[0] ? '(' . $eng->client->name . ')' . $eng->name : 'ALL';
         $status = isset($state) ? ($state == '1' ? 'Approved' : 'Pending') : 'ALL';
-        return 'PAYROLL_' . (isset($consultant) ? $consultant->fullname() : 'ALL' ). '_START-' . $start . '_END-' . $end . '_STATUS-' . $status . '_ENGAGEMENT-' . $engname;
+        return 'PAYROLL_' . (isset($consultant) ? $consultant->fullname() : 'ALL') . '_START-' . $start . '_END-' . $end . '_STATUS-' . $status . '_ENGAGEMENT-' . $engname;
     }
 
 }

@@ -3,14 +3,12 @@
        title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-            id="client-engagements"
-            data-live-search="true">
-        <option value="" data-icon="glyphicon-briefcase" selected>Client & Engagement
-        </option>
+            id="client-engagements" title="&#xf0b1; Engagement"
+            data-live-search="true" multiple>
         @foreach($clientIds as $cid=>$engagements)
             <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
                 @foreach($engagements as $eng)
-                    <option value="{{$eng[0]}}" {{Request('eid')==$eng[0]?'selected':''}}>{{$eng[1]}}</option>
+                    <option value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
                 @endforeach
             </optgroup>
         @endforeach
@@ -18,9 +16,8 @@
     @if($admin)
         <i>&nbsp;</i>
         <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-                id="consultant-select"
+                id="consultant-select" title="&#xf007; Consultant"
                 data-live-search="true">
-            <option value="" data-icon="glyphicon-user" selected>Consultant</option>
             @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
                 <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
             @endforeach
@@ -28,9 +25,8 @@
     @endif
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-            id="state-select"
+            id="state-select" title="&#xf024; Status"
             data-live-search="true">
-        <option value="" data-icon="glyphicon-flag" selected>Status</option>
         <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
         <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
     </select>
@@ -51,10 +47,11 @@
                 '&state=' + $('#state-select').selectpicker('val') +
                 '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
             @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
-                    @endif
-            window.location.href = "{{$target}}" + query;
+            @endif
+                window.location.href = "{{$target}}" + query;
 
         }
+
         function reset_select() {
             $('#filter-template').find('select.selectpicker').selectpicker('val', '');
             $('#filter-template').find('.date-picker').val("").datepicker("update");

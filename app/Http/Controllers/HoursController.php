@@ -27,11 +27,11 @@ class HoursController extends Controller
     {
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
         $hours = $this->paginate(Hour::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant, $request->get('state')), 25);
+            $request->get('end'), explode(',', $request->get('eid')), $consultant, $request->get('state')), 25);
         return view('hours', ['hours' => $hours,
             'clientIds' => Engagement::groupedByClient($consultant),
-            'admin'=>$isAdmin
-            ]);
+            'admin' => $isAdmin
+        ]);
     }
 
     /**

@@ -29,7 +29,7 @@ class ExpenseController extends Controller
     {
         $consultant = $isAdmin?($request->get('conid') ? Consultant::find($request->get('conid')) : null): Auth::user()->consultant;
         $expenses = $this->paginate(Expense::recentReports($request->get('start'),
-            $request->get('end'), $request->get('eid'), $consultant,$request->get('state')), 25);
+            $request->get('end'), explode(',',$request->get('eid')), $consultant,$request->get('state')), 25);
         return view('expenses', ['expenses' => $expenses,
             'clientIds' => Engagement::groupedByClient($consultant),
             'admin'=>$isAdmin
