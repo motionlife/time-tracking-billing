@@ -78,4 +78,19 @@ class Consultant extends Model
             return $this->arrangements()->where([['engagement_id', '=', $eid], ['position_id', '=', $pid]])->first();
         return $this->arrangements()->where('engagement_id', $eid)->first();
     }
+
+    //What is the best index to tell 'most frequent' input task? 2 factors: recent + count
+    public function getRecentInputTask($amount = 5)
+    {
+        return $this->justCreatedHourReports(null, null, 70)->mapToGroups(function ($item, $key) {
+            $arr = $item->arrangement;
+            return [$arr->engagement_id . '-' . $arr->position_id . '-' . $item->task_id => 1 / (Carbon::now()->diffInMinutes($item->created_at) + 1)];
+        })->sortByDesc(function ($item, $key) {
+            $total = 0.0;
+            foreach ($item as $delta) {
+                $total+=$delta;
+            }
+            return $total;
+        })->take($amount);
+    }
 }

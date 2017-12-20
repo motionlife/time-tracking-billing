@@ -43,18 +43,18 @@ class HoursController extends Controller
     {
         //today's report
         $consultant = Auth::user()->consultant;
-        $hours = $consultant->justCreatedHourReports(Carbon::today()->startOfDay(), Carbon::today()->endOfDay(), 10);
-
+        $hours = $consultant->justCreatedHourReports(Carbon::today()->startOfDay(), Carbon::today()->endOfDay(), 15);
         if ($request->ajax()) {
             if ($request->get('fetch') == 'position') {
                 return $consultant->getMyArrInfoByEid($request->get('eid'));
             }
+        }else{
+            return view('new-hour', [
+                'hours' => $hours,
+                'clientIds' => Engagement::groupedByClient($consultant),
+                'defaultIds'=> $consultant->getRecentInputTask(5)->keys()
+            ]);
         }
-
-        return view('new-hour', [
-            'hours' => $hours,
-            'clientIds' => Engagement::groupedByClient($consultant)
-        ]);
     }
 
     /**

@@ -7,8 +7,12 @@
                     <h3 class="page-title">Working Time Report</h3>
                 </div>
                 <div class="col-md-9">
-                    <a href="javascript:void(0)" class="btn btn-default"
-                       id="day-week">Daily&nbsp;<i class="fa fa-arrows-h" aria-hidden="true">&nbsp;Weekly</i></a>
+                    <div class="pull-right">
+                        <label class="switch">
+                            <input id="day-week" type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
                 </div>
             </div>
             <hr>
@@ -82,7 +86,7 @@
                             <table class="table table-responsive">
                                 <thead>
                                 <tr>
-                                    <th>Engagement(client)<br><i>Task description</i></th>
+                                    <th>[Client]Engagement<br><i>Task description</i></th>
                                     @for($i=0;$i<7;$i++)
                                         @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
                                         <th>{{substr($date->addDay($i)->format('l'),0,3)}}
@@ -94,6 +98,18 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                @foreach($defaultIds as $ids)
+                                    @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
+                                    <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
+                                        <th scope="row">[<span>{{$eng->client->name}}</span>]<span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span></th>
+                                        @for($i=0;$i<7;$i++)
+                                            <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
+                                                <a href="javascript:void(0);" title="Add description" ref="popover" data-desc="">
+                                                    <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
+                                        @endfor
+                                        <td><a href="javascript:void(0)" class="deletable-row"><i class="fa fa-times" aria-hidden="true"></i></a></td>
+                                    </tr>
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -103,7 +119,6 @@
                                     Row</i></a>
                             <i>&nbsp;</i>
                             <button type="submit" id="matrix-submit" class="btn btn-primary"
-                                    disabled="true"
                                     data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing">Submit
                             </button>
                         </div>
@@ -116,7 +131,7 @@
         <table>
             <tbody>
             <tr>
-                <th scope="row"><span></span>(<span></span>)<br><span></span></th>
+                <th scope="row">[<span></span>]<span></span><br><span></span></th>
                 @for($i=0;$i<7;$i++)
                     <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
                         <a href="javascript:void(0);" title="Add description" ref="popover"><i
@@ -280,7 +295,7 @@
                 $('.daily-weekly-view').slideToggle();
             });
             $('#hours-roll').slimScroll({
-                height: '420px'
+                height: '450px'
             });
             $('#week-picker').datepicker({
                 todayHighlight: true,
@@ -314,8 +329,8 @@
                 tr.data('eid', engoption.val());
                 tr.data('pid', $('#position-addrow').val());
                 tr.data('tid', task.val());
-                tr.find('th span:first-child').text(engoption.text())
-                    .next().text(engoption.parent().attr('label'))
+                tr.find('th span:first-child').text(engoption.parent().attr('label'))
+                    .next().text(engoption.text())
                     .next().next().text(task.data('task'));
                 $('#engtaskModal').modal('toggle');
                 $('#matrix-submit').attr('disabled', false);
@@ -348,7 +363,7 @@
                     });
                 });
                 data.push({name: 'json', value: JSON.stringify(json)});
-                if (json.length)
+                if (json.length) {
                     $.ajax({
                         type: "POST",
                         url: "/hour",
@@ -356,7 +371,7 @@
                         dataType: 'json',
                         success: function (feedback) {
                             if (feedback.code == 7) {
-                                toastr.success('Success! Report has been saved!');
+                                toastr.success('<a href="/hour?state=0">Success! Report has been saved! Click to see detail.</a>');
                                 var td = $('#hours-roll').find('tbody tr td');
                                 td.find('input').val('');
                                 td.find('a[ref="popover"]').data('desc', '').find('i').removeClass("fa-sticky-note").addClass("fa-sticky-note-o");
@@ -375,6 +390,9 @@
                             $("#matrix-submit").button('reset');
                         }
                     });
+                } else {
+                    toastr.warning("Well, you should at least input something...");
+                }
                 e.preventDefault();
             });
             $(document).on('click', '.deletable-row', function () {
@@ -410,6 +428,7 @@
                 }
             });
         });
+
         function deleteTodaysReport(hid) {
             var li = $('a[href*="deleteTodaysReport(' + hid + ')"]').parent().parent().parent();
             swal({
@@ -463,9 +482,9 @@
         }
 
         #hours-roll thead th:first-child i, tbody tr th span:last-child {
-            font-weight: lighter;
+            font-weight: 700;
             font-size: small;
-            color: rgba(128, 128, 128, 0.53);
+            color: rgba(91, 91, 93, 0.62);
         }
 
         #hours-roll tbody tr input[type=number] {
@@ -478,6 +497,64 @@
             width: 19%;
             display: inline-block;
             margin-left: .1em;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 26px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(31px);
+            -ms-transform: translateX(31px);
+            transform: translateX(31px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 30px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
         }
     </style>
 @endsection

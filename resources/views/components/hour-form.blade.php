@@ -62,7 +62,7 @@
 </div>
 <br>
 <textarea id="description" class="form-control notebook" name="description" placeholder="description"
-          rows="4"></textarea>
+          rows="3"></textarea>
 <br>
 @if(isset($admin))
     @if($admin)
