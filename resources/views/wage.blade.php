@@ -171,6 +171,7 @@
                                                 <th>Engagement</th>
                                                 <th>Status</th>
                                                 <th>Business Development Share</th>
+                                                <th>Total Billable Hours</th>
                                                 <th>Earned</th>
                                             </tr>
                                             </thead>
@@ -196,6 +197,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
+                                                    <td>{{$eng[2]}}</td>
                                                     <td>${{number_format($eng[1],2)}}</td>
                                                 </tr>
                                             @endforeach

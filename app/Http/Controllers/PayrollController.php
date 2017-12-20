@@ -57,16 +57,18 @@ class PayrollController extends Controller
                 $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
                 $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
             }
-
-            $data = ['admin' => $isAdmin,
-                'consultants' => $consultants,
-                'incomes' => $incomes,
-                'buzIncomes' => $buz_dev_incomes,
-                'hrs' => $hourNumbers,];
-
-            if ($file == 'excel') return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
-
-            return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
+            if ($request->session()->has('data') && $file == 'excel') {
+                $data = $request->session()->get('data');
+                return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
+            } else {
+                $data = ['admin' => $isAdmin,
+                    'consultants' => $consultants,
+                    'incomes' => $incomes,
+                    'buzIncomes' => $buz_dev_incomes,
+                    'hrs' => $hourNumbers,];
+                $request->session()->put('data', $data);
+                return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
+            }
         }
     }
 
@@ -93,7 +95,13 @@ class PayrollController extends Controller
                 if (!$eid[0] || in_array($engagement->id, $eid)) {
                     $devs = $engagement->incomeForBuzDev($start, $end, $state);
                     if ($devs) {
-                        array_push($engs, [$engagement, $devs]);
+                        $tbh = 0;
+                        foreach ($engagement->arrangements as $arrangement) {
+                            foreach ($arrangement->hours as $hour) {
+                                $tbh += $hour->billable_hours;
+                            }
+                        }
+                        array_push($engs, [$engagement, $devs, $tbh]);
                         $total += $devs;
                     }
                 }
@@ -119,14 +127,13 @@ class PayrollController extends Controller
                         $cells->setFontWeight('bold');
                         $cells->setAlignment('center');
                     });
-                foreach ($data['consultants'] as $i => $consultant) {
+                $content = [];
+                foreach ($data['consultants'] as $consultant) {
                     $conid = $consultant->id;
                     $salary = $data['incomes'][$conid];
-                    $sheet->row($i + 2, [
-                        $consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1],
-                        number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)
-                    ]);
+                    array_push($content, [$consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)]);
                 }
+                $sheet->fromArray($content, null, "A2", true, false);
             });
         })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
             $excel->setTitle('Payroll Overview')
@@ -143,14 +150,14 @@ class PayrollController extends Controller
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
                     });
+                $content = [];
                 foreach ($data['hours'] as $i => $hour) {
                     $arr = $hour->arrangement;
                     $eng = $arr->engagement;
-                    $sheet->row($i + 2, [
-                        $eng->client->name, $eng->name, $hour->report_date, $hour->billable_hours, $hour->non_billable_hours,
-                        number_format($hour->billable_hours * $arr->billing_rate * (1 - $arr->firm_share), 2), $hour->description, $hour->getStatus()[0]
-                    ]);
+                    array_push($content, [$eng->client->name, $eng->name, $hour->report_date, $hour->billable_hours, $hour->non_billable_hours,
+                        number_format($hour->billable_hours * $arr->billing_rate * (1 - $arr->firm_share), 2), $hour->description, $hour->getStatus()[0]]);
                 }
+                $sheet->fromArray($content, null, "A2", true, false);
             });
 
             $excel->sheet('Expenses($' . number_format($data['income'][1], 2) . ')', function ($sheet) use ($data) {
@@ -163,20 +170,21 @@ class PayrollController extends Controller
                         $cells->setFontWeight('bold');
                         $cells->setAlignment('center');
                     });
+                $content = [];
                 foreach ($data['expenses'] as $i => $expense) {
                     $arr = $expense->arrangement;
                     $eng = $arr->engagement;
-                    $sheet->row($i + 2, [
+                    array_push($content, [
                         $eng->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
                         number_format($expense->total(), 2), $expense->description, $expense->getStatus()[0]
                     ]);
                 }
-
+                $sheet->fromArray($content, null, "A2", true, false);
             });
 
             $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
                 $sheet->freezeFirstRow()
-                    ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Earned'])
+                    ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Total Billable Hours', 'Earned'])
                     ->setAllBorders('thin')
                     ->cells('A1:E1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
@@ -184,12 +192,14 @@ class PayrollController extends Controller
                         $cells->setFontWeight('bold');
                         $cells->setAlignment('center');
                     });
+                $content = [];
                 foreach ($data['buz_devs']['engs'] as $i => $eng) {
-                    $sheet->row($i + 2, [
+                    array_push($content, [
                         $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
-                        number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1], 2)
+                        number_format($eng[0]->buz_dev_share * 100, 1), $eng[2], number_format($eng[1], 2)
                     ]);
                 }
+                $sheet->fromArray($content, null, "A2", true, false);
             })->setActiveSheetIndex(0);
         })->export('xlsx');
     }
