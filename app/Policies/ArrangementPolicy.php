@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Policies;
 
+use Illuminate\Http\Request;
 use newlifecfo\User;
 use newlifecfo\Models\Arrangement;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -9,14 +10,25 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ArrangementPolicy
 {
     use HandlesAuthorization;
+    private $request;
 
     public function before($user, $ability)
     {
-        if ($user->isSuperAdmin()) {
-            return true;
-        } else if (!$user->isVerified()) {
-            return false;
-        }
+//        if ($user->isSuperAdmin()) {
+//            return true;
+//        } else if (!$user->isVerified()) {
+//            return false;
+//        }
+    }
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    private function inAdminMode()
+    {
+        return $this->request->is('/admin/*') || $this->request->get('admin');
     }
 
     /**
@@ -31,7 +43,7 @@ class ArrangementPolicy
         //
         $consultant = $user->consultant;
         $engagement = $arrangement->engagement;
-        return $user->isSupervisor() || $consultant->id == $arrangement->consultant_id ||
+        return ($user->isSupervisor() && $this->inAdminMode()) || $consultant->id == $arrangement->consultant_id ||
             ($engagement->isPending() && $engagement->leader_id == $consultant->id);
     }
 

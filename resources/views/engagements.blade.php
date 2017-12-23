@@ -390,7 +390,7 @@
             $('.eng-edit').on('click', function () {
                 initModal(true);
                 $.get({
-                    url: '/engagement/' + $(this).attr('data-id') + '/edit',
+                    url: '/engagement/' + $(this).attr('data-id') + '/edit?admin={{$admin}}',
                     success: function (data) {
                         $('#engagement-name').val(data.name);
                         $('#client-select').selectpicker('val', data.client_id);
