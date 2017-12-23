@@ -18,7 +18,7 @@
                         <form action="" id="hour-form">
                             <div class="modal-body">
                                 <div class="panel-body">
-                                    @component('components.hour-form',['admin'=>$admin])
+                                    @component('components.hour-form',['admin'=>$admin,'clientIds'=>null])
                                     @endcomponent
                                 </div>
                             </div>
@@ -204,7 +204,7 @@
                         if (feedback.code == 7) {
                             toastr.success('Success! Report has been updated!');
                             tr.find('td:nth-child(4)').html(feedback.record.task);
-                            tr.find('td:nth-child(5) strong').html(feedback.record.billable_hours);
+                            tr.find('td:nth-child(5)').html(feedback.record.billable_hours);
                             tr.find('td:nth-child(6)').html(feedback.record.report_date);
                             @if(!$admin) tr.find('td:nth-child(7)').html(feedback.record.description);
                             @endif

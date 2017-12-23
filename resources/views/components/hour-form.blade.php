@@ -1,17 +1,7 @@
 <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-    <select id="client-engagement" class="selectpicker show-tick" data-width="auto" data-dropup-auto="false"
-            data-live-search="true" name="eid" title="Select the engagements your want report to" required>
-        @if(isset($clientIds))
-            @foreach($clientIds as $cid=>$engagements)
-                <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
-                    @foreach($engagements as $eng)
-                        <option value="{{$eng[0]}}">{{$eng[1]}}</option>
-                    @endforeach
-                </optgroup>
-            @endforeach
-        @endif
-    </select>
+    @component('components.engagement_selector',['dom_id'=>"client-engagement",'clientIds'=>$clientIds])
+    @endcomponent
 </div>
 <br>
 <div class="input-group">
@@ -25,18 +15,8 @@
 </div>
 <br>
 <div class="input-group">
-    <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
-    <select id="task-id" class="selectpicker show-sub-text" data-live-search="true"
-            data-width="auto" name="task_id" data-dropup-auto="false"
-            title="Please select one of the tasks your did" required>
-        @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
-            <?php $gname = $tgroup->name?>
-            @foreach($tgroup->tasks as $task)
-                <option value="{{$task->id}}"
-                        data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
-            @endforeach
-        @endforeach
-    </select>
+    @component('components.task_selector',['dom_id'=>'task-id'])
+    @endcomponent
 </div>
 <br>
 <div class="input-group">

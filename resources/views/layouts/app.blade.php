@@ -167,7 +167,7 @@
         <div class="clearfix"></div>
         <footer>
             <div class="container-fluid">
-                <p class="copyright">&copy; 2017 <a href="#" target="_blank">New Life CFO</a>. All Rights Reserved.</p>
+                <p class="copyright">&copy; 2018 <a href="#" target="_blank">New Life CFO</a>. All Rights Reserved.</p>
             </div>
         </footer>
     </div>

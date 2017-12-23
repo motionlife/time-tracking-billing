@@ -157,20 +157,8 @@
                     <div class="modal-body">
                         <div class="input-group form-group-sm">
                             <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp;Engagement:</span>
-                            <select id="client-engagement-addrow"
-                                    class="selectpicker show-tick form-control form-control-sm" data-width="100%"
-                                    data-dropup-auto="false"
-                                    data-live-search="true" name="eid" title="Select the engagements" required>
-                                @if(isset($clientIds))
-                                    @foreach($clientIds as $cid=>$engagements)
-                                        <optgroup label="{{newlifecfo\Models\Client::find($cid)->name}}">
-                                            @foreach($engagements as $eng)
-                                                <option value="{{$eng[0]}}">{{$eng[1]}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                @endif
-                            </select>
+                            @component('components.engagement_selector',['dom_id'=>"client-engagement-addrow",'clientIds'=>$clientIds])
+                            @endcomponent
                             <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Position:</span>
                             <select class="selectpicker form-control form-control-sm" id="position-addrow" name="pid"
                                     data-width="100%"
@@ -178,19 +166,8 @@
                         </div>
                         <br>
                         <div class="input-group form-group-sm">
-                            <span class="input-group-addon"><i class="fa fa-tasks"></i>&nbsp;Task:</span>
-                            <select id="task-id-addrow" class="selectpicker show-sub-text form-control form-control-sm"
-                                    data-live-search="true"
-                                    data-width="100%" name="task_id" data-dropup-auto="false"
-                                    title="Select your task" required>
-                                @foreach(\newlifecfo\Models\Templates\Taskgroup::all() as $tgroup)
-                                    <?php $gname = $tgroup->name?>
-                                    @foreach($tgroup->tasks as $task)
-                                        <option value="{{$task->id}}" data-task="{{$task->description}}"
-                                                data-content="{{$gname.' <strong>'.$task->description.'</strong>'}}"></option>
-                                    @endforeach
-                                @endforeach
-                            </select>
+                            @component('components.task_selector',['dom_id'=>'task-id-addrow'])
+                            @endcomponent
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -329,7 +306,7 @@
                 tr.data('eid', engoption.val());
                 tr.data('pid', $('#position-addrow').val());
                 tr.data('tid', task.val());
-                tr.find('th span:first-child').text(engoption.parent().attr('label'))
+                tr.find('th span:first-child').text(engoption.parent().data('label'))
                     .next().text(engoption.text())
                     .next().next().text(task.data('task'));
                 $('#engtaskModal').modal('toggle');
@@ -460,7 +437,6 @@
         }
     </script>
 @endsection
-
 @section('special-css')
     <style>
         #hours-roll thead span {
@@ -494,7 +470,7 @@
         }
 
         #hours-roll tbody tr a {
-            width: 19%;
+            width: 18%;
             display: inline-block;
             margin-left: .1em;
         }

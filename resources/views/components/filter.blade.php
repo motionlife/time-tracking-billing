@@ -3,12 +3,12 @@
        title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-            id="client-engagements" title="&#xf0b1; Engagement"
-            data-live-search="true" multiple>
+            id="client-engagements" title="&#xf0b1; Engagement" data-live-search="true" data-selected-text-format="count" multiple>
         @foreach($clientIds as $cid=>$engagements)
-            <optgroup label="{{newlifecfo\Models\Client::find($cid)->name }}">
+            @php $cname=newlifecfo\Models\Client::find($cid)->name;@endphp
+            <optgroup label="" data-subtext="<a href='#' data-id='{{$engagements->map(function($e){return $e[0];})}}' class='group-client-name'><span class='label label-info'><strong>{{$cname}}</strong></span></a>">
                 @foreach($engagements as $eng)
-                    <option value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
+                    <option data-tokens="{{$cname.' '.$eng[1]}}" value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
                 @endforeach
             </optgroup>
         @endforeach
@@ -41,21 +41,31 @@
     <i>&nbsp;</i>
     <a href="javascript:filter_resource();" type="button" class="btn btn-info btn-sm"
        id="filter-button">{{isset($payroll)?'View':'Filter'}}</a>
-    <script>
-        function filter_resource() {
-            var query = '?eid=' + $('#client-engagements').selectpicker('val') +
-                '&state=' + $('#state-select').selectpicker('val') +
-                '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
-            @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
-            @endif
-                window.location.href = "{{$target}}" + query;
+    @section('filter-module')
+        <script>
+            function filter_resource() {
+                var query = '?eid=' + $('#client-engagements').selectpicker('val') +
+                    '&state=' + $('#state-select').selectpicker('val') +
+                    '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
+                @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
+                @endif
+                    window.location.href = "{{$target}}" + query;
 
-        }
+            }
 
-        function reset_select() {
-            $('#filter-template').find('select.selectpicker').selectpicker('val', '');
-            $('#filter-template').find('.date-picker').val("").datepicker("update");
-            filter_resource();
-        }
-    </script>
+            function reset_select() {
+                $('#filter-template').find('select.selectpicker').selectpicker('val', '');
+                $('#filter-template').find('.date-picker').val("").datepicker("update");
+                filter_resource();
+            }
+
+            $(function () {
+                var groupClientNameSelected;
+                $('.group-client-name').on('click', function () {
+                    groupClientNameSelected = groupClientNameSelected === $(this).data('id') ? '' : $(this).data('id');
+                    $('#client-engagements').selectpicker('val', groupClientNameSelected);
+                });
+            });
+        </script>
+    @endsection
 </div>

@@ -1,13 +1,12 @@
 @extends('layouts.html')
 
 @section('wrapper')
-    <div class="main-content">
+    <div class="main-content"  style="margin-top: 6em">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-6 col-md-offset-3">
                     <div class="panel panel-default">
-                        <div class="panel-heading">Reset Password</div>
-
+                        <div class="panel-heading"><strong>Reset Password</strong></div>
                         <div class="panel-body">
                             <form class="form-horizontal" method="POST" action="{{ route('password.request') }}">
                                 {{ csrf_field() }}
