@@ -57,6 +57,7 @@ class PayrollController extends Controller
                 $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
                 $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
             }
+            $sum =  $this->sumIncome($incomes,$buz_dev_incomes);
             if ($request->session()->has('data') && $file == 'excel') {
                 $data = $request->session()->get('data');
                 return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
@@ -65,14 +66,31 @@ class PayrollController extends Controller
                     'consultants' => $consultants,
                     'incomes' => $incomes,
                     'buzIncomes' => $buz_dev_incomes,
-                    'hrs' => $hourNumbers,];
+                    'hrs' => $hourNumbers,
+                    'income'=>[$sum[0],$sum[1]],
+                    'buz_devs'=>['total'=>$sum[2]]];
                 $request->session()->put('data', $data);
                 return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
             }
         }
     }
 
-    //todo : dealing with status query request
+    private function sumIncome($incomes,$buz_dev_incomes)
+    {
+        $sum_bh = 0;
+        $sum_ex = 0;
+        $sum_dev = 0;
+        foreach ($incomes as $income)
+        {
+            $sum_bh+=$income[0];
+            $sum_ex+=$income[1];
+        }
+        foreach ($buz_dev_incomes as $dev)
+        {
+            $sum_dev+= $dev;
+        }
+        return[$sum_bh,$sum_ex,$sum_dev];
+    }
     private function getIncome(Consultant $consultant, $start, $end, $eid, $state, &$hrs = null)
     {
         $total_bh = 0;
@@ -133,6 +151,8 @@ class PayrollController extends Controller
                     $salary = $data['incomes'][$conid];
                     array_push($content, [$consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)]);
                 }
+                array_push($content,[]);
+                array_push($content,['Hourly Total',$data['income'][0],'Expense Total',$data['income'][1],'Buz Dev Total',$data['buz_devs']['total']]);
                 $sheet->fromArray($content, null, "A2", true, false);
             });
         })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
