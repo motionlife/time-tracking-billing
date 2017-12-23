@@ -24,9 +24,9 @@ class CreateEngagementsTable extends Migration
             //indicate whether the engagement has closed or sth
             $table->unsignedTinyInteger('status')->default(1)
                 ->comment('0=>open,1=>pending');
-            //indicate how the client gonna pay, ie. paying cycle type
+            //indicate Client Billed Type: Hourly; Monthly Retainer; Fixed Fee Project;
             $table->unsignedTinyInteger('paying_cycle')->default(0)
-                ->comment('0=/hourly,1=/monthly,2=/semi-monthly,3=/year,4=engagement fixed,..');
+                ->comment('0=/hourly,1=/monthly retainer,2= Fixed Fee Project,..');
             //billing amount to client every term/cycle
             $table->decimal('cycle_billing', 15, 2)->default(0)
                 ->comment('not given when paying_cycle is hourly');

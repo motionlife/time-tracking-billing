@@ -118,7 +118,7 @@ class EngagementController extends Controller
      */
     public function show($id)
     {
-        //
+        //todo : leader should be the first in the arrangement table
     }
 
     /**
@@ -179,7 +179,8 @@ class EngagementController extends Controller
                     }
                     //only manager or superAdmin can touch the status
                     $status = $request->get('status');
-                    if ($user->can('changeStatus', $eng) && is_numeric($status)) {
+                    if ($user->can('changeStatus', $eng)) {
+                        if(isset($status))
                         $eng->update(['status' => $status]);
                     } else {
                         $feedback['code'] = 5;

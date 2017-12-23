@@ -46,33 +46,17 @@ class Engagement extends Model
         return $this->belongsTo(Consultant::class, 'leader_id');
     }
 
-    //'0=/hourly,1=/15-day,2=/month,3=/year,4=engagement fixed,..'
-    public function clientBilledType()
+    //indicate Client Billed Type: Hourly; Monthly Retainer; Fixed Fee Project;
+    public function clientBilledType($cycle = null)
     {
-        switch ($this->paying_cycle) {
-            case 0:
-                return 'Hourly';
-            case 1:
-                return 'Monthly';
-            case 2:
-                return 'Semi-monthly';
-            case 3:
-                return 'Engagement Fixed';
-        }
-        return 'Unknown';
-    }
-
-    public static function billedType($cycle)
-    {
+        if (!isset($cycle)) $cycle = $this->paying_cycle;
         switch ($cycle) {
             case 0:
                 return 'Hourly';
             case 1:
-                return 'Monthly';
+                return 'Monthly Retainer';
             case 2:
-                return 'Semi-monthly';
-            case 3:
-                return 'Engagement Fixed';
+                return 'Fixed Fee Project';
         }
         return 'Unknown';
     }
@@ -113,7 +97,7 @@ class Engagement extends Model
         return $this->isActive() ? 'success' : ($this->isClosed() ? 'default' : 'warning');
     }
 
-    public function clientLaborBills($start = null, $end = null,$state = null)
+    public function clientLaborBills($start = null, $end = null, $state = null)
     {
         //For monthly labor billing, detail not implemented yet...
         //todo: dealing with different client-billing type
@@ -133,24 +117,24 @@ class Engagement extends Model
         } else {
             $total = 0;
             foreach ($this->arrangements as $arr) {
-                $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19',$state);
+                $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19', $state);
             }
             return $total;
         }
     }
 
-    public function clientExpenseBills($start = '1970-01-01', $end = null,$state)
+    public function clientExpenseBills($start = '1970-01-01', $end = null, $state)
     {
         $total = 0;
         foreach ($this->arrangements as $arr) {
-            $total += $arr->reportedExpenses($start, $end,$state);
+            $total += $arr->reportedExpenses($start, $end, $state);
         }
         return $total;
     }
 
-    public function incomeForBuzDev($start = null, $end = null,$state=null)
+    public function incomeForBuzDev($start = null, $end = null, $state = null)
     {
-        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19',$state) * $this->buz_dev_share : 0;
+        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19', $state) * $this->buz_dev_share : 0;
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)

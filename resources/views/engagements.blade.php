@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('popup-container')
+    <div id="billing-day-container"></div>
+@endsection
 @section('content')
     @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
     <div class="main-content">
@@ -6,7 +9,7 @@
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
                  aria-labelledby="engagementModalLabel" data-backdrop="static" data-keyboard="false"
                  aria-hidden="true">
-                <div class="modal-dialog" role="document">
+                <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="engagementModalLabel"><span>Setup A New Engagement</span>
@@ -19,10 +22,6 @@
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-briefcase"
-                                                                           aria-hidden="true"></i>&nbsp;Name:</span>
-                                        <input type="text" class="form-control" id="engagement-name" name="name"
-                                               placeholder="input a name" required>
                                         <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client:</span>
                                         <select id="client-select" class="selectpicker" data-width="auto"
                                                 data-live-search="true"
@@ -32,22 +31,31 @@
                                                         data-content="<strong>{{$client}}</strong>"></option>
                                             @endforeach
                                         </select>
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-briefcase"
+                                                                           aria-hidden="true"></i>&nbsp;Name:</span>
+                                        <input type="text" list="engagement-names" class="form-control flexdatalist"
+                                               id="engagement-name" name="name"
+                                               placeholder="input a name" data-selection-required='true'
+                                               data-min-length='0' data-search-by-word='true' required>
+                                        <datalist id="engagement-names">
+                                            <option value="CFO Services">
+                                            <option value="Controller Services">
+                                            <option value="Business Intelligence">
+                                        </datalist>
                                         <span class="input-group-addon"><i class="fa fa-male" aria-hidden="true"></i>&nbsp; Leader:</span>
-                                        <select class="selectpicker" name="leader_id" id="leader_id" disabled>
+                                        <select class="selectpicker" name="leader_id" id="leader_id" data-width="auto"
+                                                disabled>
                                             @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
                                                 <option value="{{$consultant->id}}" {{($manage&&$consultant->id==$leader->id)?'selected':''}}>{{$consultant->fullname()}}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                    <br>
+                                    <div class="input-group">
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar"></i>&nbsp; Start Date</span>
                                         <input class="date-picker form-control" id="start-date" name="start_date"
                                                placeholder="mm/dd/yyyy" type="text" required/>
-                                    </div>
-                                    <br>
-                                    <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-handshake-o"
                                                                            aria-hidden="true"></i>&nbsp; Buziness Dev:</span>
                                         <input type="text" class="form-control" id="buz_dev_person" value="New Life CFO"
@@ -65,17 +73,20 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-hourglass-half"
                                                                            aria-hidden="true"></i>&nbsp;Client Billed Type:</span>
-                                        <select id="cycle-select" class="selectpicker" data-width="25%"
+                                        <select id="cycle-select" class="selectpicker" data-width="auto"
                                                 name="paying_cycle" required>
-                                            @for($i=0;$i<4;$i++)
-                                                <option value="{{$i}}">{{\newlifecfo\Models\Engagement::billedType($i)}}</option>
-                                            @endfor
+                                            <option value="0">Hourly</option>
+                                            <option value="1">Monthly Retainer</option>
+                                            <option value="2">Fixed Fee Project</option>
                                         </select>
                                         <span class="input-group-addon"><i
                                                     class="fa fa-money"></i>&nbsp;Billing Amount:<strong>$</strong></span>
                                         <input class="form-control" id="billing_amount" name="cycle_billing"
                                                type="number" step="0.1" min="0" placeholder="N/A">
-
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-calendar-check-o"></i>&nbsp; Billing Day</span>
+                                        <input class="form-control" id="billing-day" name="billing_day"
+                                               placeholder="dd" type="number" min="1" max="31" step="1" required/>
                                     </div>
                                     <br>
                                 </div>
@@ -88,7 +99,8 @@
                                         <tr>
                                             <th>Consultant</th>
                                             <th>Position</th>
-                                            <th id="bill-pay-head">Billing Rate</th>
+                                            <th>Billing Rate</th>
+                                            <th>Pay Rate</th>
                                             <th>Firm Share%</th>
                                             <th></th>
                                         </tr>
@@ -96,7 +108,7 @@
                                         <tbody id="members-table">
                                         <tr>
                                             <td>
-                                                <select class="selectpicker cid" data-width="120px"
+                                                <select class="selectpicker cid" data-width="150px"
                                                         data-dropup-auto="false"
                                                         data-live-search="true"
                                                         required>
@@ -106,7 +118,7 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <select class="selectpicker pid" data-width="140px" required
+                                                <select class="selectpicker pid" data-width="200px" required
                                                         data-dropup-auto="false">
                                                     @foreach(\newlifecfo\Models\Templates\Position::all() as $position)
                                                         <option value="{{$position->id}}">{{$position->name}}</option>
@@ -114,12 +126,11 @@
                                                 </select>
                                             </td>
                                             <td><input type="number" step=0.01 min=0 class="form-control b-rate"></td>
+                                            <td><input type="number" step=0.01 min=0 class="form-control p-rate"></td>
                                             <td><input type="number" step=0.01 min=0 max=100
                                                        class="form-control f-share"></td>
-                                            <td>
-                                                <a href="javascript:void(0);"><i class="fa fa-minus-circle"
-                                                                                 aria-hidden="true"></i></a>
-                                            </td>
+                                            <td><a href="javascript:void(0);"><i class="fa fa-minus-circle"
+                                                                                 aria-hidden="true"></i></a></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -127,7 +138,7 @@
                             </div>
                             @if($admin)
                                 <div class="row"
-                                     style="width:95%;border-style: dotted;color:#33c0ff;padding: .2em .2em .2em .2em;margin-left: 1.1em">
+                                     style="width:95%;border-style: dotted;color:#33c0ff;padding: .2em .2em .2em .2em;margin-left: 1.4em">
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
                                             <input name="status" value="1" type="radio">
@@ -310,6 +321,13 @@
                     autoclose: true
                 }
             );
+            $('#billing-day').datepicker({
+                container: '#billing-day-container',
+                format: 'dd',
+                todayHighlight: true,
+                autoclose: true,
+                orientation:'bottom'
+            });
             $('#start-date').datepicker('setDate', new Date());
             $('#filter-button').on('click', function () {
                 var query = '?cid=' + $('#client-filter').selectpicker('val')
@@ -340,11 +358,14 @@
             $('#cycle-select').on('changed.bs.select', function (e) {
                 if (this.value != 0) {
                     $('#billing_amount').attr('disabled', false).attr('placeholder', 'per cycle');
-                    $('#bill-pay-head').html('Pay Rate');
+                    $('.b-rate').val('').attr('disabled',true);
+                    $('.p-rate').val('').attr('disabled',false);
                 } else {
                     $('#billing_amount').attr({'placeholder': 'N/A', 'disabled': true}).val('');
-                    $('#bill-pay-head').html('Billing Rate');
+                    $('.b-rate').val('').attr('disabled',false);
+                    $('.p-rate').val('').attr('disabled',true);
                 }
+                $('#billing-day').attr('disabled', this.value != 1);
             });
             $('.slim-scroll').slimScroll({
                 height: '130px'
@@ -357,7 +378,6 @@
                 initModal(false);
                 $('#engagementModal').modal('toggle');
             });
-
             $('.eng-delete').on('click', function () {
                 var id = $(this).attr('data-id');
                 var anchor = $(this);
@@ -399,19 +419,11 @@
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
-                        $('#submit-modal').attr('disabled', @if($admin) false
-                        @else data.status == 0   @endif  );
+                        $('#submit-modal').attr('disabled', @if($admin) false @else data.status == 0  @endif );
                         @if($admin)
                         $("input[name=status][value=" + data.status + "]").prop('checked', true);
                         @endif
-                        if (data.paying_cycle !== "0") {
-                            $('#bill-pay-head').html('Pay Rate');
-                            $('#billing_amount').attr('disabled', false);
-                        }
-                        else {
-                            $('#bill-pay-head').html('Billing Rate');
-                            $('#billing_amount').attr({'placeholder': 'N/A', 'disabled': true}).val('');
-                        }
+
                         var table = $('#members-table');
                         var tr = table.find('tr').first();
                         $.each(data.arrangements, function (i, o) {
@@ -429,6 +441,10 @@
                                 tr.find('select').last().selectpicker('val', '');
                             }
                         });
+                    },
+                    complete:function () {
+                        $('#cycle-select').trigger('change');
+
                     },
                     dataType: 'json'
                 });
@@ -517,8 +533,10 @@
             tb.find("tr .selectpicker").selectpicker('refresh');
             if (!update) {
                 $('#cycle-select').selectpicker('val', 0);
-                $('#bill-pay-head').html('Billing Rate');
+                $('#engagement-name').val('');
                 $('#billing_amount').val('').attr('disabled', true);
+                $('#billing-day').val('').attr('disabled', true);
+                $('.p-rate').val('').attr('disabled',true);
                 $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
                 tb.find('select').first().selectpicker('val', $('#leader_id').val());
@@ -580,17 +598,12 @@
             color: Grey;
         }
 
-        #members-table tr td:nth-child(3) input {
-            width: 100px;
+        #members-table tr td input[type='number'] {
+            text-align: center;
         }
 
-        #members-table tr td:nth-child(4) input {
-            width: 70px;
+        #billing-day-container div.datepicker-days thead {
+            display: none;
         }
-
-        .arrangement-table tbody tr td:nth-last-child(-n+2) {
-            width: 20%;
-        }
-
     </style>
 @endsection
