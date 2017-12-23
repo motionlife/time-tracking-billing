@@ -412,12 +412,12 @@
                 $.get({
                     url: '/engagement/' + $(this).attr('data-id') + '/edit?admin={{$admin}}',
                     success: function (data) {
+                        $('#cycle-select').selectpicker('val', data.paying_cycle).trigger('change');
                         $('#engagement-name').val(data.name);
                         $('#client-select').selectpicker('val', data.client_id);
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
-                        $('#cycle-select').selectpicker('val', data.paying_cycle);
                         $('#billing_amount').val(data.cycle_billing);
                         $('#submit-modal').attr('disabled', @if($admin) false @else data.status == 0  @endif );
                         @if($admin)
@@ -441,10 +441,6 @@
                                 tr.find('select').last().selectpicker('val', '');
                             }
                         });
-                    },
-                    complete:function () {
-                        $('#cycle-select').trigger('change');
-
                     },
                     dataType: 'json'
                 });
@@ -532,11 +528,8 @@
             tb.find("tr:not(:first-child)").remove();
             tb.find("tr .selectpicker").selectpicker('refresh');
             if (!update) {
-                $('#cycle-select').selectpicker('val', 0);
+                $('#cycle-select').selectpicker('val', 0).trigger('change');
                 $('#engagement-name').val('');
-                $('#billing_amount').val('').attr('disabled', true);
-                $('#billing-day').val('').attr('disabled', true);
-                $('.p-rate').val('').attr('disabled',true);
                 $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Setup A New Engagement');
                 tb.find('select').first().selectpicker('val', $('#leader_id').val());

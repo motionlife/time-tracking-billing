@@ -2,8 +2,10 @@
 
 namespace newlifecfo\Providers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use newlifecfo\Policies\ArrangementPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,10 +14,14 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Request $request)
     {
+        //Boot Method Dependency Injection
         //add to fix mysql bug, could be removed when changed to sql server
 //        Schema::defaultStringLength(191);
+        $this->app->when(ArrangementPolicy::class)
+            ->needs('$inAdminMode')
+            ->give($request->is('/admin/*') || $request->get('admin'));
     }
 
     /**
@@ -25,6 +31,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 }

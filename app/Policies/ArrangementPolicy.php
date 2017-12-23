@@ -10,7 +10,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class ArrangementPolicy
 {
     use HandlesAuthorization;
-    private $request;
+    private $inAdminMode;
 
     public function before($user, $ability)
     {
@@ -21,14 +21,9 @@ class ArrangementPolicy
 //        }
     }
 
-    public function __construct(Request $request)
+    public function __construct($inAdminMode)
     {
-        $this->request = $request;
-    }
-
-    private function inAdminMode()
-    {
-        return $this->request->is('/admin/*') || $this->request->get('admin');
+        $this->inAdminMode = $inAdminMode;
     }
 
     /**
@@ -43,7 +38,7 @@ class ArrangementPolicy
         //
         $consultant = $user->consultant;
         $engagement = $arrangement->engagement;
-        return ($user->isSupervisor() && $this->inAdminMode()) || $consultant->id == $arrangement->consultant_id ||
+        return ($user->isSupervisor() && $this->inAdminMode) || $consultant->id == $arrangement->consultant_id ||
             ($engagement->isPending() && $engagement->leader_id == $consultant->id);
     }
 
