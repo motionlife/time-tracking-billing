@@ -30,6 +30,8 @@ class CreateEngagementsTable extends Migration
             //billing amount to client every term/cycle
             $table->decimal('cycle_billing', 15, 2)->default(0)
                 ->comment('not given when paying_cycle is hourly');
+            $table->unsignedTinyInteger('billing_day')->default(31)->nullable()
+                ->comment('day of each month when billing the client');
             //$table->decimal('total_billing', 15, 2)->default(0);
             //$table->decimal('operating_profit', 15, 2)->default(0)->comment('=total_billing - payrolls');
             $table->timestamps();
