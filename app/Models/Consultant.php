@@ -52,6 +52,14 @@ class Consultant extends Model
     {
         return $this->hasMany(Arrangement::class);
     }
+    public function hours()
+    {
+        return $this->hasMany(Hour::class);
+    }
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
 
     //all the engagements he has ever leaded
     public function lead_engagements()

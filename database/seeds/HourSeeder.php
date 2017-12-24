@@ -140,9 +140,18 @@ class HourSeeder extends Seeder
 
     public function get_task_id($group, $desc)
     {
-        $g = Taskgroup::firstOrCreate(['name' => $group]);
-        return Task::firstOrCreate(['taskgroup_id' => $g->id], ['description' => $desc])->id;
+        if($group==''||$group==' '||str_contains($group,'blank'))
+        {
+            $group = 'Other';
+        }
+        if($desc==''||$desc==' '||str_contains($desc,'blank'))
+        {
+            $desc = 'Other';
+        }
+        $g = Taskgroup::firstOrCreate(['name' => preg_replace('/\s+/', ' ', $group)]);
+        return Task::firstOrCreate(['taskgroup_id' => $g->id, 'description' => preg_replace('/\s+/', ' ', $desc)])->id;
     }
+
 
     public function get_client_id($name)
     {
@@ -158,6 +167,9 @@ class HourSeeder extends Seeder
 
     public function get_pos_id($pos)
     {
+        if ($pos == '' || $pos == ' ' || str_contains($pos, 'blank')) {
+            $pos = 'Other';
+        }
         return Position::firstOrCreate(['name' => $pos])->id;
     }
 

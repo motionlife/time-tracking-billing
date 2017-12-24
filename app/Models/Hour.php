@@ -36,4 +36,8 @@ class Hour extends Report
         }
     }
 
+    public function earned()
+    {
+        return $this->billable_hours * $this->rate * $this->share;
+    }
 }

@@ -29,5 +29,12 @@ class TaskgroupSeeder extends Seeder
         (new Taskgroup(['name'=>'Value Builder']))->save();
         (new Taskgroup(['name'=>'Vendor Management']))->save();
 
+        (new Taskgroup(['name'=>'NLCFO - Admin']))->save();//17
+        (new Taskgroup(['name'=>'NLCFO - Infrastructure']))->save();//18
+        (new Taskgroup(['name'=>'NLCFO - Networking & Marketing']))->save();//19
+        (new Taskgroup(['name'=>'NLCFO - Prospects & Proposals']))->save();//20
+
+        (new Taskgroup(['name'=>'Other']))->save();//21
+
     }
 }

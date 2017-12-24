@@ -27,5 +27,6 @@ class PositionSeeder extends Seeder
         (new Position(['name'=>'Financial Analyst']))->save();
         (new Position(['name'=>'Financial Sr Analyst']))->save();
         (new Position(['name'=>'Staff']))->save();
+        (new Position(['name'=>'Other']))->save();
     }
 }

@@ -4,6 +4,7 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
@@ -63,20 +64,15 @@ class TestController extends Controller
             $totalbillablehour = 0;
             $totalnonbillablehour = 0;
             $totalexpense = 0;
-            foreach ($consultant->arrangements as $arrangement) {
-                $billing_rate = $arrangement->billing_rate;
-                $firm_share = $arrangement->firm_share;
-                $hourlypay = $billing_rate * (1 - $firm_share);
-                foreach ($arrangement->hours as $hour) {
-                    $totalpay += $hour->billable_hours * $hourlypay;
-                    $totalbillablehour += $hour->billable_hours;
-                    $totalnonbillablehour += $hour->non_billable_hours;
-                }
-
-                foreach ($arrangement->expenses as $expense) {
-                    $totalexpense += $expense->total();
-                }
+            foreach ($consultant->hours as $hour) {
+                $totalpay += $hour->earned();
+                $totalbillablehour += $hour->billable_hours;
+                $totalnonbillablehour += $hour->non_billable_hours;
             }
+            foreach ($consultant->expenses as $expense) {
+                $totalexpense += $expense->total();
+            }
+
             array_push($output, ['name' => $consultant->fullname(),
                 'totalbh' => $totalbillablehour,
                 'totalnbh' => $totalnonbillablehour,
@@ -103,7 +99,6 @@ class TestController extends Controller
             }
             array_push($bills, ['hoursBill' => $hoursbill, 'expensesBill' => $expensesbill]);
         }
-
 
         return view('test', ['consultants' => $consultants,
             'result' => $output, 'csv' => $this->getTotalFromCSV(), 'clients' => $clients,
@@ -196,8 +191,14 @@ class TestController extends Controller
 
     public function get_task_id($group, $desc)
     {
-        $g = Taskgroup::firstOrCreate(['name' => $group]);
-        return Task::firstOrCreate(['taskgroup_id' => $g->id], ['description' => $desc])->id;
+        if ($group == '' || $group == ' ' || str_contains($group, 'blank')) {
+            $group = 'Other';
+        }
+        if ($desc == '' || $desc == ' ' || str_contains($desc, 'blank')) {
+            $desc = 'Other';
+        }
+        $g = Taskgroup::firstOrCreate(['name' => preg_replace('/\s+/', ' ', $group)]);
+        return Task::firstOrCreate(['taskgroup_id' => $g->id, 'description' => preg_replace('/\s+/', ' ', $desc)])->id;
     }
 
     public function get_client_id($name)
@@ -214,6 +215,9 @@ class TestController extends Controller
 
     public function get_pos_id($pos)
     {
+        if ($pos == '' || $pos == ' ' || str_contains($pos, 'blank')) {
+            $pos = 'Other';
+        }
         return Position::firstOrCreate(['name' => $pos])->id;
     }
 

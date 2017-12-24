@@ -16,7 +16,7 @@
                         </div>
                         <form action="" id="expense-form">
                             {{ csrf_field() }}
-                            <div class="modal-body">
+                            <div class="modal-body" style="margin-top: -1.7em">
                                 <div class="panel-body">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
@@ -106,14 +106,14 @@
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
                                                         <input name="review_state" value="1" type="radio">
-                                                        <span><i></i>Endorse Report</span>
+                                                        <span><i></i><strong>Endorse Report</strong></span>
                                                     </label>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="fancy-radio">
                                                         <input name="review_state" value="2"
                                                                type="radio">
-                                                        <span><i></i>Recommend Re-submit</span>
+                                                        <span><i></i><strong>Recommend Re-submit</strong></span>
                                                     </label>
                                                 </div>
                                             </div>

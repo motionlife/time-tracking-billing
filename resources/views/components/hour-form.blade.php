@@ -51,14 +51,14 @@
                 <div class="col-md-6">
                     <label class="fancy-radio">
                         <input name="endorse-or-not" value="1" type="radio">
-                        <span><i></i>Endorse Report</span>
+                        <span><i></i><strong>Endorse Report</strong></span>
                     </label>
                 </div>
                 <div class="col-md-6">
                     <label class="fancy-radio">
                         <input name="endorse-or-not" value="2"
                                type="radio">
-                        <span><i></i>Recommend Re-submit</span>
+                        <span><i></i><strong>Recommend Re-submit</strong></span>
                     </label>
                 </div>
             </div>

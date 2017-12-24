@@ -16,6 +16,7 @@ class CreateExpensesTable extends Migration
         Schema::create('expenses', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('arrangement_id');
+            $table->unsignedInteger('consultant_id');
             $table->date('report_date');
             $table->boolean('company_paid')->default(false)
             ->comment('whether the expense had already paid by New Life CFO');

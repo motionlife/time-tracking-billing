@@ -23,9 +23,12 @@ class ExpenseSeeder extends Seeder
     {
         if (($handle = fopen(__DIR__ . '\data\Billing\billing.csv', "r")) !== FALSE) {
             $client_name = '';
+            $con_name = '';
+            $con_id = '';
             $eng_name = '';
             $position = '';
             $arr = null;
+            $bcHours = [];
             fgetcsv($handle, 0, ",");//move the cursor one step because of header
             while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
                 $skip = false;
@@ -50,12 +53,14 @@ class ExpenseSeeder extends Seeder
                     $eng = Engagement::firstOrCreate(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name],
                         ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30"), 'status' => 0]);
                     //fetch first or create
-                    $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $this->get_consultant_id($con_name), 'position_id' => $this->get_pos_id($position)],
+                    $con_id = $this->get_consultant_id($con_name);
+                    $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)],
                         ['billing_rate' => 0, 'firm_share' => 1.0, 'pay_rate' => 0]);//temporarily assign firm_share to 0, updated by another file
                 } else if ($line[4]) {
                     if (count($line) > 22 && $this->number($line[22])) {
                         $exp = Expense::create([
                             'arrangement_id' => $arr->id,
+                            'consultant_id' => $con_id,
                             'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
                             'hotel' => $this->number($line[12]),
                             'flight' => $this->number($line[13]),
@@ -71,37 +76,43 @@ class ExpenseSeeder extends Seeder
                             Receipt::Create(['expense_id' => $exp->id, 'filename' => $line[20]]);
                         }
                     } else {
-                        $bh = abs($this->number($line[7]));
-                        $nbh = abs($this->number($line[8]));
-                        $arr->update(['billing_rate' => $this->number($line[9])]);
-                        if ($bh || $nbh || $line[10]) {
-                            Hour::Create([
-                                'arrangement_id' => $arr->id,
-                                'task_id' => $this->get_task_id($line[5], $line[6]),
-                                'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
-                                'billable_hours' => $bh,
-                                'non_billable_hours' => $nbh,
-                                'rate' => $this->number($line[9]),
-                                'share' => 1 - $arr->firm_share,
-                                'description' => $line[10],
-                                'review_state' => 1
-                            ]);
-                        }
+                        //deal with payroll and billing not consistent problem
+                        array_push($bcHours, new Hour([
+                            'arrangement_id' => $arr->id,
+                            'consultant_id' => $con_id,
+                            'task_id' => $this->get_task_id($line[5], $line[6]),
+                            'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
+                            'billable_hours' => $this->number($line[7]),
+                            'non_billable_hours' => $this->number($line[8]),
+                            'rate' => $this->number($line[9]),
+                            'description' => $line[10],
+                            'review_state' => 1
+                        ]));
                     }
                 }
             }
-            $this->updateShare();
+            $this->seedHours();
+            //deal with payroll and billing not consistent problem
+            foreach ($bcHours as $hour) {
+                if ($hour->billable_hours || $hour->non_billable_hours || $hour->description) {
+                    Hour::firstOrCreate(['arrangement_id' => $hour->arrangement_id, 'consultant_id' => $hour->consultant_id,
+                        'task_id' => $hour->task_id, 'report_date' => $hour->report_date, 'billable_hours' => $hour->billable_hours],
+                        ['non_billable_hours' => $hour->non_billable_hours, 'review_state' => 1, 'share' => 1 - $hour->arrangement->firm_share, 'rate' => $hour->rate, 'description' => $hour->description]);
+                }
+            }
+
         }
     }
 
     //fetch the firm_share info for each newly created arrangement from another data file
-    private function updateShare()
+    private function seedHours()
     {
         if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
             $eng_name = '';
             $position = '';
             $con_name = '';
+            $con_id = '';
             $tgroup = '';
             $arr = null;
             $need_updated = true;
@@ -138,20 +149,21 @@ class ExpenseSeeder extends Seeder
                         //fetch first or create
                         $arr = Arrangement::where(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)])
                             ->first();
-                        $arr->update(['firm_share' => $this->number($line[11]) / 100]);
+                        $arr->update(['firm_share' => $this->number($line[11]) / 100, 'billing_rate' => $this->number($line[9])]);
                         $need_updated = false;
                     }
-                    //BEGIN TO UPDATE THE SHARE OF HOURS
-                    $taskid = $this->get_task_id($tgroup, $taskDesc);
-                    $hour = Hour::where(['arrangement_id' => $arr->id, 'task_id' => $taskid,
-                        'report_date' => $report_date, 'billable_hours' => abs($this->number($line[7])),
-                        'description' => $line[13]])->first();
-                    if(isset($hour)) {
-                        $hour->update(['share' => 1 - $this->number($line[11]) / 100]);
-                    }else{
-                        echo 'aid='.$arr->id.' task_id='.$taskid.' rdate='.$report_date.' bh='.abs($this->number($line[7])).' desc='.$line[13];
-                    }
-
+                    Hour::Create([
+                        'arrangement_id' => $arr->id,
+                        'consultant_id' => $con_id,
+                        'task_id' => $this->get_task_id($tgroup, $taskDesc),
+                        'report_date' => $report_date,
+                        'billable_hours' => $this->number($line[7]),
+                        'non_billable_hours' => $this->number($line[8]),
+                        'rate' => $this->number($line[9]),
+                        'share' => 1 - $this->number($line[11]) / 100,
+                        'description' => $line[13],
+                        'review_state' => 1
+                    ]);
                 }
             }
             fclose($handle);
@@ -161,8 +173,14 @@ class ExpenseSeeder extends Seeder
 
     public function get_task_id($group, $desc)
     {
-        $g = Taskgroup::firstOrCreate(['name' => $group]);
-        return Task::firstOrCreate(['taskgroup_id' => $g->id, 'description' => $desc])->id;
+        if ($group == '' || $group == ' ' || str_contains($group, 'blank')) {
+            $group = 'Other';
+        }
+        if ($desc == '' || $desc == ' ' || str_contains($desc, 'blank')) {
+            $desc = 'Other';
+        }
+        $g = Taskgroup::firstOrCreate(['name' => preg_replace('/\s+/', ' ', $group)]);
+        return Task::firstOrCreate(['taskgroup_id' => $g->id, 'description' => preg_replace('/\s+/', ' ', $desc)])->id;
     }
 
     public function get_client_id($name)
@@ -179,6 +197,9 @@ class ExpenseSeeder extends Seeder
 
     public function get_pos_id($pos)
     {
+        if ($pos == '' || $pos == ' ' || str_contains($pos, 'blank')) {
+            $pos = 'Other';
+        }
         return Position::firstOrCreate(['name' => $pos])->id;
     }
 

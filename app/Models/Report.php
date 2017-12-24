@@ -22,6 +22,11 @@ class Report extends Model
         return $this->belongsTo(Arrangement::class);
     }
 
+    public function consultant()
+    {
+        return $this->belongsTo(Consultant::class);
+    }
+
     public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null)
     {
         $arrangements = isset($consultant) ? $consultant->arrangements() : Arrangement::all();
