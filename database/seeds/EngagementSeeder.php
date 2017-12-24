@@ -31,15 +31,15 @@ class EngagementSeeder extends Seeder
                 } else if ($line[3]) {
                     $start = $line[3];
                 } else if ($line[4]) {
-                    $share = is_numeric($line[4]) ? $line[4] / 100 : 0;
+                    $share = $this->number($line[4]) / 100;
                 } else if ($line[5]) {
                     $eng_id = Engagement::create([
                         'client_id' => $this->get_client_id($client_name),
                         'leader_id' => $this->get_consultant_id($line[5]),
                         'name' => $eng_name,
-                        'start_date' => $start,
+                        'start_date' => \Carbon\Carbon::parse($start)->toDateString('Y-m-d'),
                         'buz_dev_share' => $share,
-                        'status'=>0
+                        'status' => 1
                     ])->id;
                 } else if ($line[6]) {
                     Arrangement::create([
@@ -47,8 +47,9 @@ class EngagementSeeder extends Seeder
                         'position_id' => $this->get_position_id($line[6]),
                         'consultant_id' => $this->get_consultant_id($line[7]),
                         'billing_rate' => $this->number($line[9]),
+                        'pay_rate' => 0,
                         'firm_share' => $this->number($line[10]) / 100,
-                        'status'=>0,
+                        'status' => 0,
                     ]);
                 }
             }
@@ -72,6 +73,7 @@ class EngagementSeeder extends Seeder
     {
         return Position::where('name', $name)->first()->id;
     }
+
     public function number($str)
     {
         return (float)filter_var($str, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);

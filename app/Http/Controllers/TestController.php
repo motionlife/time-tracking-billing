@@ -22,21 +22,22 @@ class TestController extends Controller
     public function index(Request $request)
     {
 
-        return Excel::create('TestExcelFile', function ($excel) {
-            $excel->setTitle('Payroll Overview')
-                ->setCreator('Hao Xiong')
-                ->setCompany('New Life CFO')
-                ->setDescription('Your Payroll under the specified condition');
-
-            $excel->sheet('simple-sheet', function ($sheet) {
-
-                $sheet->fromArray(array(
-                    array('data1', 'data2'),
-                    array('data3', 'data4')
-                ));
-
-            });
-        })->export('xlsx');
+//        return Excel::create('TestExcelFile', function ($excel) {
+//            $excel->setTitle('Payroll Overview')
+//                ->setCreator('Hao Xiong')
+//                ->setCompany('New Life CFO')
+//                ->setDescription('Your Payroll under the specified condition');
+//
+//            $excel->sheet('simple-sheet', function ($sheet) {
+//
+//                $sheet->fromArray(array(
+//                    array('data1', 'data2'),
+//                    array('data3', 'data4')
+//                ));
+//
+//            });
+//        })->export('xlsx');
+        return $this->numberTest($request);
     }
 
 

@@ -18,7 +18,7 @@ class ConsultantSeeder extends Seeder
         $faker = Faker\Factory::create('en_US');
         foreach ($data as $consultant) {
             $user = User::create(['first_name' => explode(" ", $consultant['name'])[0],
-                'last_name' => explode(" ", $consultant['name'])[1],
+                'last_name' => isset(explode(" ", $consultant['name'])[1]) ? explode(" ", $consultant['name'])[1] : explode(" ", $consultant['name'])[0],
                 'email' => $consultant['email'],
                 'password' => bcrypt($consultant['password']),
                 'role' => array_search('Consultant', User::ROLES),

@@ -81,9 +81,9 @@ class Engagement extends Model
         switch ($this->status) {
 
             case 0:
-                return 'Active';//Operating, running
-            case 1:
                 return 'Pending';//when just created before approval by boss
+            case 1:
+                return 'Active';//Operating, running
             case 2:
                 return 'Closed';
             case 3:

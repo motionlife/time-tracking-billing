@@ -142,19 +142,19 @@
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
                                             <input name="status" value="1" type="radio">
-                                            <span><i></i>Pending</span>
+                                            <span><i></i><p class="label label-warning">Pending</p></span>
                                         </label>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
                                             <input name="status" value="0" type="radio">
-                                            <span><i></i>Active</span>
+                                            <span><i></i><p class="label label-success">Active</p></span>
                                         </label>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
                                             <input name="status" value="2" type="radio">
-                                            <span><i></i>Closed</span>
+                                            <span><i></i><p class="label label-default">Closed</p></span>
                                         </label>
                                     </div>
                                 </div>
@@ -365,7 +365,7 @@
                     $('.b-rate').val('').attr('disabled',false);
                     $('.p-rate').val('').attr('disabled',true);
                 }
-                $('#billing-day').attr('disabled', this.value != 1);
+                $('#billing-day').attr('disabled', this.value != 1).val('');
             });
             $('.slim-scroll').slimScroll({
                 height: '130px'
@@ -430,6 +430,7 @@
                             tr.find('.cid').selectpicker('val', o.consultant_id);
                             tr.find('.pid').selectpicker('val', o.position_id);
                             tr.find('.b-rate').val(o.billing_rate);
+                            tr.find('.p-rate').val(o.pay_rate);
                             tr.find('.f-share').val(o.firm_share * 100);
                             if (data.arrangements[i + 1]) {
                                 tr = tr.clone().appendTo(table);
@@ -545,6 +546,7 @@
                 form.push({name: 'consultant_ids[]', value: $(this).find('.cid').selectpicker('val')},
                     {name: 'position_ids[]', value: $(this).find('.pid').selectpicker('val')},
                     {name: 'billing_rates[]', value: $(this).find('.b-rate').val()},
+                    {name: 'pay_rates[]', value: $(this).find('.p-rate').val()},
                     {name: 'firm_shares[]', value: $(this).find('.f-share').val()}
                 );
             });
@@ -590,7 +592,9 @@
         td > i.Closed {
             color: Grey;
         }
-
+        .fancy-radio .label{
+            font-size: small;
+        }
         #members-table tr td input[type='number'] {
             text-align: center;
         }

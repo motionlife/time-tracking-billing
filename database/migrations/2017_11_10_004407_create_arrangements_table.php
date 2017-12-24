@@ -19,9 +19,11 @@ class CreateArrangementsTable extends Migration
             $table->unsignedInteger('consultant_id');
             $table->unsignedInteger('position_id')->comment('job position of the consultant');
             $table->decimal('billing_rate', 15, 2)
-                ->comment('used as pay_rate when client\'s pay_cycle is not hourly');
+                ->comment('effective when the billing type is hourly');
+            $table->decimal('pay_rate', 15, 2)
+                ->comment('effective when the billing type is monthly or project fixed');
             $table->double('firm_share')->comment('the percentage of share that company should get');
-            $table->tinyInteger('status')->default(0)->comment('0:normal arrangement;1. detached from engagement');
+            $table->tinyInteger('status')->default(0)->comment('0:normal arrangement;1. Parent Engagement was deleted');
             $table->timestamps();
             $table->softDeletes();
         });
