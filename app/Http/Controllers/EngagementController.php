@@ -78,9 +78,9 @@ class EngagementController extends Controller
             $lid = $request->get('leader_id');
             if ($consultant->id == $lid) {
                 $eng = new Engagement(['client_id' => $request->get('client_id'), 'leader_id' => $lid,
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),
+                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),'billing_day'=>$request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
-                    'cycle_billing' => $request->get('cycle_billing') ?: 0, 'status' => 1
+                    'cycle_billing' => $request->get('cycle_billing') ?: 0, 'status' => 0
                 ]);
                 //only supervisor can touch the status(no need to apply policy here)
                 /* if ($this->authorize('activate', $eng) || $this->authorize('close', $eng))
@@ -166,7 +166,7 @@ class EngagementController extends Controller
             $eng = Engagement::find($id);
             if ($user->can('update', $eng)) {
                 if ($eng->update(['client_id' => $request->get('client_id'),
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),
+                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),'billing_day'=>$request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
                     'cycle_billing' => $request->get('cycle_billing') ?: 0
                 ])) {
@@ -234,10 +234,11 @@ class EngagementController extends Controller
         $pids = $request->get('position_ids');
         $fs = $request->get('firm_shares');
         $bs = $request->get('billing_rates');
+        $ps = $request->get('pay_rates');
         foreach ($request->get('consultant_ids') as $i => $cid) {
             if ($cid && $pids[$i]) {
                 if (!Arrangement::updateOrCreate(['engagement_id' => $id, 'consultant_id' => $cid, 'position_id' => $pids[$i]],
-                    ['billing_rate' => $bs[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))
+                    ['billing_rate' => $bs[$i] ?: 0,'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))
 
                     return false;
             }
@@ -251,11 +252,12 @@ class EngagementController extends Controller
         $pids = $request->get('position_ids');
         $fs = $request->get('firm_shares');
         $bs = $request->get('billing_rates');
+        $ps = $request->get('pay_rates');
         foreach ($eng->arrangements as $arr) {
             $i = array_search($arr->consultant_id, $cids);
             if ($i == false) {
                 //delete the removed consultant
-                //soft delete indicates the consultant has been removed from his original engagement
+                //soft delete indicates the consultant has been removed from his original engagement?
                 $arr->delete();
             }
         }
@@ -263,7 +265,7 @@ class EngagementController extends Controller
         foreach ($cids as $i => $cid) {
             if (!Arrangement::updateOrCreate(
                 ['engagement_id' => $eng->id, 'consultant_id' => $cid],
-                ['billing_rate' => $bs[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0, 'position_id' => $pids[$i]]
+                ['billing_rate' => $bs[$i] ?: 0,'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0, 'position_id' => $pids[$i]]
             )) {
                 return false;
             }

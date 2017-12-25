@@ -141,13 +141,13 @@
                                      style="width:95%;border-style: dotted;color:#33c0ff;padding: .2em .2em .2em .2em;margin-left: 1.4em">
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
-                                            <input name="status" value="1" type="radio">
+                                            <input name="status" value="0" type="radio">
                                             <span><i></i><p class="label label-warning">Pending</p></span>
                                         </label>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="fancy-radio">
-                                            <input name="status" value="0" type="radio">
+                                            <input name="status" value="1" type="radio">
                                             <span><i></i><p class="label label-success">Active</p></span>
                                         </label>
                                     </div>
@@ -205,8 +205,8 @@
                         <select class="selectpicker form-control" data-width="fit"
                                 id="status-select"
                                 data-live-search="true" title="&#xf024; Status">
-                            <option value="0" {{Request('status')=="0"?'selected':''}}>Active</option>
-                            <option value="1" {{Request('status')=="1"?'selected':''}}>Pending</option>
+                            <option value="0" {{Request('status')=="0"?'selected':''}}>Pending</option>
+                            <option value="1" {{Request('status')=="1"?'selected':''}}>Active</option>
                             <option value="2" {{Request('status')=="2"?'selected':''}}>Closed</option>
                         </select>
                         <input class="date-picker form-control" size=10 id="start-date-filter"
@@ -282,7 +282,7 @@
                                                     <td> {{$arrangement->position->name}}</td>
                                                     <td>
                                                         @can('view',$arrangement)
-                                                            ${{$arrangement->billing_rate}}
+                                                            ${{$hourly?$arrangement->billing_rate:$arrangement->pay_rate}}
                                                         @endcan
                                                     </td>
                                                     <td>
@@ -419,7 +419,8 @@
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#billing_amount').val(data.cycle_billing);
-                        $('#submit-modal').attr('disabled', @if($admin) false @else data.status == 0  @endif );
+                        $('#billing-day').val(data.billing_day);
+                        $('#submit-modal').attr('disabled', @if($admin) false @else data.status != 0  @endif );
                         @if($admin)
                         $("input[name=status][value=" + data.status + "]").prop('checked', true);
                         @endif
