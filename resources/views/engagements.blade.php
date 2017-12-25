@@ -560,32 +560,25 @@
         .arrangement-table {
             margin-top: -3.8%;
         }
-
         .engagement-table {
             margin-bottom: -1.2em;
         }
-
         .table td, .table th {
             text-align: center;
         }
-
         .deletable-row {
             color: red;
         }
-
         .panel-subtitle > strong {
             color: #27b2ff;
         }
-
         td > i {
             font-size: 0.7em;
             margin-right: 0.5em;
         }
-
         td > i.Pending {
             color: red;
         }
-
         td > i.Active {
             color: #19ff38;
         }
