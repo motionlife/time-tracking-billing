@@ -396,7 +396,6 @@
                     url: "?fav=task&eid=" + tr.data('eid') + "&pid=" + tr.data('pid') + "&tid=" + tr.data('tid'),
                     success: function (data) {
                         if (data.code == 7) {
-                            console.log("succeed");
                             if (state === 'off') {
                                 anchor.data('state', 'on');
                                 star.removeClass('fa fa-star-o').addClass('fa fa-star');
