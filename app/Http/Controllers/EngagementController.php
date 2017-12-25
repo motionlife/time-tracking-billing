@@ -137,6 +137,7 @@ class EngagementController extends Controller
                 foreach ($eng->arrangements as $arrangement) {
                     if (!$user->can('view', $arrangement)) {
                         $arrangement->billing_rate = '';
+                        $arrangement->pay_rate='';
                         $arrangement->firm_share = '';
                     }
                     $arrangement->makeHidden(['engagement', 'created_at', 'updated_at', 'deleted_at']);
