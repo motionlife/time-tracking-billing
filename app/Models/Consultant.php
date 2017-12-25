@@ -40,7 +40,10 @@ class Consultant extends Model
     {
         return $this->belongsTo(Contact::class);
     }
-
+    public function settings()
+    {
+        return $this->hasMany(Setting::class);
+    }
     //all the developed clients
     public function dev_clients()
     {

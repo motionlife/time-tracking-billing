@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Hour;
+use newlifecfo\Models\Setting;
 
 class HoursController extends Controller
 {
@@ -37,7 +38,7 @@ class HoursController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function create(Request $request)
     {
@@ -47,12 +48,28 @@ class HoursController extends Controller
         if ($request->ajax()) {
             if ($request->get('fetch') == 'position') {
                 return $consultant->getMyArrInfoByEid($request->get('eid'));
+            } else if ($request->get('fav') === 'task') {
+                $eid = $request->get('eid');
+                $pid = $request->get('pid');
+                $tid = $request->get('tid');
+                return ['code' => $this->updateSettings($consultant, 'fav_task', $eid . '-' . $pid . '-' . $tid) ? 7 : 0];
             }
-        }else{
+        } else {
+            $favTasks = [];
+            $taskSetting = $consultant->settings()->where('key', 'fav_task')->first();
+            if ($taskSetting) $favTasks = explode(',', $taskSetting->value);
+            if(!$favTasks[0]) array_shift($favTasks);
+            if(sizeof($favTasks)) {
+                $recentTasks = $favTasks; $fav=true;
+            }else{
+                $recentTasks = $consultant->getRecentInputTask(5)->keys();
+                $fav=false;
+            }
             return view('new-hour', [
                 'hours' => $hours,
                 'clientIds' => Engagement::groupedByClient($consultant),
-                'defaultIds'=> $consultant->getRecentInputTask(5)->keys()
+                'defaultTasks' => $recentTasks,
+                'fav'=>$fav
             ]);
         }
     }
@@ -226,6 +243,16 @@ class HoursController extends Controller
                 if ($hour->delete()) return json_encode(['message' => 'succeed']);
             }
             return json_encode(['message' => 'delete_failed, no authorization']);
+        }
+    }
+
+    private function updateSettings($consultant, $key, $value)
+    {
+        $setting = $consultant->settings()->where(['key' => $key])->first();
+        if ($setting) {
+            return $setting->toggle($value);
+        } else {
+            return (new Setting(['consultant_id' => $consultant->id, 'key' => $key, 'value' => $value]))->save();
         }
     }
 }

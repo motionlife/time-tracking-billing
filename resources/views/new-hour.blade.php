@@ -86,7 +86,7 @@
                             <table class="table table-responsive">
                                 <thead>
                                 <tr>
-                                    <th>[Client]Engagement<br><i>Task description</i></th>
+                                    <th>[<span>Client</span>]Engagement<br><i>Task description</i></th>
                                     @for($i=0;$i<7;$i++)
                                         @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
                                         <th>{{substr($date->addDay($i)->format('l'),0,3)}}
@@ -98,17 +98,24 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($defaultIds as $ids)
-                                    @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
-                                    <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
-                                        <th scope="row">[<span>{{$eng->client->name}}</span>]<span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span></th>
-                                        @for($i=0;$i<7;$i++)
-                                            <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
-                                                <a href="javascript:void(0);" title="Add description" ref="popover" data-desc="">
-                                                    <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
-                                        @endfor
-                                        <td><a href="javascript:void(0)" class="deletable-row"><i class="fa fa-times" aria-hidden="true"></i></a></td>
-                                    </tr>
+                                @foreach($defaultTasks as $key=>$ids)
+                                        @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
+                                        <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
+                                            <th scope="row"><span
+                                                        class="label label-success">{{$eng->client->name}}</span><span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span><a
+                                                        href="javascript:void(0);" class="mark-fav-task" title="Mark as your favorite task for automatic display."
+                                                        data-state="{{$fav?'on':'off'}}"><i class="fa fa-star{{$fav?'':'-o'}}" aria-hidden="true"></i></a>
+                                            </th>
+                                            @for($i=0;$i<7;$i++)
+                                                <td><input class='form-control input-sm' type='number' min="0"
+                                                           step="0.1" max="24"/>
+                                                    <a href="javascript:void(0);" title="Add description" ref="popover"
+                                                       data-desc="">
+                                                        <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
+                                            @endfor
+                                            <td><a href="javascript:void(0)" class="deletable-row"><i
+                                                            class="fa fa-times" aria-hidden="true"></i></a></td>
+                                        </tr>
                                 @endforeach
                                 </tbody>
                             </table>
@@ -131,7 +138,10 @@
         <table>
             <tbody>
             <tr>
-                <th scope="row">[<span></span>]<span></span><br><span></span></th>
+                <th scope="row"><span class="label label-success"></span><span></span><br><span></span><a
+                            href="javascript:void(0);" class="mark-fav-task"  title="Mark as your favorite task for automatic display." data-state="off"><i class="fa fa-star-o"
+                                                                                                 aria-hidden="true"></i></a>
+                </th>
                 @for($i=0;$i<7;$i++)
                     <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
                         <a href="javascript:void(0);" title="Add description" ref="popover"><i
@@ -368,7 +378,7 @@
                         }
                     });
                 } else {
-                    toastr.warning("Well, you should at least input something...");
+                    toastr.warning("Well, you should at least input some hours...");
                 }
                 e.preventDefault();
             });
@@ -376,6 +386,26 @@
                 $(this).parent().parent().fadeOut(300, function () {
                     $(this).remove();
                     if (!$('#hours-roll').find('tbody tr').length) $('#matrix-submit').attr('disabled', true);
+                });
+            }).on('click', '.mark-fav-task', function () {
+                var star = $(this).find('i');
+                var state = $(this).data('state');
+                var anchor = $(this);
+                var tr = anchor.parent().parent();
+                $.ajax({
+                    url: "?fav=task&eid=" + tr.data('eid') + "&pid=" + tr.data('pid') + "&tid=" + tr.data('tid'),
+                    success: function (data) {
+                        if (data.code == 7) {
+                            console.log("succeed");
+                            if (state === 'off') {
+                                anchor.data('state', 'on');
+                                star.removeClass('fa fa-star-o').addClass('fa fa-star');
+                            } else {
+                                anchor.data('state', 'off');
+                                star.removeClass('fa fa-star').addClass('fa fa-star-o');
+                            }
+                        }
+                    }
                 });
             });
             var focuseda;
@@ -450,7 +480,7 @@
 
         #hours-roll tbody tr th span:nth-child(2) {
             color: #287eff;
-            font-weight: lighter;
+            font-weight: 600;
         }
 
         #week-info {
@@ -473,6 +503,11 @@
             width: 18%;
             display: inline-block;
             margin-left: .1em;
+        }
+
+        a.mark-fav-task, a.mark-fav-task:hover {
+            color: #ffc317;
+        !important;
         }
 
         .switch {
