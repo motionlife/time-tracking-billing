@@ -55,7 +55,7 @@ class HoursController extends Controller
                 return ['code' => $this->updateSettings($consultant, 'fav_task', $eid . '-' . $pid . '-' . $tid) ? 7 : 0];
             }
         } else {
-            $favTasks = [];
+            $favTasks = [''];
             $taskSetting = $consultant->settings()->where('key', 'fav_task')->first();
             if ($taskSetting) $favTasks = explode(',', $taskSetting->value);
             if(!$favTasks[0]) array_shift($favTasks);
