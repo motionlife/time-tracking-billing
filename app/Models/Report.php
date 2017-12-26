@@ -26,6 +26,10 @@ class Report extends Model
     {
         return $this->belongsTo(Consultant::class);
     }
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null)
     {

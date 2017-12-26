@@ -22,7 +22,7 @@ class ConsultantSeeder extends Seeder
                 'email' => $consultant['email'],
                 'password' => bcrypt($consultant['password']),
                 'role' => array_search('Consultant', User::ROLES),
-                'priority' => 1,
+                'priority' => $consultant['name'] == 'Burt Copeland' ? 51 : 1,
                 'remember_token' => str_random(20)]);
             $contact = Contact::create(['email' => $user->email,
                 'profile_img_path' => str_random(10) . '.jpg',

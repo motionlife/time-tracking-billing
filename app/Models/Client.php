@@ -82,7 +82,14 @@ class Client extends Model
     {
         return $this->hasMany(Engagement::class);
     }
-
+    public function hours()
+    {
+        return $this->hasMany(Hour::class);
+    }
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
     public function laborBills($start = '1970-01-01', $end = '2038-01-19',$state=null)
     {
         //only those engagements that bill client hourly

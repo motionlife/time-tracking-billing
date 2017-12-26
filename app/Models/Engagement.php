@@ -48,8 +48,9 @@ class Engagement extends Model
 
     public function isHourlyBilling()
     {
-        return $this->paying_cycle==0;
+        return $this->paying_cycle == 0;
     }
+
     //indicate Client Billed Type: Hourly; Monthly Retainer; Fixed Fee Project;
     public function clientBilledType()
     {
@@ -103,33 +104,31 @@ class Engagement extends Model
     public function clientLaborBills($start = null, $end = null, $state = null)
     {
         //For monthly labor billing, detail not implemented yet...
-        //todo: dealing with different client-billing type
+        //todo: dealing with different client-billing type should be scrutinized when do the billing
         if ($this->paying_cycle != 0) {
             $start = Carbon::parse($start ?: $this->start_date);
             $end = $end ? Carbon::parse($end) : Carbon::now();
             $days = $start->diffInDays($end);
             if ($this->paying_cycle == 1) {
                 return $this->cycle_billing / 30 * $days;
-            } else if ($this->paying_cycle == 2) {
-                return $this->cycle_billing / 15 * $days;
-            } else if ($this->paying_cycle == 3 && $this->isClosed()) {
+            } else if ($this->paying_cycle == 2 && $this->isClosed()) {
                 return $this->cycle_billing;
             } else {
                 return 0;
             }
         } else {
             $total = 0;
-            foreach ($this->arrangements as $arr) {
+            foreach ($this->arrangements()->withTrashed()->get() as $arr) {
                 $total += $arr->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19', $state);
             }
             return $total;
         }
     }
 
-    public function clientExpenseBills($start = '1970-01-01', $end = null, $state)
+    public function clientExpenseBills($start = '1970-01-01', $end = null, $state = null)
     {
         $total = 0;
-        foreach ($this->arrangements as $arr) {
+        foreach ($this->arrangements()->withTrashed()->get() as $arr) {
             $total += $arr->reportedExpenses($start, $end, $state);
         }
         return $total;

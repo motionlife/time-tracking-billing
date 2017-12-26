@@ -18,6 +18,9 @@ class Expense extends Report
             + $this->car_rental + $this->mileage_cost + $this->other;
     }
 
+    /**
+     * @deprecated
+     */
     public function summary(array &$data)
     {
         $day = new Carbon($this->report_date);

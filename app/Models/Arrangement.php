@@ -59,9 +59,10 @@ class Arrangement extends Model
             });
     }
 
-    public function monthlyExpenses($start = '1970-01-01', $end = '2038-01-19')
+    public function monthlyExpenses($start = '1970-01-01', $end = '2038-01-19', $state = null)
     {
-        return $this->expenses()->whereBetween('report_date', [$start, $end])->get()
+        return (isset($state) ? $this->expenses()->where('review_state', $state) : $this->expenses())
+            ->whereBetween('report_date', [$start, $end])->get()
             ->mapToGroups(function ($exp) {
                 return [Carbon::parse($exp->report_date)->format('y-M') => $exp->total()];
             })->transform(function ($month) {
@@ -69,20 +70,21 @@ class Arrangement extends Model
             });
     }
 
-    public function dailyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19')
+    public function dailyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19', $state = null)
     {
-        $net_rate = (1 - $this->firm_share) * $this->billing_rate;
+        //$net_rate = (1 - $this->firm_share) * $this->billing_rate;
         $eid = $this->engagement->id;
-        return $this->hours()->whereBetween('report_date', [$start, $end])->get()
-            ->mapToGroups(function ($hour) use ($net_rate) {
+        return (isset($state) ? $this->hours()->where('review_state', $state) : $this->hours())
+            ->whereBetween('report_date', [$start, $end])->get()
+            ->mapToGroups(function ($hour) {
                 return [Carbon::parse($hour->report_date)->format('M d') =>
-                    [$hour->billable_hours, $hour->non_billable_hours, $hour->billable_hours * $net_rate]];
+                    [$hour->billable_hours, $hour->non_billable_hours, $hour->earned()]];
             })->transform(function ($day) use ($eid) {
                 return [$day->sum(0), $day->sum(1), $day->sum(2), $eid];
             });
     }
 
-    public function reportedHours($start = null, $end = null, $billable = true, $state = null, &$hrs = null)
+    private function reportedHours($start = null, $end = null, $billable = true, $state = null, &$hrs = null)
     {
         $query = (isset($state) ? $this->hours()->where('review_state', $state) : $this->hours())
             ->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']);
@@ -101,17 +103,13 @@ class Arrangement extends Model
 
     public function monthlyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19', $th = true)
     {
-        $net_rate = (1 - $this->firm_share) * $this->billing_rate;
+        //$net_rate = (1 - $this->firm_share) * $this->billing_rate;
         return $this->hours()->whereBetween('report_date', [$start, $end])->get()
-            ->mapToGroups(function ($hour) use ($net_rate, $th) {
+            ->mapToGroups(function ($hour) use ($th) {
                 return [Carbon::parse($hour->report_date)->format('y-M') =>
-                    [$th ? $hour->billable_hours + $hour->non_billable_hours : $hour->billable_hours,
-                        $hour->billable_hours * $net_rate]];
+                    [$th ? $hour->billable_hours + $hour->non_billable_hours : $hour->billable_hours, $hour->earned()]];
             })->transform(function ($month) {
                 return [$month->sum(0), $month->sum(1)];
-//                return $group->reduce(function ($carry, $item) {
-//                    return [$carry[0] + $item[0], $carry[1] + $item[1]];
-//                });
             });
     }
 

@@ -14,7 +14,9 @@ class Hour extends Report
         return $this->belongsTo(Task::class);
     }
 
-    //deprecated
+    /**
+     * @deprecated
+     */
     public function summary(array &$data)
     {
         $day = new Carbon($this->report_date);
