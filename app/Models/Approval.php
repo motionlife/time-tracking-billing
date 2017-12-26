@@ -21,6 +21,6 @@ class Approval extends Model
     //get the user the approval been requested to
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault();
     }
 }

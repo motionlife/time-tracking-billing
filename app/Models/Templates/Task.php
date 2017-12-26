@@ -18,7 +18,9 @@ class Task extends Model
 
     public function taskGroup()
     {
-        return $this->belongsTo(Taskgroup::class,'taskgroup_id');
+        return $this->belongsTo(Taskgroup::class,'taskgroup_id')->withDefault([
+            'name'=>'Other'
+        ]);
     }
 
     public function getDesc()

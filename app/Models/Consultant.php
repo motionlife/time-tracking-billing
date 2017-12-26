@@ -38,7 +38,7 @@ class Consultant extends Model
     //Get the contact info
     public function contact()
     {
-        return $this->belongsTo(Contact::class);
+        return $this->belongsTo(Contact::class)->withDefault();
     }
     public function settings()
     {

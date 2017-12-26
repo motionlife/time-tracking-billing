@@ -33,7 +33,7 @@ class Client extends Model
     //Get the contact info
     public function contact()
     {
-        return $this->belongsTo(Contact::class);
+        return $this->belongsTo(Contact::class)->withDefault();
     }
 
     //Get the consultant who developed this client
@@ -74,7 +74,7 @@ class Client extends Model
     //client belong to which industry
     public function industry()
     {
-        return $this->belongsTo(Industry::class, 'industry_id');
+        return $this->belongsTo(Industry::class, 'industry_id')->withDefault();
     }
 
     //get all the engagements of this client

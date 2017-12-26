@@ -20,6 +20,6 @@ class Revenue extends Model
     //get the client publish this revenue
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class)->withDefault(['name'=>'Deleted']);
     }
 }

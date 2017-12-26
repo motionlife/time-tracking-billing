@@ -11,7 +11,9 @@ class Hour extends Report
 
     public function task()
     {
-        return $this->belongsTo(Task::class);
+        return $this->belongsTo(Task::class)->withDefault([
+            'description'=>'Other'
+        ]);
     }
 
     /**

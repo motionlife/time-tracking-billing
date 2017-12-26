@@ -28,7 +28,7 @@ class Engagement extends Model
     //get the client who initiated the engagement
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class)->withDefault(['name'=>'Deleted']);
     }
 
     public static function groupedByClient($consultant = null)
@@ -43,7 +43,10 @@ class Engagement extends Model
     //get the leader(consultant) of the engagement
     public function leader()
     {
-        return $this->belongsTo(Consultant::class, 'leader_id');
+        return $this->belongsTo(Consultant::class, 'leader_id')->withDefault([
+            'first_name'=>'Deleted',
+            'last_name'=>'Deleted',
+        ]);
     }
 
     public function isHourlyBilling()

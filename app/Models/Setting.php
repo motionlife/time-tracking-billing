@@ -10,7 +10,10 @@ class Setting extends Model
     protected $guarded = [];
     public function consultant()
     {
-        return $this->belongsTo(Consultant::class);
+        return $this->belongsTo(Consultant::class)->withDefault([
+            'first_name'=>'Deleted',
+            'last_name'=>'Deleted'
+        ]);
     }
     public function toggle($value)
     {

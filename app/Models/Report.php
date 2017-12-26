@@ -19,16 +19,22 @@ class Report extends Model
     //to which arrangement the hour reported
     public function arrangement()
     {
-        return $this->belongsTo(Arrangement::class);
+        return $this->belongsTo(Arrangement::class)->withDefault();
     }
 
     public function consultant()
     {
-        return $this->belongsTo(Consultant::class);
+        return $this->belongsTo(Consultant::class)->withDefault(function ($consultant) {
+            $consultant->first_name = 'Deleted';
+            $consultant->last_name = 'Deleted';
+        });
     }
+
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class)->withDefault(function ($client) {
+            $client->name = "Deleted";
+        });
     }
 
     public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null)

@@ -23,19 +23,24 @@ class Arrangement extends Model
     //get it's parent engagement
     public function engagement()
     {
-        return $this->belongsTo(Engagement::class);//should we add with default?
+        return $this->belongsTo(Engagement::class)->withDefault(function ($engagement) {
+            $engagement->name = "Deleted";
+        });//should we add with default?
     }
 
     //get the arranged consultant
     public function consultant()
     {
-        return $this->belongsTo(Consultant::class);
+        return $this->belongsTo(Consultant::class)->withDefault(function ($consultant) {
+            $consultant->first_name = "Deleted";
+            $consultant->last_name = "Deleted";
+        });
     }
 
     //get the arranged position
     public function position()
     {
-        return $this->belongsTo(Position::class);
+        return $this->belongsTo(Position::class)->withDefault();
     }
 
     //all the hour reports for this arrangement

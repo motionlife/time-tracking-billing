@@ -20,6 +20,6 @@ class Receipt extends Model
     //get the expense report the receipt belongs to
     public function expense()
     {
-        return $this->belongsTo(Expense::class);
+        return $this->belongsTo(Expense::class)->withDefault();
     }
 }
