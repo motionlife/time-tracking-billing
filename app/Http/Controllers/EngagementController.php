@@ -36,7 +36,7 @@ class EngagementController extends Controller
             'leaders' => Engagement::all()->map(function ($item, $key) {
                 return $item->leader;
             })->unique(),
-            'admin'=>$isAdmin
+            'admin' => $isAdmin
         ]);
     }
 
@@ -58,7 +58,7 @@ class EngagementController extends Controller
             'leader' => $consultant,
             'clients' => $consultant->lead_engagements->map(function ($item, $key) {
                 return $item->client;
-            })->unique(),'admin'=>false]);
+            })->unique(), 'admin' => false]);
     }
 
     /**
@@ -70,15 +70,13 @@ class EngagementController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        //$user = Auth::user()
         $consultant = Auth::user()->consultant;
         $feedback = [];
         if ($request->ajax()) {
             $lid = $request->get('leader_id');
             if ($consultant->id == $lid) {
                 $eng = new Engagement(['client_id' => $request->get('client_id'), 'leader_id' => $lid,
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),'billing_day'=>$request->get('billing_day'),
+                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'), 'billing_day' => $request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
                     'cycle_billing' => $request->get('cycle_billing') ?: 0, 'status' => 0
                 ]);
@@ -126,7 +124,7 @@ class EngagementController extends Controller
      *
      * @param  int $id
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|string
      */
     public function edit($id, Request $request)
     {
@@ -137,7 +135,7 @@ class EngagementController extends Controller
                 foreach ($eng->arrangements as $arrangement) {
                     if (!$user->can('view', $arrangement)) {
                         $arrangement->billing_rate = '';
-                        $arrangement->pay_rate='';
+                        $arrangement->pay_rate = '';
                         $arrangement->firm_share = '';
                     }
                     $arrangement->makeHidden(['engagement', 'created_at', 'updated_at', 'deleted_at']);
@@ -167,7 +165,7 @@ class EngagementController extends Controller
             $eng = Engagement::find($id);
             if ($user->can('update', $eng)) {
                 if ($eng->update(['client_id' => $request->get('client_id'),
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'),'billing_day'=>$request->get('billing_day'),
+                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'), 'billing_day' => $request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
                     'cycle_billing' => $request->get('cycle_billing') ?: 0
                 ])) {
@@ -179,20 +177,17 @@ class EngagementController extends Controller
                         $feedback['message'] = 'Updating arrangements failed, engagement update rollback';
                     }
                     //only manager or superAdmin can touch the status
-                    $status = $request->get('status');
                     if ($user->can('changeStatus', $eng)) {
-                        if(isset($status))
-                        $eng->update(['status' => $status]);
+                        $status = $request->get('status');
+                        if (isset($status)) $eng->update(['status' => $status]);
                     } else {
                         $feedback['code'] = 5;
                         $feedback['message'] = 'Status updating failed, no authorization';
                     }
-
                 } else {
                     $feedback['code'] = 4;
                     $feedback['message'] = 'unknown error during updating';
                 }
-
             } else {
                 $feedback['code'] = 1;
                 $feedback['message'] = 'Active engagement can only be updated by manager';
@@ -230,17 +225,16 @@ class EngagementController extends Controller
         }
     }
 
-    private function saveArrangements(Request $request, $id)
+    private function saveArrangements(Request $request, $eid)
     {
         $pids = $request->get('position_ids');
-        $fs = $request->get('firm_shares');
         $bs = $request->get('billing_rates');
         $ps = $request->get('pay_rates');
+        $fs = $request->get('firm_shares');
         foreach ($request->get('consultant_ids') as $i => $cid) {
             if ($cid && $pids[$i]) {
-                if (!Arrangement::updateOrCreate(['engagement_id' => $id, 'consultant_id' => $cid, 'position_id' => $pids[$i]],
-                    ['billing_rate' => $bs[$i] ?: 0,'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))
-
+                if (!Arrangement::updateOrCreate(['engagement_id' => $eid, 'consultant_id' => $cid, 'position_id' => $pids[$i]],
+                    ['billing_rate' => $bs[$i] ?: 0, 'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]))
                     return false;
             }
         }
@@ -255,18 +249,19 @@ class EngagementController extends Controller
         $bs = $request->get('billing_rates');
         $ps = $request->get('pay_rates');
         foreach ($eng->arrangements as $arr) {
-            $i = array_search($arr->consultant_id, $cids);
-            if ($i == false) {
-                //delete the removed consultant
-                //soft delete indicates the consultant has been removed from his original engagement?
+            $keys = array_keys($cids,$arr->consultant_id);
+            if(!$keys){
                 $arr->delete();
+            }else{
+                $pos = array_values(array_only($pids,$keys));
+                if (!in_array($arr->position_id,$pos)) $arr->delete();
             }
         }
         //add new one if exist and update the old guys
         foreach ($cids as $i => $cid) {
             if (!Arrangement::updateOrCreate(
-                ['engagement_id' => $eng->id, 'consultant_id' => $cid],
-                ['billing_rate' => $bs[$i] ?: 0,'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0, 'position_id' => $pids[$i]]
+                ['engagement_id' => $eng->id, 'consultant_id' => $cid, 'position_id' => $pids[$i]],
+                ['billing_rate' => $bs[$i] ?: 0, 'pay_rate' => $ps[$i] ?: 0, 'firm_share' => $fs[$i] / 100 ?: 0]
             )) {
                 return false;
             }

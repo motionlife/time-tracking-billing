@@ -111,15 +111,15 @@
                                                 <select class="selectpicker cid" data-width="150px"
                                                         data-dropup-auto="false"
                                                         data-live-search="true"
-                                                        required>
+                                                        required disabled>
                                                     @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
                                                         <option value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
                                             <td>
-                                                <select class="selectpicker pid" data-width="200px" required
-                                                        data-dropup-auto="false">
+                                                <select class="selectpicker pid" data-width="200px"
+                                                        data-dropup-auto="false" required disabled>
                                                     @foreach(\newlifecfo\Models\Templates\Position::all() as $position)
                                                         <option value="{{$position->id}}">{{$position->name}}</option>
                                                     @endforeach
@@ -326,7 +326,7 @@
                 format: 'dd',
                 todayHighlight: true,
                 autoclose: true,
-                orientation:'bottom'
+                orientation: 'bottom'
             });
             $('#start-date').datepicker('setDate', new Date());
             $('#filter-button').on('click', function () {
@@ -358,14 +358,15 @@
             $('#cycle-select').on('changed.bs.select', function (e) {
                 if (this.value != 0) {
                     $('#billing_amount').attr('disabled', false).attr('placeholder', 'per cycle');
-                    $('.b-rate').val('').attr('disabled',true);
-                    $('.p-rate').val('').attr('disabled',false);
+                    $('.b-rate').val('').attr('disabled', true);
+                    $('.p-rate').val('').attr('disabled', false);
                 } else {
                     $('#billing_amount').attr({'placeholder': 'N/A', 'disabled': true}).val('');
-                    $('.b-rate').val('').attr('disabled',false);
-                    $('.p-rate').val('').attr('disabled',true);
+                    $('.b-rate').val('').attr('disabled', false);
+                    $('.p-rate').val('').attr('disabled', true);
                 }
                 $('#billing-day').attr('disabled', this.value != 1).val('');
+                $('.f-share').attr('disabled', this.value != 0).val('');
             });
             $('.slim-scroll').slimScroll({
                 height: '130px'
@@ -419,12 +420,12 @@
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(data.buz_dev_share * 100);
                         $('#billing_amount').val(data.cycle_billing);
-                        $('#billing-day').val(data.billing_day);
-                        $('#submit-modal').attr('disabled', @if($admin) false @else data.status != 0  @endif );
+                        $('#billing-day').datepicker('setDate', new Date('2022-12-' + data.billing_day + ' 00:00'));
+                        $('#submit-modal').attr('disabled', @if($admin) false
+                        @else data.status != 0  @endif );
                         @if($admin)
                         $("input[name=status][value=" + data.status + "]").prop('checked', true);
-                        @endif
-
+                                @endif
                         var table = $('#members-table');
                         var tr = table.find('tr').first();
                         $.each(data.arrangements, function (i, o) {
@@ -439,8 +440,6 @@
                                 tr.find('.bootstrap-select').replaceWith(function () {
                                     return $('select', this);
                                 });
-                                tr.find('select').first().attr('disabled', false).selectpicker('val', '');
-                                tr.find('select').last().selectpicker('val', '');
                             }
                         });
                     },
@@ -496,9 +495,9 @@
                 tr.find('.bootstrap-select').replaceWith(function () {
                     return $('select', this);
                 });
-                tr.find('select').first().attr('disabled', false).selectpicker('val', '');
-                tr.find('select').last().selectpicker('val', '');
-
+                tr.find('.cid').attr('disabled', false).selectpicker('val', '');
+                tr.find('.pid').attr('disabled', false).selectpicker('val', '');
+                tr.find('input').val('');
             });
             $(document).on('click', '.deletable-row', function () {
                 var tr = $(this).parent().parent();
@@ -515,7 +514,7 @@
                             tr.fadeOut(300, function () {
                                 $(this).remove();
                             });
-                            toastr.success('Consultant been removed!');
+                            toastr.success('Consultant will be removed after updating!');
                         });
                 } else {
                     tr.fadeOut(300, function () {
@@ -560,25 +559,32 @@
         .arrangement-table {
             margin-top: -3.8%;
         }
+
         .engagement-table {
             margin-bottom: -1.2em;
         }
+
         .table td, .table th {
             text-align: center;
         }
+
         .deletable-row {
             color: red;
         }
+
         .panel-subtitle > strong {
             color: #27b2ff;
         }
+
         td > i {
             font-size: 0.7em;
             margin-right: 0.5em;
         }
+
         td > i.Pending {
             color: red;
         }
+
         td > i.Active {
             color: #19ff38;
         }
@@ -586,9 +592,11 @@
         td > i.Closed {
             color: Grey;
         }
-        .fancy-radio .label{
+
+        .fancy-radio .label {
             font-size: small;
         }
+
         #members-table tr td input[type='number'] {
             text-align: center;
         }
