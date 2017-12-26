@@ -23,12 +23,12 @@ class ExpenseSeeder extends Seeder
     {
         if (($handle = fopen(__DIR__ . '\data\Billing\billing.csv', "r")) !== FALSE) {
             $client_name = '';
-            $con_name = '';
+            $client_id = 0;
             $con_id = '';
             $eng_name = '';
             $position = '';
             $arr = null;
-            $bcHours = [];
+            $billHours = [];
             fgetcsv($handle, 0, ",");//move the cursor one step because of header
             while (($line = fgetcsv($handle, 0, ",")) !== FALSE) {
                 $skip = false;
@@ -48,12 +48,13 @@ class ExpenseSeeder extends Seeder
                 } else if ($line[2]) {
                     $position = $line[2];
                 } else if ($line[3]) {
-                    $con_name = $line[3];
+                    $con_id = $this->get_consultant_id($line[3]);
                     //check if is an un-enrolled arrangement
-                    $eng = Engagement::firstOrCreate(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name],
+                    $client_id = $this->get_client_id($client_name);
+                    $eng = Engagement::firstOrCreate(['client_id' => $client_id, 'name' => $eng_name],
                         ['leader_id' => $this->get_consultant_id('New Life'), 'start_date' => date("1989-06-30"), 'status' => 0]);
                     //fetch first or create
-                    $con_id = $this->get_consultant_id($con_name);
+
                     $arr = Arrangement::firstOrCreate(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)],
                         ['billing_rate' => 0, 'firm_share' => 1.0, 'pay_rate' => 0]);//temporarily assign firm_share to 0, updated by another file
                 } else if ($line[4]) {
@@ -61,6 +62,7 @@ class ExpenseSeeder extends Seeder
                         $exp = Expense::create([
                             'arrangement_id' => $arr->id,
                             'consultant_id' => $con_id,
+                            'client_id' => $client_id,
                             'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
                             'hotel' => $this->number($line[12]),
                             'flight' => $this->number($line[13]),
@@ -77,15 +79,17 @@ class ExpenseSeeder extends Seeder
                         }
                     } else {
                         //deal with payroll and billing not consistent problem
-                        array_push($bcHours, new Hour([
+                        array_push($billHours, new Hour([
                             'arrangement_id' => $arr->id,
                             'consultant_id' => $con_id,
+                            'client_id' => $client_id,
                             'task_id' => $this->get_task_id($line[5], $line[6]),
                             'report_date' => \Carbon\Carbon::parse($line[4])->toDateString('Y-m-d'),
                             'billable_hours' => $this->number($line[7]),
                             'non_billable_hours' => $this->number($line[8]),
                             'rate' => $this->number($line[9]),
                             'description' => $line[10],
+                            'rate_type' => 0,
                             'review_state' => 1
                         ]));
                     }
@@ -93,11 +97,11 @@ class ExpenseSeeder extends Seeder
             }
             $this->seedHours();
             //deal with payroll and billing not consistent problem
-            foreach ($bcHours as $hour) {
+            foreach ($billHours as $hour) {
                 if ($hour->billable_hours || $hour->non_billable_hours || $hour->description) {
-                    Hour::firstOrCreate(['arrangement_id' => $hour->arrangement_id, 'consultant_id' => $hour->consultant_id,
+                    Hour::firstOrCreate(['arrangement_id' => $hour->arrangement_id, 'consultant_id' => $hour->consultant_id, 'client_id' => $hour->client_id,
                         'task_id' => $hour->task_id, 'report_date' => $hour->report_date, 'billable_hours' => $hour->billable_hours],
-                        ['non_billable_hours' => $hour->non_billable_hours, 'review_state' => 1, 'share' => 1 - $hour->arrangement->firm_share, 'rate' => $hour->rate, 'description' => $hour->description]);
+                        ['non_billable_hours' => $hour->non_billable_hours, 'review_state' => 1, 'share' => 1 - $hour->arrangement->firm_share, 'rate' => $hour->rate, 'rate_type' => 0, 'description' => $hour->description]);
                 }
             }
 
@@ -109,6 +113,7 @@ class ExpenseSeeder extends Seeder
     {
         if (($handle = fopen(__DIR__ . '\data\payroll\payroll_hours.csv', "r")) !== FALSE) {
             $client_name = '';
+            $client_id = 0;
             $eng_name = '';
             $position = '';
             $con_name = '';
@@ -145,7 +150,8 @@ class ExpenseSeeder extends Seeder
                     if ($need_updated) {
                         //check if is an un-enrolled arrangement
                         $con_id = $this->get_consultant_id($con_name);
-                        $eng = Engagement::where(['client_id' => $this->get_client_id($client_name), 'name' => $eng_name])->first();
+                        $client_id = $this->get_client_id($client_name);
+                        $eng = Engagement::where(['client_id' => $client_id, 'name' => $eng_name])->first();
                         //fetch first or create
                         $arr = Arrangement::where(['engagement_id' => $eng->id, 'consultant_id' => $con_id, 'position_id' => $this->get_pos_id($position)])
                             ->first();
@@ -155,12 +161,14 @@ class ExpenseSeeder extends Seeder
                     Hour::Create([
                         'arrangement_id' => $arr->id,
                         'consultant_id' => $con_id,
+                        'client_id' => $client_id,
                         'task_id' => $this->get_task_id($tgroup, $taskDesc),
                         'report_date' => $report_date,
                         'billable_hours' => $this->number($line[7]),
                         'non_billable_hours' => $this->number($line[8]),
                         'rate' => $this->number($line[9]),
                         'share' => 1 - $this->number($line[11]) / 100,
+                        'rate_type' => 0,
                         'description' => $line[13],
                         'review_state' => 1
                     ]);

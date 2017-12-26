@@ -102,8 +102,9 @@ class HoursController extends Controller
                             $feedback['code'] = 2;
                             $feedback['message'] = 'You are not in this engagement';
                         } else {
-                            $hour = Hour::create(['arrangement_id' => $arr->id,'consultant_id'=>$arr->consultant_id,
-                                'rate'=>$eng->isHourlyBilling() ? $arr->billing_rate : $arr->pay_rate,'share'=>1 - $arr->firm_share,
+                            $hour = Hour::create(['arrangement_id' => $arr->id, 'consultant_id' => $arr->consultant_id,
+                                'rate' => $eng->isHourlyBilling() ? $arr->billing_rate : $arr->pay_rate, 'share' => 1 - $arr->firm_share,
+                                'rate_type' => $eng->isHourlyBilling() ? 0 : 1, 'client_id'=>$eng->client_id,
                                 'task_id' => $item['tid'], 'report_date' => $item['date'],
                                 'billable_hours' => $item['bh'], 'description' => isset($item['desc']) ? $item['desc'] : '']);
                             if ($hour) {
@@ -127,9 +128,10 @@ class HoursController extends Controller
                         $feedback['code'] = 2;
                         $feedback['message'] = 'You are not in this engagement';
                     } else {
-                        $hour = (new Hour(['arrangement_id' => $arr->id,'consultant_id'=>$arr->consultant_id]))
-                            ->fill($request->except(['eid', 'pid', 'review_state']));
+                        $hour = (new Hour(['arrangement_id' => $arr->id, 'consultant_id' => $arr->consultant_id]))->fill($request->except(['eid', 'pid', 'review_state']));
                         $hour->rate = $eng->isHourlyBilling() ? $arr->billing_rate : $arr->pay_rate;
+                        $hour->rate_type = $eng->isHourlyBilling() ? 0 : 1;
+                        $hour->client_id = $eng->client_id;
                         $hour->share = 1 - $arr->firm_share;
                         if ($hour->save()) {
                             $feedback['code'] = 7;
@@ -208,7 +210,7 @@ class HoursController extends Controller
         if ($request->ajax()) {
             $hour = Hour::find($id);
             if ($user->can('update', $hour)) {
-                if ($hour->update($user->isSupervisor() ? $request->all() : $request->except(['review_state','rate','share','consultant_id']))) {
+                if ($hour->update($user->isSupervisor() ? $request->all() : $request->except(['review_state', 'rate','rate_type', 'share', 'consultant_id','client_id']))) {
                     $feedback['code'] = 7;
                     $feedback['message'] = 'Record Update Success';
                     $feedback['record'] = ['ename' => str_limit($hour->arrangement->engagement->name, 19),

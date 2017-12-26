@@ -17,6 +17,7 @@ class CreateExpensesTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('arrangement_id');
             $table->unsignedInteger('consultant_id');
+            $table->unsignedInteger('client_id');
             $table->date('report_date');
             $table->boolean('company_paid')->default(false)
             ->comment('whether the expense had already paid by New Life CFO');
