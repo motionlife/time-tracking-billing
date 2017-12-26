@@ -28,4 +28,28 @@ class Expense extends Report
             $data['last2_expense'] += $this->total();
         }
     }
+
+    public static function filter($consultant = null, $start = null, $end = null, $review_state = null)
+    {
+        return (isset($consultant) ? $consultant->expenses()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']) :
+            self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']))
+            ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 7)->get();
+    }
+
+    public static function monthlyExpenses($consultant = null, $start = null, $end = null, $review_state = null)
+    {
+        return self::filter($consultant, $start, $end, $review_state)
+            ->mapToGroups(function ($exp) {
+                return [Carbon::parse($exp->report_date)->format('y-M') => $exp->total()];
+            })->transform(function ($month) {
+                return $month->sum();
+            });
+    }
+
+    public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null)
+    {
+        return self::filter($consultant, $start, $end, $review_state)->sum(function ($exp) {
+            return $exp->total();
+        });
+    }
 }

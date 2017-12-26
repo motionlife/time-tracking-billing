@@ -116,7 +116,6 @@ class EngagementController extends Controller
      */
     public function show($id)
     {
-        //todo : leader should be the first in the arrangement table
     }
 
     /**

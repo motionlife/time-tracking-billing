@@ -46,11 +46,14 @@ class Engagement extends Model
         return $this->belongsTo(Consultant::class, 'leader_id');
     }
 
-    //indicate Client Billed Type: Hourly; Monthly Retainer; Fixed Fee Project;
-    public function clientBilledType($cycle = null)
+    public function isHourlyBilling()
     {
-        if (!isset($cycle)) $cycle = $this->paying_cycle;
-        switch ($cycle) {
+        return $this->paying_cycle==0;
+    }
+    //indicate Client Billed Type: Hourly; Monthly Retainer; Fixed Fee Project;
+    public function clientBilledType()
+    {
+        switch ($this->paying_cycle) {
             case 0:
                 return 'Hourly';
             case 1:

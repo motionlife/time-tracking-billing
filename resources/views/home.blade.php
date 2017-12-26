@@ -6,8 +6,9 @@
             <div class="panel panel-headline">
                 <div class="panel-heading">
                     <h3 class="panel-title">Semi-monthly Overview</h3>
-                    <p class="panel-subtitle">Period: {{$data['dates']['startOfLast']->toFormattedDateString('M d, Y')}}
-                        - {{$data['dates']['endOfLast']->toFormattedDateString('M d, Y')}}</p>
+                    <p class="panel-subtitle"><a href="/hour?start={{$data['dates']['startOfLast']->toDateString()}}&end={{$data['dates']['endOfLast']->toDateString()}}">
+                            Period: {{$data['dates']['startOfLast']->toFormattedDateString('M d, Y')}}
+                        - {{$data['dates']['endOfLast']->toFormattedDateString('M d, Y')}}</a></p>
                 </div>
                 <div class="panel-body">
                     <div class="row">

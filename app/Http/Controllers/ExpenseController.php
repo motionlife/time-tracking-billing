@@ -149,7 +149,6 @@ class ExpenseController extends Controller
             if ($user->can('update', $expense)) {
                 $excepted = $user->isSupervisor() && $request->get('review_state') != 'undefined' ? ['eid', 'receipts'] : ['eid', 'receipts', 'review_state'];
                 if ($expense->update($request->except($excepted))) {
-                    //todo: Receipts should be handling in another method-------------------!!!!!!
                     if ($this->saveReceipts($request, $expense->id)) {
                         $feedback['code'] = 7;
                         $feedback['message'] = 'Record Update Success';
