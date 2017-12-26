@@ -232,7 +232,7 @@
                                                    data-id="{{$engagement->id}}"><i
                                                             class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                 <span>&nbsp;|&nbsp;</span>
-                                                <a href="javascript:void(0)" class="eng-delete"
+                                                <a href="javascript:void(0)" class="eng-delete" data-del="{{!$engagement->isPending()&&$manage?'0':'1'}}"
                                                    data-id="{{$engagement->id}}"><i
                                                             class="fa fa-trash-o" aria-hidden="true"></i></a>
                                             </div>
@@ -380,6 +380,10 @@
                 $('#engagementModal').modal('toggle');
             });
             $('.eng-delete').on('click', function () {
+                if($(this).data('del')==0){
+                    toastr.warning('Can\'t delete non-pending engagement here.');
+                    return;
+                }
                 var id = $(this).attr('data-id');
                 var anchor = $(this);
                 swal({
