@@ -18,20 +18,6 @@ class Expense extends Report
             + $this->car_rental + $this->mileage_cost + $this->other;
     }
 
-    /**
-     * @deprecated
-     */
-    public function summary(array &$data)
-    {
-        $day = new Carbon($this->report_date);
-        //$key = $day->toDateString();//used if need return the expense of each single date
-        if ($day->between($data['dates']['startOfLast'], $data['dates']['endOfLast'])) {
-            $data['expense'] += $this->total();
-        } else if ($day->between($data['dates']['startOfLast2'], $data['dates']['endOfLast2'])) {
-            $data['last2_expense'] += $this->total();
-        }
-    }
-
     public static function filter($consultant = null, $start = null, $end = null, $review_state = null)
     {
         return (isset($consultant) ? $consultant->expenses()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']) :

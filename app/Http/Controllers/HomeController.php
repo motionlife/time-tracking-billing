@@ -34,11 +34,10 @@ class HomeController extends Controller
         $consultant = Auth::user()->consultant;
 
         $lastSum = Hour::dailyHoursAndIncome($consultant, $data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
-        foreach ($lastSum as $day => $amounts)
-        {
+        foreach ($lastSum as $day => $amounts) {
             $data['total_last_nb'] += $amounts[1];
-            foreach ($amounts[3] as $aid){
-                if (isset($data['eids'][$aid])){
+            foreach ($amounts[3] as $aid) {
+                if (isset($data['eids'][$aid])) {
                     $data['eids'][$aid]++;
                 } else {
                     $data['eids'][$aid] = 1;
@@ -52,63 +51,31 @@ class HomeController extends Controller
                 $data['last_earn'][$day] = $amounts[2];
             }
         }
-        $last2Total = Hour::stat($consultant,$data['dates']['startOfLast2'], $data['dates']['endOfLast2'],1);
+        $last2Total = Hour::stat($consultant, $data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
         $data['total_last2_earn'] = $last2Total['total_income'];
-        $data['last_expense'] += Expense::reportedExpenses($consultant,$data['dates']['startOfLast'], $data['dates']['endOfLast'],1);
-        $data['last2_expense'] += Expense::reportedExpenses($consultant,$data['dates']['startOfLast2'], $data['dates']['endOfLast2'],1);
+        $data['last_expense'] += Expense::reportedExpenses($consultant, $data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
+        $data['last2_expense'] += Expense::reportedExpenses($consultant, $data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
 
-        foreach (Hour::monthlyHoursAndIncome($consultant,Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(),1)
+        foreach (Hour::monthlyHoursAndIncome($consultant, Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), 1)
                  as $mon => $amounts) {
             $data['dates']['mon'][$mon][0] += $amounts[0];
             $data['dates']['mon'][$mon][1] += $amounts[1];
-        };
-        foreach (Expense::monthlyExpenses($consultant,Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(),1)
+        }
+        foreach (Expense::monthlyExpenses($consultant, Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), 1)
                  as $mon => $amount) {
             $data['dates']['mon'][$mon][1] += $amount;
         }
 
-
-//        foreach ($consultant->arrangements as $arr) {
-//            //todo: to deal with the case where it's engagement hab been deleted, Alter Arrangement table add status column
-//            if (!$arr->engagement) continue;
-//            foreach ($arr->dailyHoursAndIncome($data['dates']['startOfLast'], $data['dates']['endOfLast'], $arr->engagement->id) as $day => $amounts) {
-//                $data['total_last_nb'] += $amounts[1];
-//                if (isset($data['eids'][$amounts[3]])) $data['eids'][$amounts[3]]++; else $data['eids'][$amounts[3]] = 1;
-//                if (isset($data['last_b'][$day])) {
-//                    $data['last_b'][$day] += $amounts[0];
-//                    $data['last_earn'][$day] += $amounts[2];
-//                } else {
-//                    $data['last_b'][$day] = $amounts[0];
-//                    $data['last_earn'][$day] = $amounts[2];
-//                }
-//            }
-//
-//            $data['total_last2_earn'] += $arr->hoursIncomeForConsultant($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
-//            $data['last_expense'] += $arr->reportedExpenses($data['dates']['startOfLast'], $data['dates']['endOfLast']);
-//            $data['last2_expense'] += $arr->reportedExpenses($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
-//
-//            foreach ($arr->monthlyHoursAndIncome(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay())
-//                     as $mon => $amounts) {
-//                $data['dates']['mon'][$mon][0] += $amounts[0];
-//                $data['dates']['mon'][$mon][1] += $amounts[1];
-//            };
-//
-//            foreach ($arr->monthlyExpenses(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay())
-//                     as $mon => $amount) {
-//                $data['dates']['mon'][$mon][1] += $amount;
-//            }
-//        }
-
         foreach ($consultant->dev_clients()->withTrashed()->get() as $dev_client) {
             foreach ($dev_client->engagements()->withTrashed()->get() as $engagement) {
                 if ($engagement->buz_dev_share == 0) continue;
-                $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast']);
-                $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2']);
+                $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast'],1);
+                $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2'],1);
                 foreach ($engagement->arrangements()->withTrashed()->get() as $arr) {
                     foreach ($arr->monthlyHoursAndIncome(Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay())
                              as $mon => $amounts) {
                         $data['dates']['mon'][$mon][1] += $amounts[1] * $engagement->buz_dev_share;
-                    };
+                    }
                 }
             }
         }

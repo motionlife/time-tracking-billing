@@ -77,7 +77,6 @@ class Arrangement extends Model
 
     public function dailyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19', $state = null)
     {
-        //$net_rate = (1 - $this->firm_share) * $this->billing_rate;
         $eid = $this->engagement->id;
         return (isset($state) ? $this->hours()->where('review_state', $state) : $this->hours())
             ->whereBetween('report_date', [$start, $end])->get()
@@ -89,27 +88,9 @@ class Arrangement extends Model
             });
     }
 
-    private function reportedHours($start = null, $end = null, $billable = true, $state = null, &$hrs = null)
-    {
-        $query = (isset($state) ? $this->hours()->where('review_state', $state) : $this->hours())
-            ->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']);
-        $sum = $query->sum($billable ? 'billable_hours' : 'non_billable_hours');
-        if (isset($hrs)) {
-            if ($billable) {
-                $hrs[0] += $sum;
-                $hrs[1] += $query->sum('non_billable_hours');
-            } else {
-                $hrs[0] += $query->sum('billable_hours');
-                $hrs[1] += $sum;
-            }
-        }
-        return $sum;
-    }
-
     public function monthlyHoursAndIncome($start = '1970-01-01', $end = '2038-01-19', $th = true)
     {
-        //$net_rate = (1 - $this->firm_share) * $this->billing_rate;
-        return $this->hours()->whereBetween('report_date', [$start, $end])->get()
+        return $this->hours()->whereBetween('report_date', [$start, $end])->where('review_state',1)->get()
             ->mapToGroups(function ($hour) use ($th) {
                 return [Carbon::parse($hour->report_date)->format('y-M') =>
                     [$th ? $hour->billable_hours + $hour->non_billable_hours : $hour->billable_hours, $hour->earned()]];
@@ -118,14 +99,20 @@ class Arrangement extends Model
             });
     }
 
-    public function hoursBillToClient($start = null, $end = null, $state = null, &$hrs = null)
+    public function hoursIncomeForConsultant($start = null, $end = null, $review_state = null, &$hrs = null)
     {
-        return $this->billing_rate ? $this->reportedHours($start ?: '1970-01-01', $end ?: '2038-01-19', true, $state, $hrs) * $this->billing_rate : 0;
+        $total = 0;
+        $hours = $this->hours()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+            ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 7)->get();
+        foreach ($hours as $hour) {
+            $total += $hour->earned();
+            if (isset($hrs)) {
+                $hrs[0] += $hour->billable_hours;
+                $hrs[1] += $hour->non_billable_hours;
+            }
+        }
+        return $total;
     }
 
-    public function hoursIncomeForConsultant($start = null, $end = null, $state = null, &$hrs = null)
-    {
-        return $this->hoursBillToClient($start ?: '1970-01-01', $end ?: '2038-01-19', $state, $hrs) * (1 - $this->firm_share);
-    }
 
 }
