@@ -68,6 +68,14 @@ class Engagement extends Model
         return 'Unknown';
     }
 
+    public function hasReported()
+    {
+        foreach ($this->arrangements()->withTrashed()->get() as $arrangement) {
+            if ($arrangement->hours()->count() > 0) return true;
+        }
+        return false;
+    }
+
     public function isPending()
     {
         return $this->state() == 'Pending';
@@ -108,19 +116,9 @@ class Engagement extends Model
     {
         //For monthly labor billing, detail not implemented yet...
         //todo: dealing with different client-billing type should be scrutinized when do the billing
-        if ($this->paying_cycle != 0) {
-            $start = Carbon::parse($start ?: $this->start_date);
-            $end = $end ? Carbon::parse($end) : Carbon::now();
-            $days = $start->diffInDays($end);
-            if ($this->paying_cycle == 1) {
-                return $this->cycle_billing / 30 * $days;
-            } else if ($this->paying_cycle == 2 && $this->isClosed()) {
-                return $this->cycle_billing;
-            } else {
-                return 0;
-            }
-        } else {
+        if ($this->paying_cycle == 0) {
             $total = 0;
+            //in case some consultant was removed from the engagement
             foreach ($this->arrangements()->withTrashed()->get() as $arr) {
                 $hours = $arr->hours()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
                     ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 7)->get();
@@ -129,7 +127,33 @@ class Engagement extends Model
                 }
             }
             return $total;
+        } else if ($this->paying_cycle == 1 && $this->hasReported()) {
+            $start_day = Carbon::parse($this->start_date);
+            $start = Carbon::parse($start);
+            $end = Carbon::parse($end);
+            $start = $start_day->diffInDays($start, false) > 0 ? $start : $start_day;
+            $days = $start->startOfDay()->diffInDays($end->startOfDay(), false);
+            $billedMonths = 0;
+            if ($days >= 0) {
+                $bd = ($this->billing_day > 28 && $start->month == 2) ?
+                    $start->copy()->endOfMonth()->startOfDay() : $start->copy()->day($this->billing_day);
+                if ($bd->between($start, $end)) $billedMonths++;
+                while ($this->incBd($bd)->between($start, $end)) {
+                    $billedMonths++;
+                };
+            }
+            return $billedMonths * $this->cycle_billing;
+        } else if ($this->paying_cycle == 2) {
+            //fixed fee
+            if ($this->isClosed() && $this->hasReported())
+                return $this->cycle_billing;
         }
+        return 0;
+    }
+
+    private function incBd(Carbon $billingDate)
+    {
+        return ($billingDate->day > 28 && $billingDate->month == 1) ? $billingDate->addDays(10)->endOfMonth()->startOfDay() : $billingDate->addMonth()->day($this->billing_day);
     }
 
     public function clientExpenseBills($start = '1970-01-01', $end = null, $state = null)
