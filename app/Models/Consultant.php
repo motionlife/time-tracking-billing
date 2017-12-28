@@ -79,7 +79,8 @@ class Consultant extends Model
     public function getMyArrInfoByEid($eid)
     {
         return $this->arrangements()->where('engagement_id', $eid)->get()->map(function ($arr) {
-            return ['position' => $arr->position, 'br' => $arr->billing_rate, 'fs' => $arr->firm_share];
+            $eng = $arr->engagement;
+            return ['position' => $arr->position, 'br' => $eng->paying_cycle == 0 ? $arr->billing_rate : $arr->pay_rate, 'fs' => $eng->paying_cycle == 0 ? $arr->firm_share : 0];
         });
     }
 

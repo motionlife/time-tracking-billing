@@ -177,11 +177,11 @@
                             @php
                                 $arr = $expense->arrangement;
                                 $eng = $arr->engagement;
-                                $cname =$arr->consultant->fullname();
+                                $cname =$expense->consultant->fullname();
                             @endphp
                             <tr data-del="{{$admin||$expense->isPending()?1:0}}">
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td>{{str_limit($eng->client->name,22)}}</td>
+                                <td>{{str_limit($expense->client->name,22)}}</td>
                                 <td>
                                     <a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a>
                                 </td>

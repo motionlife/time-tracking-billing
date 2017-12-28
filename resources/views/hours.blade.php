@@ -65,11 +65,11 @@
                             @php
                                 $arr = $hour->arrangement;
                                 $eng = $arr->engagement;
-                                $cname =$arr->consultant->fullname();
+                                $cname =$hour->consultant->fullname();
                             @endphp
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
-                                <td>{{str_limit($eng->client->name,19)}}</td>
+                                <td>{{str_limit($hour->client->name,19)}}</td>
                                 <td><a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a></td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td>{{number_format($hour->billable_hours,1)}}</td>
@@ -126,7 +126,7 @@
                 $.get({
                     url: '/hour/' + hid + '/edit',
                     success: function (data) {
-                        $('#income-estimate').attr({"data-br": data.billing_rate, "data-fs": data.firm_share});
+                        $('#income-estimate').attr({"data-br": data.rate, "data-fs": data.share});
                         $('#client-engagement').attr('disabled', true)
                             .empty().append('<option selected>' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
