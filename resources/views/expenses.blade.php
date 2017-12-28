@@ -34,7 +34,10 @@
                                                placeholder="mm/dd/yyyy"
                                                name="report_date" type="text" required/>
                                         <span class="input-group-addon"><i class="fa fa-calendar-check-o"
-                                                                           aria-hidden="true"></i>&nbsp;Company Paid<a href="javascript:void(0)" title="Expense already paid by New Lif CFO?"><i class="fa fa-info-circle" aria-hidden="true"></i></a>:</span>
+                                                                           aria-hidden="true"></i>&nbsp;Company Paid<a
+                                                    href="javascript:void(0)"
+                                                    title="Expense already paid by New Lif CFO?"><i
+                                                        class="fa fa-info-circle" aria-hidden="true"></i></a>:</span>
                                         <select class="selectpicker" id="input-company-paid" name="company_paid"
                                                 data-width="auto">
                                             <option value="1">Yes</option>
@@ -70,7 +73,9 @@
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
                                                step="0.01" min="0">
-                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost<a href="javascript:void(0)" title="number of mileage * $0.54"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost<a
+                                                    href="javascript:void(0)" title="number of mileage * $0.54"><i
+                                                        class="fa fa-info-circle" aria-hidden="true"></i></a>
                                             :$</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
                                                name="mileage_cost"
@@ -174,10 +179,12 @@
                                 $eng = $arr->engagement;
                                 $cname =$arr->consultant->fullname();
                             @endphp
-                            <tr>
+                            <tr data-del="{{$admin||$expense->isPending()?1:0}}">
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($eng->client->name,22)}}</td>
-                                <td><a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a></td>
+                                <td>
+                                    <a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a>
+                                </td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
                                 <td>{{$expense->report_date}}</td>
                                 <td>${{number_format($expense->total(),2)}}</td>
@@ -200,8 +207,13 @@
                                         {{str_limit($expense->description,37)}}
                                     @endif
                                 </td>
-                                <td><span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span></td>
-                                <td><a href=" javascript:editExpense({{$expense->id}})"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense({{$expense->id}})"><i class="fa fa-times"></i></a></td>
+                                <td>
+                                    <span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span>
+                                </td>
+                                <td><a href=" javascript:editExpense({{$expense->id}})"><i
+                                                class="fa fa-pencil-square-o"></i></a><a
+                                            href="javascript:deleteExpense({{$expense->id}})"><i
+                                                class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -273,7 +285,8 @@
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
                                 tr.find('td:nth-child(6) strong').html('$' + feedback.record.total);
                                 tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
-                                @if(!$admin)tr.find('td:nth-child(8)').html(feedback.record.description);
+                                @if(!$admin)
+                                tr.find('td:nth-child(8)').html(feedback.record.description);
                                 @endif
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                                 tr.addClass('update-highlight');
@@ -282,7 +295,7 @@
                                 }, 2100);
                             } else {
                                 toastr.success('Success! Expense has been created!');
-                                $('<tr><th scope="row">*</th><td>' + feedback.data.cname + '</td><td>' + feedback.data.ename + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
+                                $('<tr data-del="1"><th scope="row">*</th><td>' + feedback.data.cname + '</td><td>' + feedback.data.ename + '</td><td>' + feedback.data.company_paid + '</td><td>' + feedback.data.report_date + '</td><td><strong>$' + feedback.data.total + '</strong></td><td>' + outputLink(feedback.data.receipts) + '</td><td>' + feedback.data.description + '</td><td><span class="label label-' + feedback.data.status[1] + '">' + feedback.data.status[0] + '</span></td><td><a href="javascript:editExpense(' + feedback.data.expid + ')"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:deleteExpense(' + feedback.data.expid + ')"><i class="fa fa-times"></i></a></td></tr>')
                                     .prependTo('#main-table').hide().fadeIn(1500);
                             }
                         } else {
@@ -327,6 +340,7 @@
                     $('#report-update').attr('disabled', data.review_state !== "0");
                     $('#consultant-name').text(data.cname);
                     @if($admin)
+                    $('#report-update').attr('disabled', false);
                     $("input[name=review_state][value=" + data.review_state + "]").prop('checked', true);
                     if (data.review_state === "0") $("input[name=review_state]").prop('checked', false);
                     $('#expense-feedback').val(data.feedback);
@@ -343,34 +357,39 @@
         }
 
         function deleteExpense(id) {
-            swal({
-                    title: "Are you sure?",
-                    text: "You will not be able to recover this record after delete it!",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#DD6B55",
-                    confirmButtonText: "Yes, delete it!"
-                },
-                function () {
-                    $.post({
-                        url: "/expense/" + id,
-                        data: {_token: "{{csrf_token()}}", _method: 'delete'},
-                        success: function (data) {
-                            if (data.message == 'succeed') {
-                                $('a[href*="deleteExpense(' + id + ')"]').parent().parent().fadeOut(777, function () {
-                                    $(this).remove();
-                                });
-                                toastr.success('Success! Report has been deleted!');
-                            } else {
-                                toastr.warning('Failed! Fail to delete the record!' + data.message);
-                            }
-                        },
-                        error: function (data) {
-                            toastr.warning('Failed! Fail to delete the record!' + data);
-                        },
-                        dataType: 'json'
+            var tr = $('a[href*="deleteExpense(' + id + ')"]').parent().parent();
+            if (tr.data('del') == 1) {
+                swal({
+                        title: "Are you sure?",
+                        text: "You will not be able to recover this record after delete it!",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, delete it!"
+                    },
+                    function () {
+                        $.post({
+                            url: "/expense/" + id,
+                            data: {_token: "{{csrf_token()}}", _method: 'delete'},
+                            success: function (data) {
+                                if (data.message == 'succeed') {
+                                    tr.fadeOut(777, function () {
+                                        $(this).remove();
+                                    });
+                                    toastr.success('Success! Report has been deleted!');
+                                } else {
+                                    toastr.warning('Failed! Fail to delete the record!' + data.message);
+                                }
+                            },
+                            error: function (data) {
+                                toastr.warning('Failed! Fail to delete the record!' + data);
+                            },
+                            dataType: 'json'
+                        });
                     });
-                });
+            } else {
+                toastr.warning('Non-pending report can only be deleted by admin');
+            }
 
         }
 
@@ -402,7 +421,8 @@
             color: red;
             margin-left: 1.5em;
         }
-        .panel tr td:nth-child(6){
+
+        .panel tr td:nth-child(6) {
             font-weight: bold;
         }
     </style>

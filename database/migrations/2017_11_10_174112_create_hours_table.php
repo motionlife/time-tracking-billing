@@ -26,6 +26,7 @@ class CreateHoursTable extends Migration
             $table->unsignedTinyInteger('rate_type')->default(0);
             $table->double('share')->comment('the reporter\'s share of the generated value,share=1 when rate is pay_rate');
             $table->text('description')->nullable();
+            $table->string('feedback')->nullable();
             $table->unsignedTinyInteger('review_state')->default(0)
                 ->comment('0=>not-reviewed,1=>review_approved,2=>review_changed,3=>concurred');
             $table->timestamps();

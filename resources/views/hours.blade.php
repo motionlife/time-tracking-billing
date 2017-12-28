@@ -82,7 +82,7 @@
                                     @endif
                                 </td>
                                 <td><span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span></td>
-                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"><i class="fa fa-times"></i></a></td>
+                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)" data-del="{{$admin||$hour->isPending()?1:0}}"><i class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -139,6 +139,7 @@
                         $('#report-update').attr('disabled', data.review_state !== "0");
                         $('#consultant-name').text(data.cname);
                         @if($admin)
+                        $('#report-update').attr('disabled', false);
                         $("input[name=endorse-or-not][value=" + data.review_state + "]").prop('checked', true);
                         if (data.review_state === "0") $("input[name=endorse-or-not]").prop('checked', false);
                         $('#hour-feedback').val(data.feedback);
@@ -153,32 +154,36 @@
                 $('#hourModal').modal('toggle');
             });
             $('tr td:last-child a:nth-child(2)').on('click', function () {
-                var td = $(this).parent();
-                swal({
-                        title: "Are you sure?",
-                        text: "You will not be able to recover this record after delete it!",
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#DD6B55",
-                        confirmButtonText: "Yes, delete it!"
-                    },
-                    function () {
-                        $.post({
-                            url: "/hour/" + td.attr('data-id'),
-                            data: {_token: "{{csrf_token()}}", _method: 'delete'},
-                            success: function (data) {
-                                if (data.message == 'succeed') {
-                                    td.parent().fadeOut(1000, function () {
-                                        $(this).remove();
-                                    });
-                                    toastr.success('Success! Report has been deleted!');
-                                } else {
-                                    toastr.warning('Failed! Fail to delete the record!' + data.message);
-                                }
-                            },
-                            dataType: 'json'
+                if($(this).data('del')=='1'){
+                    var td = $(this).parent();
+                    swal({
+                            title: "Are you sure?",
+                            text: "You will not be able to recover this record after delete it!",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, delete it!"
+                        },
+                        function () {
+                            $.post({
+                                url: "/hour/" + td.attr('data-id'),
+                                data: {_token: "{{csrf_token()}}", _method: 'delete'},
+                                success: function (data) {
+                                    if (data.message == 'succeed') {
+                                        td.parent().fadeOut(1000, function () {
+                                            $(this).remove();
+                                        });
+                                        toastr.success('Success! Report has been deleted!');
+                                    } else {
+                                        toastr.warning('Failed! Fail to delete the record!' + data.message);
+                                    }
+                                },
+                                dataType: 'json'
+                            });
                         });
-                    });
+                }else{
+                    toastr.warning('Non-pending report can only be deleted by admin')
+                }
             });
 
             $('#hour-form').on('submit', function (e) {

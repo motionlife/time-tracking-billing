@@ -73,7 +73,7 @@ class ExpenseController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $exp = (new Expense(['arrangement_id' => $arr->id]))->fill($request->except(['eid', 'receipts', 'review_state']));
+                    $exp = (new Expense(['arrangement_id' => $arr->id,'consultant_id'=>$arr->consultant_id,'client_id'=>$eng->client_id]))->fill($request->except(['eid', 'receipts', 'review_state']));
                     if ($exp->save()) {
                         if ($this->saveReceipts($request, $exp->id)) {
                             $feedback['code'] = 7;
