@@ -18,12 +18,6 @@ class Expense extends Report
             + $this->car_rental + $this->mileage_cost + $this->other;
     }
 
-    public static function filter($consultant = null, $start = null, $end = null, $review_state = null)
-    {
-        return (isset($consultant) ? $consultant->expenses()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']) :
-            self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']))
-            ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 7)->get();
-    }
 
     public static function monthlyExpenses($consultant = null, $start = null, $end = null, $review_state = null)
     {
@@ -35,9 +29,9 @@ class Expense extends Report
             });
     }
 
-    public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null)
+    public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null,$client=null)
     {
-        return self::filter($consultant, $start, $end, $review_state)->sum(function ($exp) {
+        return self::filter($consultant, $start, $end, $review_state,$client)->sum(function ($exp) {
             return $exp->total();
         });
     }

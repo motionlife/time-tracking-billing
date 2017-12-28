@@ -30,16 +30,20 @@ class PayrollController extends Controller
         if ($consultant) {
             $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $state);
             $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $state);
-            $hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
-            $expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
-            $income = $this->getIncome($consultant, $start, $end, $eid, $state);
+            $pg_hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
+            $pg_expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
+            $income = [$hourReports->sum(function ($hour) {
+                return $hour->earned();
+            }), $expenseReports->sum(function ($exp) {
+                return $exp->total();
+            })];
             $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
 
             if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
                 'filename' => $this->filename($consultant, $start, $end, $state, $eid)]);
 
             return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
-                    'hours' => $hours, 'expenses' => $expenses,
+                    'hours' => $pg_hours, 'expenses' => $pg_expenses,
                     'income' => $income,
                     'buz_devs' => $buz_devs,
                     'admin' => $isAdmin,
@@ -57,7 +61,7 @@ class PayrollController extends Controller
                 $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
                 $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
             }
-            $sum =  $this->sumIncome($incomes,$buz_dev_incomes);
+            $sum = $this->sumIncome($incomes, $buz_dev_incomes);
             if ($request->session()->has('data') && $file == 'excel') {
                 $data = $request->session()->get('data');
                 return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
@@ -67,54 +71,55 @@ class PayrollController extends Controller
                     'incomes' => $incomes,
                     'buzIncomes' => $buz_dev_incomes,
                     'hrs' => $hourNumbers,
-                    'income'=>[$sum[0],$sum[1]],
-                    'buz_devs'=>['total'=>$sum[2]]];
+                    'income' => [$sum[0], $sum[1]],
+                    'buz_devs' => ['total' => $sum[2]]];
                 $request->session()->put('data', $data);
                 return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
             }
         }
     }
 
-    private function sumIncome($incomes,$buz_dev_incomes)
+    private function sumIncome($incomes, $buz_dev_incomes)
     {
         $sum_bh = 0;
         $sum_ex = 0;
         $sum_dev = 0;
-        foreach ($incomes as $income)
-        {
-            $sum_bh+=$income[0];
-            $sum_ex+=$income[1];
+        foreach ($incomes as $income) {
+            $sum_bh += $income[0];
+            $sum_ex += $income[1];
         }
-        foreach ($buz_dev_incomes as $dev)
-        {
-            $sum_dev+= $dev;
+        foreach ($buz_dev_incomes as $dev) {
+            $sum_dev += $dev;
         }
-        return[$sum_bh,$sum_ex,$sum_dev];
+        return [$sum_bh, $sum_ex, $sum_dev];
     }
+
     private function getIncome(Consultant $consultant, $start, $end, $eid, $state, &$hrs = null)
     {
-        $total_bh = 0;
-        $total_ex = 0;
-        foreach ($consultant->arrangements as $arr) {
-            if (!$eid[0] || in_array($arr->engagement_id, $eid)) {
-                $total_bh += $arr->hoursIncomeForConsultant($start, $end, $state, $hrs);
-                $total_ex += $arr->reportedExpenses($start, $end, $state);
-            }
-        }
-        return [$total_bh, $total_ex];
+        $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $state);
+        $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $state);
+        $sumHours = $hourReports->reduce(function ($carry, $hour) {
+            return [$carry[0] + $hour->billable_hours, $carry[1] + $hour->non_billable_hours, $carry[2] + $hour->earned()];
+        });
+        $hrs[0] = $sumHours[0];
+        $hrs[1] = $sumHours[1];
+        return [$sumHours[2], $expenseReports->sum(function ($exp) {
+            return $exp->total();
+        })];
     }
 
     private function getBuzDev(Consultant $consultant, $start, $end, $eid, $state)
     {
         $total = 0;
         $engs = [];
-        foreach ($consultant->dev_clients as $dev_client) {
-            foreach ($dev_client->engagements as $engagement) {
+        foreach ($consultant->dev_clients()->withTrashed()->get() as $dev_client) {
+            foreach ($dev_client->engagements()->withTrashed()->get() as $engagement) {
                 if (!$eid[0] || in_array($engagement->id, $eid)) {
+                    if ($engagement->buz_dev_share == 0) continue;
                     $devs = $engagement->incomeForBuzDev($start, $end, $state);
                     if ($devs) {
                         $tbh = 0;
-                        foreach ($engagement->arrangements as $arrangement) {
+                        foreach ($engagement->arrangements()->withTrashed()->get() as $arrangement) {
                             foreach ($arrangement->hours as $hour) {
                                 $tbh += $hour->billable_hours;
                             }
@@ -151,8 +156,8 @@ class PayrollController extends Controller
                     $salary = $data['incomes'][$conid];
                     array_push($content, [$consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)]);
                 }
-                array_push($content,[]);
-                array_push($content,['Hourly Total',$data['income'][0],'Expense Total',$data['income'][1],'Buz Dev Total',$data['buz_devs']['total']]);
+                array_push($content, []);
+                array_push($content, ['Hourly Total', $data['income'][0], 'Expense Total', $data['income'][1], 'Buz Dev Total', $data['buz_devs']['total']]);
                 $sheet->fromArray($content, null, "A2", true, false);
             });
         })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
@@ -163,19 +168,18 @@ class PayrollController extends Controller
 
             $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
                 $sheet->freezeFirstRow()
-                    ->row(1, ['Client', 'Engagement', 'Report Date', 'Billable Hours', 'Non-billable Hours', 'Income($)', 'Description', 'Status'])
+                    ->row(1, ['Client', 'Engagement', 'Report Date', 'Billable Hours', 'Non-billable Hours', 'Rate($)', 'Rate Type', 'Share', 'Income($)', 'Description', 'Status'])
                     ->setAllBorders('thin')
-                    ->cells('A1:H1', function ($cells) {
+                    ->cells('A1:K1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');
                     });
                 $content = [];
                 foreach ($data['hours'] as $i => $hour) {
-                    $arr = $hour->arrangement;
-                    $eng = $arr->engagement;
-                    array_push($content, [$eng->client->name, $eng->name, $hour->report_date, $hour->billable_hours, $hour->non_billable_hours,
-                        number_format($hour->billable_hours * $arr->billing_rate * (1 - $arr->firm_share), 2), $hour->description, $hour->getStatus()[0]]);
+                    $eng = $hour->arrangement->engagement;
+                    array_push($content, [$hour->client->name, $eng->name, $hour->report_date, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
+                        number_format($hour->share * 100, 1) . '%', number_format($hour->earned(), 2), $hour->description, $hour->getStatus()[0]]);
                 }
                 $sheet->fromArray($content, null, "A2", true, false);
             });
@@ -192,10 +196,9 @@ class PayrollController extends Controller
                     });
                 $content = [];
                 foreach ($data['expenses'] as $i => $expense) {
-                    $arr = $expense->arrangement;
-                    $eng = $arr->engagement;
+                    $eng = $expense->arrangement->engagement;
                     array_push($content, [
-                        $eng->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
+                        $expense->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
                         number_format($expense->total(), 2), $expense->description, $expense->getStatus()[0]
                     ]);
                 }
@@ -206,7 +209,7 @@ class PayrollController extends Controller
                 $sheet->freezeFirstRow()
                     ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Total Billable Hours', 'Earned'])
                     ->setAllBorders('thin')
-                    ->cells('A1:E1', function ($cells) {
+                    ->cells('A1:F1', function ($cells) {
                         $cells->setBackground('#3bd3f9');
                         $cells->setFontFamily('Calibri');
                         $cells->setFontWeight('bold');

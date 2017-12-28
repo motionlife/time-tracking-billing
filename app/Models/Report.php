@@ -37,18 +37,25 @@ class Report extends Model
         });
     }
 
-    public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null)
+    public static function filter($consultant = null, $start = null, $end = null, $review_state = null, $client = null)
     {
-        $arrangements = isset($consultant) ? $consultant->arrangements() : Arrangement::all();
-        //todo: consider inconsistent problem caused by deleted arrangement (use soft-delete or status)
-        //$arrangements = isset($consultant) ? $consultant->arrangements()->withTrashed() : Arrangement::withTrashed();
-        $aids = $eid[0] ? $arrangements->whereIn('engagement_id', $eid)->pluck('id') : $arrangements->pluck('id');
-        if ($start || $end)
-            $qbuilder = self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
-                ->whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC');
-        else
-            $qbuilder = self::whereIn('arrangement_id', $aids)->orderByRaw('report_date DESC, created_at DESC');
-        return isset($status) ? $qbuilder->where('review_state', $status)->get() : $qbuilder->get();
+        return (isset($consultant) ? $consultant->reports(get_called_class()) :
+            (isset($client) ? $client->reports(get_called_class()) : self::query()))
+            ->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19'])
+            ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 17)->get();
+    }
+
+    public static function recentReports($start = null, $end = null, $eid = null, $consultant = null, $status = null, $client = null)
+    {
+        $reports = isset($consultant) ? $consultant->reports(get_called_class()) : (isset($client) ? $client->reports(get_called_class()) : self::query());
+        if ($eid[0]) {
+            $reports = $reports->whereIn('arrangement_id', Engagement::getAids($eid));
+        }
+        if ($start || $end) {
+            $reports = $reports->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']);
+        }
+        $reports = $reports->orderByRaw('report_date DESC, created_at DESC');
+        return isset($status) ? $reports->where('review_state', $status)->get() : $reports->get();
     }
 
     public function isPending()

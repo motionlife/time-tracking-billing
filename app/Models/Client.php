@@ -82,30 +82,33 @@ class Client extends Model
     {
         return $this->hasMany(Engagement::class);
     }
+
     public function hours()
     {
         return $this->hasMany(Hour::class);
     }
+
     public function expenses()
     {
         return $this->hasMany(Expense::class);
     }
-    public function laborBills($start = '1970-01-01', $end = '2038-01-19',$state=null)
+
+    public function reports($class)
     {
-        //only those engagements that bill client hourly
+        return $this->hasMany($class);
+    }
+
+    public function laborBills($start = '1970-01-01', $end = '2038-01-19', $state = null)
+    {
         $total = 0;
         foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientLaborBills($start, $end,$state);
+            $total += $engagement->clientLaborBills($start, $end, $state);
         }
         return $total;
     }
 
-    public function expenseBills($start = '1970-01-01', $end = '2038-01-19')
+    public function expenseBills($start = null, $end = null, $state = null)
     {
-        $total = 0;
-        foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientExpenseBills($start, $end);
-        }
-        return $total;
+        return Expense::reportedExpenses(null, $start, $end, $state, $this);
     }
 }

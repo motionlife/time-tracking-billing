@@ -156,18 +156,9 @@ class Engagement extends Model
         return ($billingDate->day > 28 && $billingDate->month == 1) ? $billingDate->addDays(10)->endOfMonth()->startOfDay() : $billingDate->addMonth()->day($this->billing_day);
     }
 
-    public function clientExpenseBills($start = '1970-01-01', $end = null, $state = null)
-    {
-        $total = 0;
-        foreach ($this->arrangements()->withTrashed()->get() as $arr) {
-            $total += $arr->reportedExpenses($start, $end, $state);
-        }
-        return $total;
-    }
-
     public function incomeForBuzDev($start = null, $end = null, $state = null)
     {
-        return $this->buz_dev_share ? $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19', $state) * $this->buz_dev_share : 0;
+        return $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19', $state) * $this->buz_dev_share;
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
@@ -178,5 +169,13 @@ class Engagement extends Model
         $collection2 = (isset($cid) ? $collection1->where('client_id', $cid) : $collection1);
         $collection3 = isset($status) ? $collection2->where('status', $status) : $collection2;
         return isset($consultant) ? $collection3->whereIn('id', $consultant->arrangements()->pluck('engagement_id')) : $collection3;
+    }
+    public static function getAids($eids)
+    {
+        $aids = collect();
+        foreach ($eids as $eid) {
+            $aids->push(self::find($eid)->arrangements->pluck('id'));
+        }
+        return $aids->flatten();
     }
 }

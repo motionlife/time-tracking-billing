@@ -40,10 +40,12 @@ class Consultant extends Model
     {
         return $this->belongsTo(Contact::class)->withDefault();
     }
+
     public function settings()
     {
         return $this->hasMany(Setting::class);
     }
+
     //all the developed clients
     public function dev_clients()
     {
@@ -55,13 +57,20 @@ class Consultant extends Model
     {
         return $this->hasMany(Arrangement::class);
     }
+
     public function hours()
     {
         return $this->hasMany(Hour::class);
     }
+
     public function expenses()
     {
         return $this->hasMany(Expense::class);
+    }
+
+    public function reports($class)
+    {
+        return $this->hasMany($class);
     }
 
     //all the engagements he has ever leaded
@@ -100,7 +109,7 @@ class Consultant extends Model
         })->sortByDesc(function ($item, $key) {
             $total = 0.0;
             foreach ($item as $delta) {
-                $total+=$delta;
+                $total += $delta;
             }
             return $total;
         })->take($amount);

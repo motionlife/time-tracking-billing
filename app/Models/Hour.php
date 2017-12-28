@@ -26,12 +26,6 @@ class Hour extends Report
         return $this->billable_hours * $this->rate * $this->share;
     }
 
-    public static function filter($consultant = null, $start = null, $end = null, $review_state = null)
-    {
-        return (isset($consultant) ? $consultant->hours()->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']) :
-            self::whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']))
-            ->where('review_state', isset($review_state) ? '=' : '<>', isset($review_state) ? $review_state : 7)->get();
-    }
 
     public static function stat($consultant = null, $start = null, $end = null, $review_state = null)
     {
@@ -57,9 +51,9 @@ class Hour extends Report
             });
     }
 
-    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null)
+    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null,$client=null)
     {
-        return self::filter($consultant, $start, $end, $review_state)
+        return self::filter($consultant, $start, $end, $review_state,$client)
             ->mapToGroups(function ($hour) {
                 return [Carbon::parse($hour->report_date)->format('y-M') =>
                     [$hour->billable_hours + $hour->non_billable_hours, $hour->earned()]];

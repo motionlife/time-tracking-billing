@@ -6,7 +6,7 @@
             <div class="panel panel-headline">
                 <div class="panel-heading">
                     <h3 class="panel-title">Semi-monthly Overview</h3>
-                    <p class="panel-subtitle"><a href="/payroll?start={{$data['dates']['startOfLast']->toDateString()}}&end={{$data['dates']['endOfLast']->toDateString()}}">
+                    <p class="panel-subtitle"><a href="/payroll?state=1&start={{$data['dates']['startOfLast']->toDateString()}}&end={{$data['dates']['endOfLast']->toDateString()}}">
                             Period: {{$data['dates']['startOfLast']->toFormattedDateString('M d, Y')}}
                         - {{$data['dates']['endOfLast']->toFormattedDateString('M d, Y')}}</a></p>
                 </div>
