@@ -72,7 +72,7 @@
                                 <td>{{str_limit($hour->client->name,19)}}</td>
                                 <td><a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a></td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
-                                <td>{{number_format($hour->billable_hours,1)}}</td>
+                                <td>{{number_format($hour->billable_hours,2)}}</td>
                                 <td>{{$hour->report_date}}</td>
                                 <td>
                                     @if($admin)

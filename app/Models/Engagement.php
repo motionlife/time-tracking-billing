@@ -68,10 +68,11 @@ class Engagement extends Model
         return 'Unknown';
     }
 
-    public function hasReported()
+    public function hasReported($review_state = null)
     {
         foreach ($this->arrangements()->withTrashed()->get() as $arrangement) {
-            if ($arrangement->hours()->count() > 0) return true;
+            $hours = isset($review_state) ? $arrangement->hours()->where('review_state', $review_state) : $arrangement->hours();
+            if ($hours->count() > 0) return true;
         }
         return false;
     }
@@ -112,7 +113,7 @@ class Engagement extends Model
         return $this->isActive() ? 'success' : ($this->isClosed() ? 'default' : 'warning');
     }
 
-    public function clientLaborBills($start = null, $end = null, $review_state = null)
+    public function HourBilling($start = null, $end = null, $review_state = null)
     {
         //For monthly labor billing, detail not implemented yet...
         //todo: dealing with different client-billing type should be scrutinized when do the billing
@@ -127,7 +128,14 @@ class Engagement extends Model
                 }
             }
             return $total;
-        } else if ($this->paying_cycle == 1 && $this->hasReported()) {
+        } else {
+            return 0;
+        }
+    }
+
+    public function NonHourBilling($start = null, $end = null, $review_state = null)
+    {
+        if ($this->paying_cycle == 1 && $this->hasReported($review_state)) {
             $start_day = Carbon::parse($this->start_date);
             $start = Carbon::parse($start);
             $end = Carbon::parse($end);
@@ -143,10 +151,8 @@ class Engagement extends Model
                 };
             }
             return $billedMonths * $this->cycle_billing;
-        } else if ($this->paying_cycle == 2) {
-            //fixed fee
-            if ($this->isClosed() && $this->hasReported())
-                return $this->cycle_billing;
+        } else if ($this->paying_cycle == 2 && $this->isClosed() && $this->hasReported($review_state)) {
+            return $this->cycle_billing;
         }
         return 0;
     }
@@ -158,7 +164,9 @@ class Engagement extends Model
 
     public function incomeForBuzDev($start = null, $end = null, $state = null)
     {
-        return $this->clientLaborBills($start ?: '1970-01-01', $end ?: '2038-01-19', $state) * $this->buz_dev_share;
+        return $this->buz_dev_share * ($this->paying_cycle == 0 ?
+                $this->HourBilling($start ?: '1970-01-01', $end ?: '2038-01-19', $state) :
+                $this->NonHourBilling($start ?: '1970-01-01', $end ?: '2038-01-19', $state));
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
@@ -170,6 +178,7 @@ class Engagement extends Model
         $collection3 = isset($status) ? $collection2->where('status', $status) : $collection2;
         return isset($consultant) ? $collection3->whereIn('id', $consultant->arrangements()->pluck('engagement_id')) : $collection3;
     }
+
     public static function getAids($eids)
     {
         $aids = collect();

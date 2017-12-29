@@ -5,51 +5,43 @@
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">{{$admin?(isset($consultant)?$consultant->fullname()."'s Payroll":'All Payrolls'):'My Payroll'}}</h3>
+                        <h3 class="panel-title">{{isset($client)?$client->name."'s Bill":'All Bills'}}</h3>
                         <p class="panel-subtitle">
-                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}</p>
+                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}&nbsp;@if(isset($client))<a href="bill" class="label label-info">View All</a>@endif</p>
                     </div>
                     <div class="panel-body col-md-9">
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'payroll'])
+                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'bill','client_id'=>isset($client)?$client->id:null])
                         @endcomponent
                     </div>
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-usd"></i></span>
                                 <p>
-                                    <span class="number">${{number_format($income[0],2)}}</span>
-                                    <span class="title">Hourly Income</span>
+                                    <span class="number">${{number_format($bill[0],2)}}</span>
+                                    <span class="title">Engagement Bill</span>
                                 </p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-taxi"></i></span>
                                 <p>
-                                    <span class="number">${{number_format($income[1],2)}}</span>
-                                    <span class="title">Expenses</span>
+                                    <span class="number">${{number_format($bill[1],2)}}</span>
+                                    <span class="title">Expenses Bill</span>
                                 </p>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="metric">
-                                <span class="icon"><i class="fa fa-handshake-o"></i></span>
-                                <p>
-                                    <span class="number">${{number_format($buz_devs['total'],2)}}</span>
-                                    <span class="title">Business Development</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
+
+                        <div class="col-md-4">
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-calculator"></i></span>
                                 <p>
                                         <span class="number"
-                                              id="total-income-tag">${{number_format($income[0]+$income[1]+$buz_devs['total'],2)}}</span>
-                                    <span class="title">Total Payroll</span>
+                                              id="total-income-tag">${{number_format($bill[0]+$bill[1],2)}}</span>
+                                    <span class="title">Total Bill</span>
                                 </p>
                             </div>
                         </div>
@@ -57,7 +49,7 @@
                     <div class="row" style="padding-left: 1.5em;padding-right: 1.5em;">
                         <div class="custom-tabs-line tabs-line-bottom left-aligned">
                             <ul class="nav" role="tablist" id="top-tab-nav">
-                                @if(isset($consultant))
+                                @if(isset($client))
                                     @php $activeTab = Request::get('tab')?:"1"; @endphp
                                     <li class="{{$activeTab=="1"?'active':''}}"><a href="#tab-left1" role="tab"
                                                                                    data-toggle="tab">Hourly
@@ -67,23 +59,18 @@
                                                                                    data-toggle="tab">Expense&nbsp;<span
                                                     class="badge bg-warning">{{$expenses->total()}}</span></a>
                                     </li>
-                                    <li class="{{$activeTab=="3"?'active':''}}"><a href="#tab-left3" role="tab"
-                                                                                   data-toggle="tab">Buz Dev
-                                            Income&nbsp;<span
-                                                    class="badge bg-danger">{{sizeof($buz_devs['engs'])}}</span></a>
-                                    </li>
                                 @else
                                     <li class="active"><a href="#tab-left1" role="tab"
-                                                          data-toggle="tab">All Consultants Payroll&nbsp;<span
-                                                    class="badge bg-success">{{$consultants->count()}}</span></a></li>
+                                                          data-toggle="tab">All Clients Bills&nbsp;<span
+                                                    class="badge bg-success">{{$clients->count()}}</span></a></li>
                                 @endif
                             </ul>
                             <div class="pull-right excel-button"><a
-                                        href="{{str_replace_first('/','',route('payroll',array_add(Request::all(),'file','excel'),false))}}"
+                                        href="{{str_replace_first('/','',route('bill',array_add(Request::all(),'file','excel'),false))}}"
                                         type="button" title="Download excel file"><img src="/img/excel.png" alt=""></a>
                             </div>
                         </div>
-                        @if(isset($consultant))
+                        @if(isset($client))
                             <div class="tab-content">
                                 <div class="tab-pane fade {{$activeTab=="1"?' in active':''}}" id="tab-left1">
                                     <div class="table-responsive">
@@ -91,13 +78,12 @@
                                             <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Client</th>
+                                                <th>Consultant</th>
                                                 <th>Engagement</th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
                                                 <th>Rate</th>
-                                                <th>Share</th>
-                                                <th>Income</th>
+                                                <th>Billed</th>
                                                 <th>Status</th>
                                             </tr>
                                             </thead>
@@ -109,18 +95,18 @@
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{$loop->index+$offset}}</th>
-                                                    <td>{{str_limit($hour->client->name,20)}}</td>
+                                                    <td>{{str_limit($hour->consultant->fullname(),23)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng->id),false))}}">{{str_limit($eng->name,20)}}</a>
+                                                        <span class="badge bg-{{$eng->paying_cycle==0?'default':($eng->paying_cycle==1?'warning':'danger')}}">{{$eng->paying_cycle==0?'H':($eng->paying_cycle==1?'M':'Fixed')}}</span>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab'),'eid',$eng->id),false))}}">{{str_limit($eng->name,23)}}</a>
                                                     </td>
                                                     <td>{{$hour->report_date}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
                                                     <td>
                                                         <span class="badge bg-{{$hour->rate_type==0?'success':'danger'}}">{{$hour->rate_type==0?'B':'P'}}</span>${{number_format($hour->rate,2)}}
                                                     </td>
-                                                    <td>{{number_format($hour->share*100,1)}}%</td>
                                                     <td>
-                                                        ${{number_format($hour->earned(),2)}}</td>
+                                                        ${{number_format($hour->billClient(),2)}}</td>
                                                     <td>
                                                         <span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span>
                                                     </td>
@@ -130,7 +116,7 @@
                                         </table>
                                     </div>
                                     <div class="pull-right pagination">
-                                        {{$hours->appends(Request::except('page','tab'))->withPath('payroll')->links()}}
+                                        {{$hours->appends(Request::except('page','tab'))->withPath('bill')->links()}}
                                     </div>
                                 </div>
 
@@ -140,7 +126,7 @@
                                             <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Client</th>
+                                                <th>Consultant</th>
                                                 <th>Engagement</th>
                                                 <th>Report Date</th>
                                                 <th>Amount</th>
@@ -155,9 +141,9 @@
                                                 @endphp
                                                 <tr>
                                                     <th scope="row">{{$loop->index+$offset}}</th>
-                                                    <td>{{str_limit($expense->client->name,30)}}</td>
+                                                    <td>{{str_limit($expense->consultant->fullname(),30)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
                                                     <td>{{$expense->report_date}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
@@ -170,52 +156,7 @@
                                         </table>
                                     </div>
                                     <div class="pull-right pagination">
-                                        {{$expenses->appends(array_add(Request::except('page'),'tab',2))->withPath('payroll')->links()}}
-                                    </div>
-                                </div>
-
-                                <div class="tab-pane fade {{$activeTab=="3"?' in active':''}}" id="tab-left3">
-                                    <div class="table-responsive">
-                                        <table class="table project-table">
-                                            <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Client</th>
-                                                <th>Engagement</th>
-                                                <th>ENG. Status</th>
-                                                <th>Business Development Share</th>
-                                                <th>Total Billable Hours</th>
-                                                <th>Earned</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @foreach($buz_devs['engs'] as $eng)
-                                                <tr>
-                                                    <td>{{$loop->index+1}}</td>
-                                                    <td>{{str_limit($eng[0]->client->name,32)}}</td>
-                                                    <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng[0]->id),false)).'&tab=3'}}">{{str_limit($eng[0]->name,32)}}</a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}}</span>
-                                                    </td>
-                                                    <td>
-                                                        @php $share = number_format($eng[0]->buz_dev_share*100,1) @endphp
-                                                        <div class="progress">
-                                                            <div class="progress-bar progress-bar-success"
-                                                                 role="progressbar" aria-valuenow="{{$share}}"
-                                                                 aria-valuemin="0" aria-valuemax="100"
-                                                                 style="width:{{$share}}%;">
-                                                                <span>{{$share}}%</span>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>{{$eng[2]}}</td>
-                                                    <td>${{number_format($eng[1],2)}}</td>
-                                                </tr>
-                                            @endforeach
-                                            </tbody>
-                                        </table>
+                                        {{$expenses->appends(array_add(Request::except('page'),'tab',2))->withPath('bill')->links()}}
                                     </div>
                                 </div>
                             </div>
@@ -224,29 +165,27 @@
                                 <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Name</th>
+                                    <th>Client</th>
                                     <th>Billable Hours</th>
                                     <th>Non-billable Hours</th>
-                                    <th>Hourly Income</th>
-                                    <th>Expense</th>
-                                    <th>Buz Dev Income</th>
+                                    <th>Engagement Bill</th>
+                                    <th>Expense Bill</th>
                                     <th>Total</th>
                                 </tr>
                                 </thead>
                                 <tbody id="summary">
-                                @foreach($consultants as $consultant)
+                                @foreach($clients as $client)
                                     <tr>
                                         <td>{{$loop->index+1}}</td>
                                         <td>
-                                            <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('conid'),'conid',$consultant->id),false))}}">{{$consultant->fullname()}}</a>
+                                            <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('cid','eid'),'cid',$client->id),false))}}">{{$client->name}}</a>
                                         </td>
-                                        @php $conid=$consultant->id;$salary = $incomes[$conid]; @endphp
-                                        <td>{{$hrs[$conid][0]}}</td>
-                                        <td>{{$hrs[$conid][1]}}</td>
-                                        <td>${{number_format($salary[0],2)}}</td>
-                                        <td>${{number_format($salary[1],2)}}</td>
-                                        <td>${{number_format($buzIncomes[$conid],2)}}</td>
-                                        <td>${{number_format($salary[0]+$salary[1]+$buzIncomes[$conid],2)}}</td>
+                                        @php $cid=$client->id;$billed = $bills[$cid]; @endphp
+                                        <td>{{$hrs[$cid][0]}}</td>
+                                        <td>{{$hrs[$cid][1]}}</td>
+                                        <td>${{number_format($billed[0],2)}}</td>
+                                        <td>${{number_format($billed[1],2)}}</td>
+                                        <td>${{number_format($billed[0]+$billed[1],2)}}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -282,9 +221,12 @@
             text-indent: 1.2em;
         }
 
-        #tab-left1 tr td:nth-child(8) {
+        #tab-left1 tr td:nth-child(7) {
             font-weight: bold;
             font-size: 14px;
+        }
+        div.metric .icon {
+            background-color: #ff040c;
         }
 
         #total-income-tag {
@@ -295,7 +237,7 @@
             font-weight: bold;
         }
 
-        #summary tr td:nth-last-child(-n+4) {
+        #summary tr td:nth-last-child(-n+3) {
             font-weight: 600;
             font-size: 1.1em;
         }
@@ -304,5 +246,6 @@
             opacity: 0.5;
             filter: alpha(opacity=50);
         }
+
     </style>
 @endsection

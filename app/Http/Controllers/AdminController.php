@@ -120,7 +120,7 @@ class AdminController extends Controller
         if ($type == 0) {
             return view('bpselect');
         } else {
-            return app(PayrollController::class)->index($request, true, $type == 1);
+            return app(AccountingController::class)->index($request, true, $type == 1);
         }
     }
 

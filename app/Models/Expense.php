@@ -21,7 +21,7 @@ class Expense extends Report
 
     public static function monthlyExpenses($consultant = null, $start = null, $end = null, $review_state = null)
     {
-        return self::filter($consultant, $start, $end, $review_state)
+        return self::reported($start, $end, null, $consultant, $review_state, null)
             ->mapToGroups(function ($exp) {
                 return [Carbon::parse($exp->report_date)->format('y-M') => $exp->total()];
             })->transform(function ($month) {
@@ -29,9 +29,9 @@ class Expense extends Report
             });
     }
 
-    public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null,$client=null)
+    public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null, $eid = null, $client = null)
     {
-        return self::filter($consultant, $start, $end, $review_state,$client)->sum(function ($exp) {
+        return self::reported($start, $end, $eid, $consultant, $review_state, $client)->sum(function ($exp) {
             return $exp->total();
         });
     }

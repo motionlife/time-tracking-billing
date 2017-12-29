@@ -3,25 +3,31 @@
        title="Reset all condition"><i class="fa fa-refresh" aria-hidden="true"></i></a>
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-            id="client-engagements" title="&#xf0b1; Engagement" data-live-search="true" data-selected-text-format="count" multiple>
+            id="client-engagements" title="&#xf0b1; Engagement" data-live-search="true"
+            data-selected-text-format="count" multiple>
+
         @foreach($clientIds as $cid=>$engagements)
             @php $cname=newlifecfo\Models\Client::find($cid)->name;@endphp
-            <optgroup label="" data-subtext="<a href='#' data-id='{{$engagements->map(function($e){return $e[0];})}}' class='group-client-name'><span class='label label-info'><strong>{{$cname}}</strong></span></a>">
+            <optgroup label=""
+                      data-subtext="<a href='#' data-id='{{$engagements->map(function($e){return $e[0];})}}' class='group-client-name'><span class='label label-info'><strong>{{$cname}}</strong></span></a>">
                 @foreach($engagements as $eng)
-                    <option data-tokens="{{$cname.' '.$eng[1]}}" value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
+                    <option data-tokens="{{$cname.' '.$eng[1]}}"
+                            value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
                 @endforeach
             </optgroup>
         @endforeach
     </select>
-    @if($admin)
-        <i>&nbsp;</i>
-        <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
-                id="consultant-select" title="&#xf007; Consultant"
-                data-live-search="true">
-            @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
-                <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
-            @endforeach
-        </select>
+    @if($target!='bill')
+        @if($admin)
+            <i>&nbsp;</i>
+            <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
+                    id="consultant-select" title="&#xf007; Consultant"
+                    data-live-search="true">
+                @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                    <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
+                @endforeach
+            </select>
+        @endif
     @endif
     <i>&nbsp;</i>
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
@@ -47,7 +53,9 @@
                 var query = '?eid=' + $('#client-engagements').selectpicker('val') +
                     '&state=' + $('#state-select').selectpicker('val') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
-                @if($admin) query += '&conid=' + $('#consultant-select').selectpicker('val');
+                @if($admin&&($target!='bill')) query += '&conid=' + $('#consultant-select').selectpicker('val');
+                @else
+                    query += '&cid={{$client_id}}';
                 @endif
                     window.location.href = "{{$target}}" + query;
 

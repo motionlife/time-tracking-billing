@@ -98,17 +98,38 @@ class Client extends Model
         return $this->hasMany($class);
     }
 
-    public function laborBills($start = '1970-01-01', $end = '2038-01-19', $state = null)
+    public function hourBill($start = null, $end = null, $state = null, $eid = null)
     {
-        $total = 0;
-        foreach ($this->engagements as $engagement) {
-            $total += $engagement->clientLaborBills($start, $end, $state);
+        $hours = Hour::reported($start, $end, $eid, null, $state, $this);
+        $sumHours = $hours->reduce(function ($carry, $hour) {
+            return [$carry[0] + $hour->billable_hours, $carry[1] + $hour->non_billable_hours, $carry[2] + $hour->billClient()];
+        });
+        $sumHours = [$sumHours[0] ?: 0, $sumHours[1] ?: 0, $sumHours[2] ?: 0];
+        foreach ($this->engagements()->withTrashed()->get() as $engagement) {
+            if (!$eid[0] || in_array($engagement->id, $eid)) {
+                $sumHours[2] += $engagement->NonHourBilling($start, $end, $state);
+            }
         }
-        return $total;
+
+        return [$sumHours[2], $hours, $sumHours[0], $sumHours[1]];
     }
 
-    public function expenseBills($start = null, $end = null, $state = null)
+    public function expenseBill($start = null, $end = null, $state = null, $eid = null)
     {
-        return Expense::reportedExpenses(null, $start, $end, $state, $this);
+        $total = 0;
+        $expenses = Expense::reported($start, $end, $eid, null, $state, $this);
+        foreach ($expenses as $expense) {
+            $total += $expense->total();
+        }
+        return [$total, $expenses];
+    }
+
+    public function getEngagementIdName()
+    {
+        $pair = collect();
+        foreach ($this->engagements as $engagement) {
+            $pair->push([$engagement->id, $engagement->name]);
+        }
+        return [$this->id => $pair];
     }
 }

@@ -32,7 +32,7 @@ class Hour extends Report
         $bh = 0;
         $nbh = 0;
         $income = 0;
-        foreach (self::filter($consultant, $start, $end, $review_state) as $hour) {
+        foreach (self::reported($start, $end, null, $consultant, $review_state, null) as $hour) {
             $bh += $hour->billable_hours;
             $nbh += $hour->non_billable_hours;
             $income += $hour->earned();
@@ -42,7 +42,7 @@ class Hour extends Report
 
     public static function dailyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null)
     {
-        return self::filter($consultant, $start, $end, $review_state)
+        return self::reported($start, $end, null, $consultant, $review_state, null)
             ->mapToGroups(function ($hour) {
                 return [Carbon::parse($hour->report_date)->format('M d') =>
                     [$hour->billable_hours, $hour->non_billable_hours, $hour->earned(), $hour->arrangement_id]];
@@ -51,9 +51,9 @@ class Hour extends Report
             });
     }
 
-    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null,$client=null)
+    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null, $client = null)
     {
-        return self::filter($consultant, $start, $end, $review_state,$client)
+        return self::reported($start, $end, null, $consultant, $review_state, $client)
             ->mapToGroups(function ($hour) {
                 return [Carbon::parse($hour->report_date)->format('y-M') =>
                     [$hour->billable_hours + $hour->non_billable_hours, $hour->earned()]];

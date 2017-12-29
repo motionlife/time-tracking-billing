@@ -85,7 +85,7 @@ class HomeController extends Controller
         ksort($data['last_b']);//data used for plotting the chart
 
         //data for latest hour report
-        $data['recent_hours'] = Hour::recentReports(null, null, null, $consultant, null)->take(5);
+        $data['recent_hours'] = Hour::reported(null, null, null, $consultant, null)->take(5);
 //            return json_encode($data);
         return view('home', ['data' => $data]);
     }

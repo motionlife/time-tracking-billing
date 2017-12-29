@@ -23,7 +23,10 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('hour', 'HoursController');
 Route::resource('expense', 'ExpenseController');
 Route::resource('engagement', 'EngagementController');
-Route::match(['get', 'post'], '/payroll', 'PayrollController@index')->name('payroll');
+Route::match(['get', 'post'], '/payroll', 'AccountingController@index')->name('payroll');
+Route::get('/bill', function (){
+    abort(404);
+})->name('bill');
 Route::match(['get', 'post'], '/profile', 'ProfileController@index');
 Route::match(['get', 'post'], '/message', 'MessageController@index');
 Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
