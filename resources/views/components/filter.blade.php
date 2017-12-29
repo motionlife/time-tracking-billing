@@ -54,7 +54,7 @@
                     '&state=' + $('#state-select').selectpicker('val') +
                     '&start=' + $('#start-date').val() + '&end=' + $('#end-date').val();
                 @if($admin&&($target!='bill')) query += '&conid=' + $('#consultant-select').selectpicker('val');
-                @else
+                @elseif($target=='bill')
                     query += '&cid={{$client_id}}';
                 @endif
                     window.location.href = "{{$target}}" + query;
