@@ -25,9 +25,11 @@ class AdminController extends Controller
             case 'engagement':
                 return $this->grantEngagement($request);
             case 'bp':
+                return $this->viewBp($request, 0);
             case 'payroll':
-            case 'billing':
-                return $this->viewBp($request);
+                return $this->viewBp($request, 1);
+            case 'bill':
+                return $this->viewBp($request, 2);
             case 'user':
                 return $this->userAdmin($request);
             case 'client':
@@ -113,9 +115,13 @@ class AdminController extends Controller
         return app(EngagementController::class)->index($request, true);
     }
 
-    private function viewBp($request)
+    private function viewBp($request, $type)
     {
-        return app(PayrollController::class)->index($request, true);
+        if ($type == 0) {
+            return view('bpselect');
+        } else {
+            return app(PayrollController::class)->index($request, true, $type == 1);
+        }
     }
 
 }

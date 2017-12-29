@@ -18,7 +18,7 @@ class PayrollController extends Controller
         $this->middleware('verifiedConsultant');
     }
 
-    public function index(Request $request, $isAdmin = false)
+    public function index(Request $request, $isAdmin = false, $payroll = true)
     {
         $start = $request->get('start');
         $end = $request->get('end');
@@ -26,57 +26,63 @@ class PayrollController extends Controller
         $state = $request->get('state');
         $file = $request->get('file');
         $user = Auth::user();
-        $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
-        if ($consultant) {
-            $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $state);
-            $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $state);
-            $pg_hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
-            $pg_expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
-            $income = [$hourReports->sum(function ($hour) {
-                return $hour->earned();
-            }), $expenseReports->sum(function ($exp) {
-                return $exp->total();
-            })];
-            $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
+        if ($payroll) {
+            $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
+            if ($consultant) {
+                $hourReports = Hour::recentReports($start, $end, $eid, $consultant, $state);
+                $expenseReports = Expense::recentReports($start, $end, $eid, $consultant, $state);
+                $pg_hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
+                $pg_expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
+                $income = [$hourReports->sum(function ($hour) {
+                    return $hour->earned();
+                }), $expenseReports->sum(function ($exp) {
+                    return $exp->total();
+                })];
+                $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
 
-            if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
-                'filename' => $this->filename($consultant, $start, $end, $state, $eid)]);
+                if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
+                    'filename' => $this->filename($consultant, $start, $end, $state, $eid)]);
 
-            return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
-                    'hours' => $pg_hours, 'expenses' => $pg_expenses,
-                    'income' => $income,
-                    'buz_devs' => $buz_devs,
-                    'admin' => $isAdmin,
-                    'consultant' => $consultant]
-            );
+                return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
+                        'hours' => $pg_hours, 'expenses' => $pg_expenses,
+                        'income' => $income,
+                        'buz_devs' => $buz_devs,
+                        'admin' => $isAdmin,
+                        'consultant' => $consultant]
+                );
 
-        } else {
-            $incomes = [];
-            $buz_dev_incomes = [];
-            $hourNumbers = [];
-            $consultants = Consultant::all();
-            foreach ($consultants as $consultant) {
-                $id = $consultant->id;
-                $hourNumbers[$id] = [0, 0];
-                $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
-                $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
-            }
-            $sum = $this->sumIncome($incomes, $buz_dev_incomes);
-            if ($request->session()->has('data') && $file == 'excel') {
-                $data = $request->session()->get('data');
-                return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
             } else {
-                $data = ['admin' => $isAdmin,
-                    'consultants' => $consultants,
-                    'incomes' => $incomes,
-                    'buzIncomes' => $buz_dev_incomes,
-                    'hrs' => $hourNumbers,
-                    'income' => [$sum[0], $sum[1]],
-                    'buz_devs' => ['total' => $sum[2]]];
-                $request->session()->put('data', $data);
-                return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
+                $incomes = [];
+                $buz_dev_incomes = [];
+                $hourNumbers = [];
+                $consultants = Consultant::all();
+                foreach ($consultants as $consultant) {
+                    $id = $consultant->id;
+                    $hourNumbers[$id] = [0, 0];
+                    $incomes[$consultant->id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
+                    $buz_dev_incomes[$consultant->id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
+                }
+                $sum = $this->sumIncome($incomes, $buz_dev_incomes);
+                if ($request->session()->has('data') && $file == 'excel') {
+                    $data = $request->session()->get('data');
+                    return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid)), true);
+                } else {
+                    $data = ['admin' => $isAdmin,
+                        'consultants' => $consultants,
+                        'incomes' => $incomes,
+                        'buzIncomes' => $buz_dev_incomes,
+                        'hrs' => $hourNumbers,
+                        'income' => [$sum[0], $sum[1]],
+                        'buz_devs' => ['total' => $sum[2]]];
+                    $request->session()->put('data', $data);
+                    return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
+                }
             }
+        }else{
+            //client billing controller
+            return 'client billing view';
         }
+
     }
 
     private function sumIncome($incomes, $buz_dev_incomes)
