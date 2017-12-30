@@ -234,20 +234,23 @@
                                 </tr>
                                 </thead>
                                 <tbody id="summary">
+                                @php $index =0; @endphp
                                 @foreach($consultants as $consultant)
-                                    <tr>
-                                        <td>{{$loop->index+1}}</td>
-                                        <td>
-                                            <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('conid'),'conid',$consultant->id),false))}}">{{$consultant->fullname()}}</a>
-                                        </td>
-                                        @php $conid=$consultant->id;$salary = $incomes[$conid]; @endphp
-                                        <td>{{$hrs[$conid][0]}}</td>
-                                        <td>{{$hrs[$conid][1]}}</td>
-                                        <td>${{number_format($salary[0],2)}}</td>
-                                        <td>${{number_format($salary[1],2)}}</td>
-                                        <td>${{number_format($buzIncomes[$conid],2)}}</td>
-                                        <td>${{number_format($salary[0]+$salary[1]+$buzIncomes[$conid],2)}}</td>
-                                    </tr>
+                                    @php $conid=$consultant->id;$salary = $incomes[$conid];$total = $salary[0]+$salary[1]+$buzIncomes[$conid];@endphp
+                                    @if($total>0.01)
+                                        <tr>
+                                            <td>{{++$index}}</td>
+                                            <td>
+                                                <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('conid'),'conid',$consultant->id),false))}}">{{$consultant->fullname()}}</a>
+                                            </td>
+                                            <td>{{$hrs[$conid][0]}}</td>
+                                            <td>{{$hrs[$conid][1]}}</td>
+                                            <td>${{number_format($salary[0],2)}}</td>
+                                            <td>${{number_format($salary[1],2)}}</td>
+                                            <td>${{number_format($buzIncomes[$conid],2)}}</td>
+                                            <td>${{number_format($total,2)}}</td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                                 </tbody>
                             </table>

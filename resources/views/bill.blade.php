@@ -7,7 +7,8 @@
                     <div class="panel-heading col-md-3">
                         <h3 class="panel-title">{{isset($client)?$client->name."'s Bill":'All Clients\' Bills'}}</h3>
                         <p class="panel-subtitle">
-                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}&nbsp;@if(isset($client))<a href="bill" class="label label-info">All Clients</a>@endif</p>
+                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}
+                            &nbsp;@if(isset($client))<a href="bill" class="label label-info">All Clients</a>@endif</p>
                     </div>
                     <div class="panel-body col-md-9">
                         @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'bill','client_id'=>isset($client)?$client->id:null])
@@ -174,19 +175,22 @@
                                 </tr>
                                 </thead>
                                 <tbody id="summary">
+                                @php $index =0  @endphp
                                 @foreach($clients as $client)
-                                    <tr>
-                                        <td>{{$loop->index+1}}</td>
-                                        <td>
-                                            <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('cid','eid'),'cid',$client->id),false))}}">{{$client->name}}</a>
-                                        </td>
-                                        @php $cid=$client->id;$billed = $bills[$cid]; @endphp
-                                        <td>{{$hrs[$cid][0]}}</td>
-                                        <td>{{$hrs[$cid][1]}}</td>
-                                        <td>${{number_format($billed[0],2)}}</td>
-                                        <td>${{number_format($billed[1],2)}}</td>
-                                        <td>${{number_format($billed[0]+$billed[1],2)}}</td>
-                                    </tr>
+                                    @php $cid=$client->id;$billed = $bills[$cid];$total = $billed[0]+$billed[1]; @endphp
+                                    @if($total>0.01)
+                                        <tr>
+                                            <td>{{++$index}}</td>
+                                            <td>
+                                                <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('cid','eid'),'cid',$client->id),false))}}">{{$client->name}}</a>
+                                            </td>
+                                            <td>{{$hrs[$cid][0]}}</td>
+                                            <td>{{$hrs[$cid][1]}}</td>
+                                            <td>${{number_format($billed[0],2)}}</td>
+                                            <td>${{number_format($billed[1],2)}}</td>
+                                            <td>${{number_format($total,2)}}</td>
+                                        </tr>
+                                    @endif
                                 @endforeach
                                 </tbody>
                             </table>
@@ -225,6 +229,7 @@
             font-weight: bold;
             font-size: 14px;
         }
+
         div.metric .icon {
             background-color: #ff040c;
         }
