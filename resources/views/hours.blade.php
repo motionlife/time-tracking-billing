@@ -9,10 +9,10 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h3 class="modal-title" id="hourModalLabel">Consultant:
-                                    <span id="consultant-name" style="color: #4bb3ff;"></span>
-                                    <a type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <i class="fa fa-times" aria-hidden="true"></i>
-                                    </a>
+                                <span id="consultant-name" style="color: #4bb3ff;"></span>
+                                <a type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </a>
                             </h3>
                         </div>
                         <form action="" id="hour-form">
@@ -33,6 +33,14 @@
                     </div>
                 </div>
             </div>
+            @if($confirm)
+                <div class="alert alert-info alert-dismissible" style="font-size: 1.2em">
+                    <a class="panel-close close" data-dismiss="alert">×</a>
+                    <i class="fa fa-exclamation-triangle"></i>
+                    You have <span class="badge bg-success">{{$confirm['count']}}</span> unconfirmed time reports in last paying period.<span class="label label-success">{{$confirm['startOfLast']->toFormattedDateString().' - '.$confirm['endOfLast']->toFormattedDateString()}}</span><a
+                            href="?confirm=1" class="btn btn-primary">Confirm All</a>
+                </div>
+            @endif
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-2">
@@ -70,7 +78,9 @@
                             <tr>
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($hour->client->name,19)}}</td>
-                                <td><a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a></td>
+                                <td>
+                                    <a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a>
+                                </td>
                                 <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 <td>{{number_format($hour->billable_hours,2)}}</td>
                                 <td>{{$hour->report_date}}</td>
@@ -81,8 +91,12 @@
                                         {{str_limit($hour->description,29)}}
                                     @endif
                                 </td>
-                                <td><span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span></td>
-                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)" data-del="{{$admin||$hour->isPending()?1:0}}"><i class="fa fa-times"></i></a></td>
+                                <td><span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span>
+                                </td>
+                                <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i
+                                                class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"
+                                                                                         data-del="{{$admin||$hour->isPending()?1:0}}"><i
+                                                class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -145,7 +159,7 @@
                         $('#hour-feedback').val(data.feedback);
                         @else
                         if (data.review_state !== "0" && data.feedback !== null)
-                            $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
+                            $('#feedback-info').addClass('alert alert-success').text('Message: ' + data.feedback);
                         else $('#feedback-info').removeClass('alert alert-success').text('');
                         @endif
                     },
@@ -154,7 +168,7 @@
                 $('#hourModal').modal('toggle');
             });
             $('tr td:last-child a:nth-child(2)').on('click', function () {
-                if($(this).data('del')=='1'){
+                if ($(this).data('del') == '1') {
                     var td = $(this).parent();
                     swal({
                             title: "Are you sure?",
@@ -181,7 +195,7 @@
                                 dataType: 'json'
                             });
                         });
-                }else{
+                } else {
                     toastr.warning('Non-pending report can only be deleted by admin')
                 }
             });
@@ -245,7 +259,8 @@
             color: red;
             margin-left: 1.5em;
         }
-        .panel tr td:nth-child(5){
+
+        .panel tr td:nth-child(5) {
             text-indent: 1.2em;
             font-weight: bold;
         }

@@ -24,33 +24,14 @@
                 <div id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle icon-menu" data-toggle="dropdown">
-                                <i class="lnr lnr-alarm"></i>
-                                <span class="badge bg-danger">7</span>
-                            </a>
-                            <ul class="dropdown-menu notifications">
-                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>System
-                                        space is almost full</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>You have 9
-                                        unfinished tasks</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Monthly
-                                        report is available</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Weekly
-                                        meeting in 1 hour</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Your
-                                        request has been approved</a></li>
-                                <li><a href="/message" class="more">See all notifications</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
                                         class="lnr lnr-question-circle"></i> <span>Help</span> <i
                                         class="icon-submenu lnr lnr-chevron-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Basic Use</a></li>
-                                <li><a href="#">Working With Data</a></li>
-                                <li><a href="#">Security</a></li>
-                                <li><a href="#">Troubleshooting</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Basic Use</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>Working With Data</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Security</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-info"></span>Troubleshooting</a></li>
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -127,8 +108,6 @@
                         <li><a href="/profile" class="{{Request::is('profile') ?'active':''}}"><i class="fa fa-id-badge"
                                                                                                   aria-hidden="true">&nbsp;</i><span>My Profile</span></a>
                         </li>
-                        <li><a href="/message" class="{{Request::is('message') ?'active':''}}"><i
-                                        class="fa fa-envelope-o" aria-hidden="true"></i><span>Messages</span></a></li>
                         @if(Auth::user()&&Auth::user()->isSupervisor())
                             <li>
                                 <a href="#subPages3" data-toggle="collapse"

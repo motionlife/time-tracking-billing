@@ -325,7 +325,7 @@
                     $('#expense-feedback').val(data.feedback);
                     @else
                     if (data.review_state !== "0" && data.feedback !== null)
-                        $('#feedback-info').addClass('alert alert-success').text('Note From Endorser: ' + data.feedback);
+                        $('#feedback-info').addClass('alert alert-success').text('Message: ' + data.feedback);
                     else $('#feedback-info').removeClass('alert alert-success').text('');
                     @endif
 

@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -37,14 +38,15 @@ class Report extends Model
         });
     }
 
+    //0-just created pending,1 approved, 2 rejected, 3 self confirmed only, 4 leader confirmed only,
     public function isPending()
     {
-        return $this->getStatus()[0] == 'Pending';
+        return $this->review_state == 0 || $this->review_state == 3;
     }
 
     public function unfinalized()
     {
-        return ($this->getStatus()[0] == 'Pending' || $this->getStatus()[0] == 'Modified');
+        return $this->review_state == 0 || $this->review_state == 3;
     }
 
     public function getStatus()
@@ -61,13 +63,10 @@ class Report extends Model
                 $status = ['Rejected', 'danger'];
                 break;
             case 3:
-                $status = ['BossReplied', 'info'];
+                $status = ['Self_Confirmed', 'info'];
                 break;
             case 4:
-                $status = ['Confirmed', 'default'];
-                break;
-            case 5:
-                $status = ['Archived', 'primary'];
+                $status = ['Leader_Confirmed', 'primary'];
                 break;
         }
         return $status;
@@ -84,5 +83,33 @@ class Report extends Model
         }
         $reports = $reports->orderByRaw('report_date DESC, created_at DESC');
         return isset($review_state) ? $reports->where('review_state', $review_state)->get() : $reports->get();
+    }
+
+    public static function needConfirm($request, $consultant)
+    {
+        if ($request->get('confirm') == 1 && $consultant) {
+            $confirm = [];
+            if (Carbon::now()->day > 15) {
+                $confirm['startOfLast'] = Carbon::parse('first day of this month')->startOfDay();
+                $confirm['endOfLast'] = Carbon::parse('first day of this month')->addDays(14)->endOfDay();
+            } else {
+                $confirm['startOfLast'] = Carbon::parse('first day of last month')->addDays(15)->startOfDay();
+                $confirm['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
+            }
+            $eid = explode(',', $request->get('eid'));
+            $hours = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
+
+//            foreach ($consultant->lead_engagements as $engagement) {
+//                foreach ($engagement->arrangements as $arrangement) {
+//                    $hours->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
+//                }
+//            }
+//            $hours = $hours->flatten();
+            $confirm['count'] = $hours->count();
+            $confirm['hours'] = $hours;
+            return $confirm;
+        } else {
+            return false;
+        }
     }
 }
