@@ -24,13 +24,11 @@ class HoursController extends Controller
     }
 
 
-    public function index(Request $request, $isAdmin = false)
+    public function index(Request $request, $isAdmin = false,$confirm =  false)
     {
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
         $eid = explode(',', $request->get('eid'));
-        $confirm = Hour::needConfirm($request, $consultant);
-        //todo should store confirming hours in session
-        $reported = $confirm ? $confirm['hours'] : Hour::reported($request->get('start'), $request->get('end'), $eid, $consultant, $request->get('state'));
+        $reported = $confirm ? $confirm['reports'] : Hour::reported($request->get('start'), $request->get('end'), $eid, $consultant, $request->get('state'));
         return view('hours', ['hours' => $this->paginate($reported, 25),
             'clientIds' => Engagement::groupedByClient($confirm ? null : $consultant),
             'admin' => $isAdmin,

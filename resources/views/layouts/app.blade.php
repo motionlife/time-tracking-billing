@@ -28,10 +28,14 @@
                                         class="lnr lnr-question-circle"></i> <span>Help</span> <i
                                         class="icon-submenu lnr lnr-chevron-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Basic Use</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>Working With Data</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-success"></span>Security</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-info"></span>Troubleshooting</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Basic Use</a>
+                                </li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>Working
+                                        With Data</a></li>
+                                <li><a href="#" class="notification-item"><span
+                                                class="dot bg-success"></span>Security</a></li>
+                                <li><a href="#" class="notification-item"><span class="dot bg-info"></span>Troubleshooting</a>
+                                </li>
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -101,7 +105,23 @@
                                     <li><a href="{{route('engagement.index')}}"
                                            class="{{Request::is('engagement') ?'active':''}}">My Engagements</a></li>
                                     <li><a href="{{route('engagement.create')}}"
-                                           class="{{Request::is('engagement/create') ?'active':''}}">Led Engagements</a></li>
+                                           class="{{Request::is('engagement/create') ?'active':''}}">Led Engagements</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#subPages3" data-toggle="collapse"
+                               class="{{str_contains(Request::path(),'approval') ? 'active':'collapsed '}}"><i
+                                        class="fa fa-gavel" aria-hidden="true"></i><span>Approval</span> <i
+                                        class="icon-submenu lnr lnr-chevron-left"></i></a>
+                            <div id="subPages3" class="collapse {{str_contains(Request::path(),'approval') ?'in':''}}">
+                                <ul class="nav">
+                                    <li><a href="/approval/hour" class="{{Request::is('approval/hour') ?'active':''}}">Time
+                                            Reports</a></li>
+                                    <li><a href="/approval/expense"
+                                           class="{{Request::is('approval/expense') ?'active':''}}">Expense Reports</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
@@ -110,20 +130,23 @@
                         </li>
                         @if(Auth::user()&&Auth::user()->isSupervisor())
                             <li>
-                                <a href="#subPages3" data-toggle="collapse"
+                                <a href="#subPages4" data-toggle="collapse"
                                    class="{{str_contains(Request::path(),'admin') ? 'active':'collapsed '}}"><i
                                             class="lnr lnr-users"></i> <span>Administration</span> <i
                                             class="icon-submenu lnr lnr-chevron-left"></i></a>
-                                <div id="subPages3" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}">
+                                <div id="subPages4" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}">
                                     <ul class="nav">
-                                        <li><a href="/admin/hour" class="{{Request::is('admin/hour')?'active':''}}">Hours Admin</a></li>
+                                        <li><a href="/admin/hour" class="{{Request::is('admin/hour')?'active':''}}">Hours
+                                                Admin</a></li>
                                         <li><a href="/admin/expense"
                                                class="{{Request::is('admin/expense')?'active':''}}">Expenses Admin</a>
                                         </li>
                                         <li><a href="/admin/engagement"
                                                class="{{Request::is('admin/engagement')?'active':''}}">Grant
                                                 Engagements</a></li>
-                                        <li><a href="/admin/bp" class="{{Request::is('admin/bp')||Request::is('admin/payroll')?'active':''}}">Billing&Payroll</a></li>
+                                        <li><a href="/admin/bp"
+                                               class="{{Request::is('admin/bp')||Request::is('admin/payroll')?'active':''}}">Billing&Payroll</a>
+                                        </li>
                                         <li><a href="/admin/user" class="{{Request::is('admin/user') ?'active':''}}">Users</a>
                                         </li>
                                         <li><a href="/admin/client"
@@ -140,7 +163,7 @@
             </div>
         </div>
         <div class="main">
-        @yield('content')
+            @yield('content')
         </div>
         <div class="clearfix"></div>
         <footer>

@@ -29,6 +29,7 @@ Route::get('/bill', function (){
 })->name('bill');
 Route::match(['get', 'post'], '/profile', 'ProfileController@index');
 Route::match(['get', 'post'], '/message', 'MessageController@index');
+Route::match(['get', 'post'], '/approval/{report}', 'ApprovalController@index');
 Route::match(['get', 'post'], '/admin/{table}', 'AdminController@index');
 Route::get('/pending', function () {
     if (Auth::user()->isVerified()) return back();

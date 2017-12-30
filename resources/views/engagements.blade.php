@@ -256,7 +256,7 @@
                                             <td>{{$engagement->leader->fullname()}}</td>
                                             <td>{{$engagement->start_date}}</td>
                                             <td>{{$formatter->format($engagement->buz_dev_share)}}</td>
-                                            <td>{{$engagement->clientBilledType()}}</td>
+                                            <td>{{str_limit($engagement->clientBilledType(),11)}}</td>
                                             <td><i class="fa fa-flag {{$engagement->state()}}"
                                                    aria-hidden="true"></i>{{$engagement->state()}}</td>
                                         </tr>

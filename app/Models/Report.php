@@ -87,29 +87,25 @@ class Report extends Model
 
     public static function needConfirm($request, $consultant)
     {
-        if ($request->get('confirm') == 1 && $consultant) {
-            $confirm = [];
-            if (Carbon::now()->day > 15) {
-                $confirm['startOfLast'] = Carbon::parse('first day of this month')->startOfDay();
-                $confirm['endOfLast'] = Carbon::parse('first day of this month')->addDays(14)->endOfDay();
-            } else {
-                $confirm['startOfLast'] = Carbon::parse('first day of last month')->addDays(15)->startOfDay();
-                $confirm['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
-            }
-            $eid = explode(',', $request->get('eid'));
-            $hours = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
-
-//            foreach ($consultant->lead_engagements as $engagement) {
-//                foreach ($engagement->arrangements as $arrangement) {
-//                    $hours->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
-//                }
-//            }
-//            $hours = $hours->flatten();
-            $confirm['count'] = $hours->count();
-            $confirm['hours'] = $hours;
-            return $confirm;
+        $confirm = [];
+        if (Carbon::now()->day > 15) {
+            $confirm['startOfLast'] = Carbon::parse('first day of this month')->startOfDay();
+            $confirm['endOfLast'] = Carbon::parse('first day of this month')->addDays(14)->endOfDay();
         } else {
-            return false;
+            $confirm['startOfLast'] = Carbon::parse('first day of last month')->addDays(15)->startOfDay();
+            $confirm['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
         }
+        $eid = explode(',', $request->get('eid'));
+        //$hours = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
+        $reports = collect();
+        foreach ($consultant->lead_engagements as $engagement) {
+            foreach ($engagement->arrangements as $arrangement) {
+                $reports->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
+            }
+        }
+        $reports = $reports->flatten();
+        $confirm['count'] = $reports->count();
+        $confirm['reports'] = $reports;
+        return $confirm;
     }
 }

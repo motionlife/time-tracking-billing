@@ -118,6 +118,8 @@
                     </div>
                 </div>
             </div>
+            @component('components.confirm',['confirm'=>$confirm])
+            @endcomponent
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-2">

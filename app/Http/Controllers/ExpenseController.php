@@ -22,17 +22,19 @@ class ExpenseController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @param bool $admin
+     * @param bool $isAdmin
+     * @param bool $confirm
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request,$isAdmin = false)
+    public function index(Request $request, $isAdmin = false, $confirm = false)
     {
-        $consultant = $isAdmin?($request->get('conid') ? Consultant::find($request->get('conid')) : null): Auth::user()->consultant;
-        $expenses = $this->paginate(Expense::reported($request->get('start'),
-            $request->get('end'), explode(',',$request->get('eid')), $consultant,$request->get('state')), 25);
+        $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
+        $expenses = $this->paginate($confirm ? $confirm['reports'] : Expense::reported($request->get('start'),
+            $request->get('end'), explode(',', $request->get('eid')), $consultant, $request->get('state')), 25);
         return view('expenses', ['expenses' => $expenses,
             'clientIds' => Engagement::groupedByClient($consultant),
-            'admin'=>$isAdmin
+            'admin' => $isAdmin,
+            'confirm' => $confirm
         ]);
     }
 
@@ -73,7 +75,7 @@ class ExpenseController extends Controller
                     $feedback['code'] = 2;
                     $feedback['message'] = 'You are not in this engagement';
                 } else {
-                    $exp = (new Expense(['arrangement_id' => $arr->id,'consultant_id'=>$arr->consultant_id,'client_id'=>$eng->client_id]))->fill($request->except(['eid', 'receipts', 'review_state']));
+                    $exp = (new Expense(['arrangement_id' => $arr->id, 'consultant_id' => $arr->consultant_id, 'client_id' => $eng->client_id]))->fill($request->except(['eid', 'receipts', 'review_state']));
                     if ($exp->save()) {
                         if ($this->saveReceipts($request, $exp->id)) {
                             $feedback['code'] = 7;

@@ -5,9 +5,9 @@
             <div class="panel panel-headline">
                 <div class="row">
                     <div class="panel-heading col-md-3">
-                        <h3 class="panel-title">{{isset($client)?$client->name."'s Bill":'All Bills'}}</h3>
+                        <h3 class="panel-title">{{isset($client)?$client->name."'s Bill":'All Clients\' Bills'}}</h3>
                         <p class="panel-subtitle">
-                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}&nbsp;@if(isset($client))<a href="bill" class="label label-info">View All</a>@endif</p>
+                            Period: {{(Request::get('start')?:'Begin of time').' - '.(Request::get('end')?:'Today')}}&nbsp;@if(isset($client))<a href="bill" class="label label-info">All Clients</a>@endif</p>
                     </div>
                     <div class="panel-body col-md-9">
                         @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'bill','client_id'=>isset($client)?$client->id:null])
