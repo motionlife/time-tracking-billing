@@ -4,14 +4,14 @@
             <div class="col-md-6">
                 <label class="fancy-radio">
                     <input name="review_state" value="1" type="radio">
-                    <span><i></i><strong>Approved</strong></span>
+                    <span><i></i><strong>Approve</strong></span>
                 </label>
             </div>
             <div class="col-md-6">
                 <label class="fancy-radio">
                     <input name="review_state" value="2"
                            type="radio">
-                    <span><i></i><strong>Rejected</strong></span>
+                    <span><i></i><strong>Reject</strong></span>
                 </label>
             </div>
         </div>

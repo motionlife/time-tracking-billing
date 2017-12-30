@@ -55,6 +55,8 @@ class ProfileController extends Controller
                     'standard_percentage' => $request->get('standard_percentage') / 100,
                     'isEmployee' => $request->get('isEmployee'), 'inactive' => $request->get('inactive')
                 ])) {
+                    $consultant->contact->phone = $request->get('phone');
+                    $consultant->contact->save();
                     $feedback['code'] = 7;
                     $feedback['message'] = 'success';
                 };

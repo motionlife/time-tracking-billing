@@ -4,7 +4,7 @@
         <h1>Edit Profile</h1>
         <hr>
         <div class="row">
-        @php $user = \Illuminate\Support\Facades\Auth::user(); @endphp
+            @php $user = \Illuminate\Support\Facades\Auth::user(); @endphp
             <div class="col-md-6 personal-info">
                 <div class="alert alert-success alert-dismissible">
                     <a class="panel-close close" data-dismiss="alert">×</a>
@@ -115,6 +115,13 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="col-md-3 control-label">Phone:</label>
+                            <div class="col-lg-8">
+                                <input class="form-control" name="phone" type="text"
+                                       value="{{$user->consultant->contact->phone}}">
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-md-3 control-label"></label>
                             <div class="col-md-8">
                                 <input type="submit" class="btn btn-primary" value="Save Changes">
@@ -165,7 +172,6 @@
 
                 return false;
             });
-
             $('#con-info-form').on('submit', function (e) {
                 e.preventDefault();
                 formdata = $(this).serializeArray();
@@ -185,17 +191,8 @@
                     },
                     dataType: 'json'
                 });
-
                 return false;
             });
-
         });
-
     </script>
-@endsection
-
-@section('special-css')
-    <style>
-
-    </style>
 @endsection
