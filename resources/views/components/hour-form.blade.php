@@ -45,27 +45,6 @@
           rows="3"></textarea>
 <br>
 @if(isset($admin))
-    @if($admin)
-        <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="fancy-radio">
-                        <input name="endorse-or-not" value="1" type="radio">
-                        <span><i></i><strong>Endorse Report</strong></span>
-                    </label>
-                </div>
-                <div class="col-md-6">
-                    <label class="fancy-radio">
-                        <input name="endorse-or-not" value="2"
-                               type="radio">
-                        <span><i></i><strong>Recommend Re-submit</strong></span>
-                    </label>
-                </div>
-            </div>
-            <input class="form-control" name="feedback" id="hour-feedback"
-                   placeholder="feedback" type="text">
-        </div>
-    @else
-        <div id="feedback-info" style="margin-bottom: -1em"></div>
-    @endif
+    @component('components.feedback',['report_id'=>'hour-feedback','admin'=>$admin])
+    @endcomponent
 @endif

@@ -140,8 +140,8 @@
                         $('#consultant-name').text(data.cname);
                         @if($admin)
                         $('#report-update').attr('disabled', false);
-                        $("input[name=endorse-or-not][value=" + data.review_state + "]").prop('checked', true);
-                        if (data.review_state === "0") $("input[name=endorse-or-not]").prop('checked', false);
+                        $("input[name=review_state][value=" + data.review_state + "]").prop('checked', true);
+                        if (data.review_state === "0") $("input[name=review_state]").prop('checked', false);
                         $('#hour-feedback').val(data.feedback);
                         @else
                         if (data.review_state !== "0" && data.feedback !== null)
@@ -200,7 +200,7 @@
                         non_billable_hours: $('#non-billable-hours').val(),
                         description: $('#description').val(),
                         @if($admin)
-                        review_state: $("input[name=endorse-or-not]:checked").val(),
+                        review_state: $("input[name=review_state]:checked").val(),
                         feedback: $('#hour-feedback').val()
                         @endif
                     },

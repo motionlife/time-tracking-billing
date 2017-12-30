@@ -422,8 +422,8 @@
                         $('#client-select').selectpicker('val', data.client_id);
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
-                        $('#buz_dev_share').val(data.buz_dev_share * 100);
-                        $('#billing_amount').val(data.cycle_billing);
+                        $('#buz_dev_share').val(parseFloat(data.buz_dev_share * 100).toFixed(2));
+                        $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
                         $('#billing-day').datepicker('setDate', new Date('2022-12-' + data.billing_day + ' 00:00'));
                         $('#submit-modal').attr('disabled', @if($admin) false
                         @else data.status != 0  @endif );
@@ -435,9 +435,9 @@
                         $.each(data.arrangements, function (i, o) {
                             tr.find('.cid').selectpicker('val', o.consultant_id);
                             tr.find('.pid').selectpicker('val', o.position_id);
-                            tr.find('.b-rate').val(o.billing_rate);
-                            tr.find('.p-rate').val(o.pay_rate);
-                            tr.find('.f-share').val(o.firm_share * 100);
+                            tr.find('.b-rate').val(parseFloat(o.billing_rate).toFixed(2));
+                            tr.find('.p-rate').val(parseFloat(o.pay_rate).toFixed(2));
+                            tr.find('.f-share').val(parseFloat(o.firm_share * 100).toFixed(2));
                             if (data.arrangements[i + 1]) {
                                 tr = tr.clone().appendTo(table);
                                 tr.find('a').addClass("deletable-row");

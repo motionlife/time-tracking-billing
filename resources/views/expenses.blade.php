@@ -105,29 +105,8 @@
                                               placeholder="description"
                                               rows="4"></textarea>
                                     <br>
-                                    @if($admin)
-                                        <div style=" border-style: dotted;color:#33c0ff; padding: .3em .3em .3em .3em;">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label class="fancy-radio">
-                                                        <input name="review_state" value="1" type="radio">
-                                                        <span><i></i><strong>Endorse Report</strong></span>
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="fancy-radio">
-                                                        <input name="review_state" value="2"
-                                                               type="radio">
-                                                        <span><i></i><strong>Recommend Re-submit</strong></span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                            <input class="form-control" name="feedback" id="expense-feedback"
-                                                   placeholder="feedback" type="text">
-                                        </div>
-                                    @else
-                                        <div id="feedback-info" style="margin-bottom: -1em"></div>
-                                    @endif
+                                    @component('components.feedback',['report_id'=>'expense-feedback','admin'=>$admin])
+                                    @endcomponent
                                 </div>
                             </div>
                             <div class="modal-footer" style="margin-top: -0.7em">

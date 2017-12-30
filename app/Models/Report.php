@@ -58,13 +58,13 @@ class Report extends Model
                 $status = ['Approved', 'success'];
                 break;
             case 2:
-                $status = ['Confirmed', 'default'];
+                $status = ['Rejected', 'danger'];
                 break;
             case 3:
                 $status = ['BossReplied', 'info'];
                 break;
             case 4:
-                $status = ['Rejected', 'danger'];
+                $status = ['Confirmed', 'default'];
                 break;
             case 5:
                 $status = ['Archived', 'primary'];
