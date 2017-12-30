@@ -61,7 +61,7 @@ class EngagementPolicy
         //active state, the team leader can only add member to it, which shall pass the policy of arrangement
         $consultant = $user->consultant;
         if ($consultant instanceof Consultant) {
-            return $user->isSupervisor() || ($consultant->id == $engagement->leader_id && $engagement->isPending());
+            return ($user->isSupervisor()&&!$engagement->isClosed()) || ($consultant->id == $engagement->leader_id && $engagement->isPending());
         }
         return false;
     }

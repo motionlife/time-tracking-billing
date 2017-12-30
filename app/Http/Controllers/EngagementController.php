@@ -2,6 +2,7 @@
 
 namespace newlifecfo\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Arrangement;
@@ -177,8 +178,10 @@ class EngagementController extends Controller
                     }
                     //only manager or superAdmin can touch the status
                     if ($user->can('changeStatus', $eng)) {
+                        $opened = !$eng->isClosed();
                         $status = $request->get('status');
                         if (isset($status)) $eng->update(['status' => $status]);
+                        if($opened&&$eng->isClosed()) $eng->update(['close_date'=>Carbon::now()->toDateString('Y-m-d')]);
                     } else {
                         $feedback['code'] = 5;
                         $feedback['message'] = 'Status updating failed, no authorization';
