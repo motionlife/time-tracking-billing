@@ -18,18 +18,16 @@ class AdminController extends Controller
     public function index($resource, Request $request)
     {
         switch ($resource) {
+            case 'report':
             case 'hour':
-                return $this->hourEndorsement($request);
             case 'expense':
-                return $this->expenseEndorsement($request);
+                return $this->adminReport($request, $resource);
             case 'engagement':
                 return $this->grantEngagement($request);
             case 'bp':
-                return $this->viewBp($request, 0);
             case 'payroll':
-                return $this->viewBp($request, 1);
             case 'bill':
-                return $this->viewBp($request, 2);
+                return $this->viewBp($request, $resource);
             case 'user':
                 return $this->userAdmin($request);
             case 'client':
@@ -100,14 +98,17 @@ class AdminController extends Controller
     {
     }
 
-    private function hourEndorsement($request)
+    private function adminReport($request, $resource)
     {
-        return app(HoursController::class)->index($request, true);
-    }
+        if ($resource == 'report') {
+            return view('selection.report-select');
+        } else if ($resource == 'hour') {
+            return app(HoursController::class)->index($request, true);
+        } else if ($resource == 'expense') {
+            return app(ExpenseController::class)->index($request, true);
 
-    private function expenseEndorsement($request)
-    {
-        return app(ExpenseController::class)->index($request, true);
+        }
+        abort(404);
     }
 
     private function grantEngagement($request)
@@ -115,12 +116,12 @@ class AdminController extends Controller
         return app(EngagementController::class)->index($request, true);
     }
 
-    private function viewBp($request, $type)
+    private function viewBp($request, $resource)
     {
-        if ($type == 0) {
+        if ($resource == 'bp') {
             return view('selection.bp-select');
         } else {
-            return app(AccountingController::class)->index($request, true, $type == 1);
+            return app(AccountingController::class)->index($request, true, $resource == 'payroll');
         }
     }
 

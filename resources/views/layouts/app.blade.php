@@ -136,11 +136,7 @@
                                             class="icon-submenu lnr lnr-chevron-left"></i></a>
                                 <div id="subPages4" class="collapse {{str_contains(Request::path(),'admin') ?'in':''}}">
                                     <ul class="nav">
-                                        <li><a href="/admin/hour" class="{{Request::is('admin/hour')?'active':''}}">Hours
-                                                Admin</a></li>
-                                        <li><a href="/admin/expense"
-                                               class="{{Request::is('admin/expense')?'active':''}}">Expenses Admin</a>
-                                        </li>
+                                        <li><a href="/admin/report" class="{{Request::is('admin/report')||Request::is('admin/hour')||Request::is('admin/expense')?'active':''}}">Admin Reports</a></li>
                                         <li><a href="/admin/engagement"
                                                class="{{Request::is('admin/engagement')?'active':''}}">Grant
                                                 Engagements</a></li>
