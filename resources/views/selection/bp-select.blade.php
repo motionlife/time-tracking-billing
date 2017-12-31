@@ -14,7 +14,7 @@
                                                                                    alt="Consultant Payroll"
                                                                                    width="90px"></a>
                             <br>
-                            <p class="label label-info">Consultants' Payrolls</p>
+                            <p class="label label-primary">Consultants' Payrolls</p>
                         </div>
                         <div class="col-md-3 pull-right">
                             <a href="bill" title="View Client Bill"><img src="/img/billing.png" alt="Client Bill"

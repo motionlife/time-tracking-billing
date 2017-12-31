@@ -96,22 +96,23 @@ class Report extends Model
             $confirm['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
         }
         $eid = explode(',', $request->get('eid'));
-        if($request->get('me')==1){
-            $reports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
-            $confirm['me']=1;
-        }
-        else{
-            $reports =  collect();
-            foreach ($consultant->lead_engagements as $engagement) {
-                foreach ($engagement->arrangements as $arrangement) {
-                    $reports->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
-                }
+
+        $reports_me = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
+        $confirm['count']['me'] = $reports_me->count();
+
+        $reports_team = collect();
+        foreach ($consultant->lead_engagements as $engagement) {
+            foreach ($engagement->arrangements as $arrangement) {
+                $reports_team->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
             }
-            $confirm['me']=0;
         }
-        $reports = $reports->flatten();
-        $confirm['count'] = $reports->count();
-        $confirm['reports'] = $reports;
+        $reports_team = $reports_team->flatten();
+        $confirm['count']['team'] = $reports_team->count();
+        if ($request->get('me') == 1) {
+            $confirm['reports'] = $reports_me;
+        } else {
+            $confirm['reports'] = $reports_team;
+        }
         return $confirm;
     }
 }
