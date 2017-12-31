@@ -175,7 +175,7 @@
                 <div class="col-md-4">
                     <h3 class="page-title"
                         style="margin: auto;">{{$manage?'Engagements I lead':($admin?'Engagement Pool':'Engagements I\'m in')}}
-                        (total {{$engagements->count()}})</h3>
+                        (total {{$engagements->total()}})</h3>
                 </div>
                 <div class="col-md-8">
                     <div class="form-inline pull-right" style="font-family:FontAwesome;" id="filter-selection">
@@ -232,7 +232,8 @@
                                                    data-id="{{$engagement->id}}"><i
                                                             class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
                                                 <span>&nbsp;|&nbsp;</span>
-                                                <a href="javascript:void(0)" class="eng-delete" data-del="{{!$engagement->isPending()&&$manage?'0':'1'}}"
+                                                <a href="javascript:void(0)" class="eng-delete"
+                                                   data-del="{{!$engagement->isPending()&&$manage?'0':'1'}}"
                                                    data-id="{{$engagement->id}}"><i
                                                             class="fa fa-trash-o" aria-hidden="true"></i></a>
                                             </div>
@@ -302,6 +303,9 @@
                     </div>
                 @endif
             @endforeach
+        </div>
+        <div class="pull-right pagination">
+            {{ $engagements->appends(Request::except('page'))->withPath(Request::is('engagement/create')?'create':'engagement')->links() }}
         </div>
     </div>
 @endsection
@@ -380,7 +384,7 @@
                 $('#engagementModal').modal('toggle');
             });
             $('.eng-delete').on('click', function () {
-                if($(this).data('del')==0){
+                if ($(this).data('del') == 0) {
                     toastr.warning('Can\'t delete non-pending engagement here.');
                     return;
                 }

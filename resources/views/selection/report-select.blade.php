@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    <p><strong>NOTE: </strong>MODIFYING CONSULTANTS' REPORT DATA MAY AFFECT THEIR INCOMES AND CLIENTS' BILLS. PLEASE PROCEED WITH CAUTION!</p>
+                    <p><strong>NOTE: </strong>DELETING OR MODIFYING REPORTS DATA MAY AFFECT CONSULTANTS' INCOMES AND CLIENTS' BILLS. PLEASE PROCEED WITH CAUTION!</p>
                 </div>
             </div>
         </div>
