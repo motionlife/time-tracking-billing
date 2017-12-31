@@ -117,9 +117,9 @@
                                         class="icon-submenu lnr lnr-chevron-left"></i></a>
                             <div id="subPages3" class="collapse {{str_contains(Request::path(),'approval') ?'in':''}}">
                                 <ul class="nav">
-                                    <li><a href="/approval/hour" class="{{Request::is('approval/hour') ?'active':''}}">Time
+                                    <li><a href="/approval/hour?summary=1" class="{{Request::is('approval/hour') ?'active':''}}">Time
                                             Reports</a></li>
-                                    <li><a href="/approval/expense"
+                                    <li><a href="/approval/expense?summary=1"
                                            class="{{Request::is('approval/expense') ?'active':''}}">Expense Reports</a>
                                     </li>
                                 </ul>

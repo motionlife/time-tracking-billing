@@ -14,6 +14,7 @@ class ApprovalController extends Controller
         $this->middleware('auth');
         $this->middleware('verifiedConsultant');
     }
+
     public function index($report, Request $request)
     {
         switch ($report) {
@@ -22,23 +23,26 @@ class ApprovalController extends Controller
             case 'expense':
                 return $this->expenseApproval($request);
         }
-       abort(404);
+        abort(404);
     }
-
 
 
     private function hourApproval($request)
     {
         $confirm = Hour::needConfirm($request, Auth::user()->consultant);
-        //todo should store confirming hours in session
-        return app(HoursController::class)->index($request, false,$confirm);
+        if ($request->get('summary')) {
+            return view('approval-select', ['confirm' => $confirm]);
+        }
+        return app(HoursController::class)->index($request, false, $confirm);
     }
 
     private function expenseApproval($request)
     {
         $confirm = Expense::needConfirm($request, Auth::user()->consultant);
-        //todo should store confirming expenses in session
-        return app(ExpenseController::class)->index($request, false,$confirm);
+        if ($request->get('summary')) {
+            return view('approval-select', ['confirm' => $confirm]);
+        }
+        return app(ExpenseController::class)->index($request, false, $confirm);
     }
 
 }

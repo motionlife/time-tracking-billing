@@ -96,8 +96,7 @@ class Report extends Model
             $confirm['endOfLast'] = Carbon::parse('last day of last month')->endOfDay();
         }
         $eid = explode(',', $request->get('eid'));
-        //$hours = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
-        $reports = collect();
+        $reports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
         foreach ($consultant->lead_engagements as $engagement) {
             foreach ($engagement->arrangements as $arrangement) {
                 $reports->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));

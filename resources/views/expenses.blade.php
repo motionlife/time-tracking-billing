@@ -264,7 +264,7 @@
                                 toastr.success('Success! Expense has been updated!');
                                 tr.find('td:nth-child(4)').html(feedback.record.company_paid);
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
-                                tr.find('td:nth-child(6) strong').html('$' + feedback.record.total);
+                                tr.find('td:nth-child(6)').html('$' + feedback.record.total);
                                 tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
                                 @if(!$admin)
                                 tr.find('td:nth-child(8)').html(feedback.record.description);
