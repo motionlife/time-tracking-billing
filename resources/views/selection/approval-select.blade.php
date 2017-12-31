@@ -10,14 +10,14 @@
                 <div class="panel-body no-padding">
                     <div class="select-bp row">
                         <div class="col-md-3">
-                            <a href="" title="View Consultant Payroll"><img src="/img/my{{$type}}.png"
+                            <a href="{{$type=='time'?'hour?me=1':'expense?me=1'}}" title="View Consultant Payroll"><img src="/img/my{{$type}}.png"
                                                                                    alt="Consultant Payroll"
                                                                                    width="90px"></a>
                             <br>
                             <p class="label label-{{$type=='time'?'primary':'info'}}">My Own Reports</p>
                         </div>
                         <div class="col-md-3 pull-right">
-                            <a href="" title="View Client Bill"><img src="/img/team{{$type}}.png" alt="Client Bill"
+                            <a href="{{$type=='time'?'hour?team=1':'expense?me=0'}}" title="View Client Bill"><img src="/img/team{{$type}}.png" alt="Client Bill"
                                                                          width="90px"></a>
                             <br>
                             <p class="label label-success">Lead Engagements</p>
