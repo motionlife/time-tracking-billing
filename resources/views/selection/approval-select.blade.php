@@ -4,25 +4,28 @@
         <div class="container-fluid">
             <div class="panel panel-headline">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Consultants' Payrolls and Clients' Bills</h3>
-                    <p class="panel-subtitle">Click the icon to see detail</p>
+                    <h3 class="panel-title">Unapproved Time Reports</h3>
+                    <p class="panel-subtitle">last paying period: <span class="badge bg-success">{{$confirm['startOfLast']->toFormattedDateString().' - '.$confirm['endOfLast']->toFormattedDateString()}}</span></p>
                 </div>
                 <div class="panel-body no-padding">
                     <div class="select-bp row">
                         <div class="col-md-3">
-                            <a href="payroll" title="View Consultant Payroll"><img src="/img/payroll.png"
+                            <a href="" title="View Consultant Payroll"><img src="/img/my{{$type}}.png"
                                                                                    alt="Consultant Payroll"
                                                                                    width="90px"></a>
                             <br>
-                            <p class="label label-success">Consultant Payroll</p>
+                            <p class="label label-{{$type=='time'?'primary':'info'}}">My Own Reports</p>
                         </div>
                         <div class="col-md-3 pull-right">
-                            <a href="bill" title="View Client Bill"><img src="/img/billing.png" alt="Client Bill"
+                            <a href="" title="View Client Bill"><img src="/img/team{{$type}}.png" alt="Client Bill"
                                                                          width="90px"></a>
                             <br>
-                            <p class="label label-success">Client Bill</p>
+                            <p class="label label-success">Lead Engagements</p>
                         </div>
                     </div>
+                </div>
+                <div class="panel-footer">
+                    <p><strong>NOTE: </strong>A REPORT SHALL BECOME <span class="label label-success">Approved</span> AFTER BEING CONFIRMED BOTH BY YOU AND THE ENGAGEMENT LEADER.</p>
                 </div>
             </div>
         </div>

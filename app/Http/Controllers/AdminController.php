@@ -118,7 +118,7 @@ class AdminController extends Controller
     private function viewBp($request, $type)
     {
         if ($type == 0) {
-            return view('bpselect');
+            return view('selection.bp-select');
         } else {
             return app(AccountingController::class)->index($request, true, $type == 1);
         }

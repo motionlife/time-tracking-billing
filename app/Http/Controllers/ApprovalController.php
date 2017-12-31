@@ -31,7 +31,7 @@ class ApprovalController extends Controller
     {
         $confirm = Hour::needConfirm($request, Auth::user()->consultant);
         if ($request->get('summary')) {
-            return view('approval-select', ['confirm' => $confirm]);
+            return view('selection.approval-select', ['confirm' => $confirm,'type'=>'time']);
         }
         return app(HoursController::class)->index($request, false, $confirm);
     }
@@ -40,7 +40,7 @@ class ApprovalController extends Controller
     {
         $confirm = Expense::needConfirm($request, Auth::user()->consultant);
         if ($request->get('summary')) {
-            return view('approval-select', ['confirm' => $confirm]);
+            return view('selection.approval-select', ['confirm' => $confirm,'type'=>'expense']);
         }
         return app(ExpenseController::class)->index($request, false, $confirm);
     }
