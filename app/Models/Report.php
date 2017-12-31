@@ -85,7 +85,7 @@ class Report extends Model
         return isset($review_state) ? $reports->where('review_state', $review_state)->get() : $reports->get();
     }
 
-    public static function needConfirm($request, $consultant)
+    public static function confirmation($request, $consultant)
     {
         $confirm = [];
         if (Carbon::now()->day > 15) {
@@ -97,21 +97,24 @@ class Report extends Model
         }
         $eid = explode(',', $request->get('eid'));
 
-        $reports_me = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
-        $confirm['count']['me'] = $reports_me->count();
+        $myReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
+        $confirm['count']['me'] = $myReports->count();
 
-        $reports_team = collect();
+        $teamReports = collect();
         foreach ($consultant->lead_engagements as $engagement) {
-            foreach ($engagement->arrangements as $arrangement) {
-                $reports_team->push(self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $arrangement->consultant, 0));
-            }
+            if (!$eid[0] || in_array($engagement->id, $eid))
+                foreach ($engagement->arrangements as $arrangement) {
+                    $teamReports = $teamReports->merge(self::reported($confirm['startOfLast'], $confirm['endOfLast'], [$engagement->id], $arrangement->consultant, 0));
+                }
         }
-        $reports_team = $reports_team->flatten();
-        $confirm['count']['team'] = $reports_team->count();
-        if ($request->get('me') == 1) {
-            $confirm['reports'] = $reports_me;
-        } else {
-            $confirm['reports'] = $reports_team;
+        $confirm['count']['team'] = $teamReports->count();
+
+        if ($request->get('reporter') == 'me') {
+            $confirm['reports'] = $myReports;
+        } else if ($request->get('reporter') == 'team') {
+            $confirm['reports'] = $teamReports;
+        }else {
+            $confirm['reports'] = collect();
         }
         return $confirm;
     }

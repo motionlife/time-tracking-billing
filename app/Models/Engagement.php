@@ -140,7 +140,7 @@ class Engagement extends Model
             $start = Carbon::parse($start ?: '1970-01-01');
             $end = Carbon::parse($end);
             $start = $start_day->diffInDays($start, false) > 0 ? $start : $start_day;
-            $end = $this->isClosed() && $end->diffInDays(Carbon::parse($this->close_date),false) < 0 ? Carbon::parse($this->close_date) : $end;
+            $end = $this->isClosed() && $end->diffInDays(Carbon::parse($this->close_date), false) < 0 ? Carbon::parse($this->close_date) : $end;
             $days = $start->startOfDay()->diffInDays($end->startOfDay(), false);
             $billedMonths = 0;
             if ($days >= 0) {

@@ -92,7 +92,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Client</th>
-                                                <th>Engagement</th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
                                                 <th>Rate</th>
@@ -111,7 +113,7 @@
                                                     <th scope="row">{{$loop->index+$offset}}</th>
                                                     <td>{{str_limit($hour->client->name,20)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng->id),false))}}">{{str_limit($eng->name,20)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,20)}}</a>
                                                     </td>
                                                     <td>{{$hour->report_date}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
@@ -141,7 +143,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Client</th>
-                                                <th>Engagement</th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Amount</th>
                                                 <th>Status</th>
@@ -157,7 +161,7 @@
                                                     <th scope="row">{{$loop->index+$offset}}</th>
                                                     <td>{{str_limit($expense->client->name,30)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
                                                     <td>{{$expense->report_date}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
@@ -181,7 +185,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Client</th>
-                                                <th>Engagement</th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>ENG. Status</th>
                                                 <th>Business Development Share</th>
                                                 <th>Total Billable Hours</th>
@@ -194,7 +200,7 @@
                                                     <td>{{$loop->index+1}}</td>
                                                     <td>{{str_limit($eng[0]->client->name,32)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab'),'eid',$eng[0]->id),false)).'&tab=3'}}">{{str_limit($eng[0]->name,32)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng[0]->id),false)).'&tab=3'}}">{{str_limit($eng[0]->name,32)}}</a>
                                                     </td>
                                                     <td>
                                                         <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}}</span>

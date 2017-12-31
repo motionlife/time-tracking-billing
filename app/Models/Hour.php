@@ -51,9 +51,9 @@ class Hour extends Report
             });
     }
 
-    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null, $client = null)
+    public static function monthlyHoursAndIncome($consultant = null, $start = null, $end = null, $review_state = null, $client = null,$eid=null)
     {
-        return self::reported($start, $end, null, $consultant, $review_state, $client)
+        return self::reported($start, $end, $eid, $consultant, $review_state, $client)
             ->mapToGroups(function ($hour) {
                 return [Carbon::parse($hour->report_date)->format('y-M') =>
                     [$hour->billable_hours + $hour->non_billable_hours, $hour->earned()]];
@@ -61,6 +61,4 @@ class Hour extends Report
                 return [$month->sum(0), $month->sum(1)];
             });
     }
-
-
 }

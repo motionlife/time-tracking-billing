@@ -118,23 +118,27 @@
                     </div>
                 </div>
             </div>
-            @component('components.confirm',['confirm'=>$confirm])
-            @endcomponent
+
             <div class="panel panel-headline">
                 <div class="row">
-                    <div class="panel-heading col-md-2">
-                        <h3 class="panel-title">{{$admin?'Expense Pool':'Expense History'}}</h3>
-                        <p class="panel-subtitle">{{$expenses->total()}} results</p>
-                    </div>
-                    <div class="panel-body col-md-10">
-                        @if(!$admin)
-                            <a class="btn btn-success" id="add-expense" href="javascript:void(0)"
-                               title="New Expense"><i class="fa fa-plus" aria-hidden="true"></i>
-                                <i>&nbsp;Add New</i></a>
-                        @endif
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'expense'])
+                    @if($confirm)
+                        @component('components.confirm',['confirm'=>$confirm,'reports'=>$expenses])
                         @endcomponent
-                    </div>
+                    @else
+                        <div class="panel-heading col-md-2">
+                            <h3 class="panel-title">{{$admin?'Expense Pool':'Expense History'}}</h3>
+                            <p class="panel-subtitle">{{$expenses->total()}} results</p>
+                        </div>
+                        <div class="panel-body col-md-10">
+                            @if(!$admin)
+                                <a class="btn btn-success" id="add-expense" href="javascript:void(0)"
+                                   title="New Expense"><i class="fa fa-plus" aria-hidden="true"></i>
+                                    <i>&nbsp;Add New</i></a>
+                            @endif
+                            @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'expense'])
+                            @endcomponent
+                            @endif
+                        </div>
                 </div>
                 <div class="panel-body no-padding">
                     <table class="table table-striped table-responsive">
@@ -142,7 +146,8 @@
                         <tr>
                             <th>#</th>
                             <th>Client</th>
-                            <th>Engagement</th>
+                            <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
+                                            class="fa fa-refresh" aria-hidden="true"></i></a></th>
                             <th>Company Paid</th>
                             <th>Report Date</th>
                             <th>Total</th>

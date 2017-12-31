@@ -27,8 +27,8 @@ class ExpensePolicy
      */
     public function view(User $user, Expense $expense)
     {
-        //
-        return $expense->arrangement->consultant_id == $user->consultant->id || $user->isSupervisor();
+        $consultant = $user->consultant;
+        return $expense->consultant_id == $consultant->id || $user->isSupervisor() || $expense->arrangement->engagement->leader->id == $consultant->id;
     }
 
     /**
@@ -51,7 +51,7 @@ class ExpensePolicy
      */
     public function update(User $user, Expense $expense)
     {
-        return ($expense->arrangement->consultant_id = $user->consultant->id && $expense->unfinalized())
+        return ($expense->consultant_id == $user->consultant->id && $expense->unfinalized())
             || $user->isSupervisor();
     }
 
@@ -64,6 +64,6 @@ class ExpensePolicy
      */
     public function delete(User $user, Expense $expense)
     {
-        return ($expense->arrangement->consultant_id = $user->consultant->id || $user->isSupervisor()) && $expense->unfinalized();
+        return ($expense->consultant_id == $user->consultant->id || $user->isSupervisor()) && $expense->unfinalized();
     }
 }

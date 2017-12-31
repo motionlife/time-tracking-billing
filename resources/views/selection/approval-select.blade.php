@@ -10,18 +10,18 @@
                 <div class="panel-body no-padding">
                     <div class="select-bp row">
                         <div class="col-md-3">
-                            <a href="{{$type=='time'?'hour?me=1':'expense?me=1'}}" title="Confirm my {{$type}} reports"><img src="/img/my{{$type}}.png"
-                                                                                   alt="{{$type}}"
-                                                                                   width="90px"></a>
+                            <a href="{{$report=='time'?'hour?reporter=me':'expense?reporter=me'}}" title="Confirm my {{$report}} reports"><img src="/img/my{{$report}}.png"
+                                                                                   alt="{{$report}}"
+                                                                                   width="90px"><span class="badge bg-{{$confirm['count']['me']==0?'default':'danger'}}">{{$confirm['count']['me']}}</span></a>
                             <br>
-                            <p class="label label-{{$type=='time'?'primary':'info'}}">My Own {{$type=='time'?'Hours':'Expenses'}}<span class="badge bg-{{$confirm['count']['me']==0?'default':'danger'}}">{{$confirm['count']['me']}}</span></p>
+                            <p class="label label-{{$report=='time'?'primary':'info'}}">My Own {{$report=='time'?'Hours':'Expenses'}}</p>
 
                         </div>
                         <div class="col-md-3 pull-right">
-                            <a href="{{$type=='time'?'hour?me=0':'expense?me=0'}}" title="Approve my team's {{$type}} reports"><img src="/img/team{{$type}}.png" alt="{{$type}}"
-                                                                         width="90px"></a>
+                            <a href="{{$report=='time'?'hour?reporter=team':'expense?reporter=team'}}" title="Approve my team's {{$report}} reports"><img src="/img/team{{$report}}.png" alt="{{$report}}"
+                                                                         width="90px"><span class="badge bg-{{$confirm['count']['team']==0?'default':'danger'}}">{{$confirm['count']['team']}}</span></a>
                             <br>
-                            <p class="label label-success">Lead Engagements<span class="badge bg-{{$confirm['count']['team']==0?'default':'danger'}}">{{$confirm['count']['team']}}</span></p>
+                            <p class="label label-success">Lead Engagements</p>
                         </div>
                     </div>
                 </div>
@@ -49,9 +49,9 @@
             color:red;
         }
         div.select-bp span.badge {
-            font-size: 1.5em;
+            font-size: 1.2em;
             position: absolute;
-            top: 22px;
+            top: 1.7em;
             right: 5px;
         }
     </style>

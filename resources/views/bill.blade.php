@@ -80,7 +80,7 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Consultant</th>
-                                                <th>Engagement</th>
+                                                <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
                                                 <th>Rate</th>
@@ -99,7 +99,7 @@
                                                     <td>{{str_limit($hour->consultant->fullname(),23)}}</td>
                                                     <td>
                                                         <span class="badge bg-{{$eng->paying_cycle==0?'default':($eng->paying_cycle==1?'warning':'danger')}}">{{$eng->paying_cycle==0?'H':($eng->paying_cycle==1?'M':'Fixed')}}</span>
-                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab'),'eid',$eng->id),false))}}">{{str_limit($eng->name,23)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,23)}}</a>
                                                     </td>
                                                     <td>{{$hour->report_date}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
@@ -128,7 +128,7 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Consultant</th>
-                                                <th>Engagement</th>
+                                                <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Amount</th>
                                                 <th>Status</th>
@@ -144,7 +144,7 @@
                                                     <th scope="row">{{$loop->index+$offset}}</th>
                                                     <td>{{str_limit($expense->consultant->fullname(),30)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
                                                     <td>{{$expense->report_date}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
@@ -182,7 +182,7 @@
                                         <tr>
                                             <td>{{++$index}}</td>
                                             <td>
-                                                <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('cid','eid'),'cid',$client->id),false))}}">{{$client->name}}</a>
+                                                <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('cid','eid','page'),'cid',$client->id),false))}}">{{$client->name}}</a>
                                             </td>
                                             <td>{{$hrs[$cid][0]}}</td>
                                             <td>{{$hrs[$cid][1]}}</td>

@@ -29,7 +29,8 @@ class HourPolicy
     public function view(User $user, Hour $hour)
     {
         //
-        return $hour->arrangement->consultant_id == $user->consultant->id || $user->isSupervisor();
+        $consultant = $user->consultant;
+        return $hour->consultant_id == $consultant->id || $user->isSupervisor() || $hour->arrangement->engagement->leader->id == $consultant->id;
     }
 
     /**
@@ -53,7 +54,7 @@ class HourPolicy
     public function update(User $user, Hour $hour)
     {
         //
-        return ($hour->arrangement->consultant_id = $user->consultant->id && $hour->unfinalized())
+        return ($hour->consultant_id == $user->consultant->id && $hour->unfinalized())
             || $user->isSupervisor();
     }
 
@@ -67,7 +68,6 @@ class HourPolicy
     public function delete(User $user, Hour $hour)
     {
         //
-        return ($hour->arrangement->consultant_id = $user->consultant->id || $user->isSupervisor()) && $hour->unfinalized();
-        //|| $user->isSupervisor();
+        return ($hour->consultant_id == $user->consultant->id || $user->isSupervisor()) && $hour->unfinalized();
     }
 }

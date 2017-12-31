@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+    @php $mcMode = $admin||Request::get('reporter')=='team'; @endphp
     <div class="main-content">
         <div class="container-fluid">
             <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
@@ -33,18 +34,22 @@
                     </div>
                 </div>
             </div>
-            @component('components.confirm',['confirm'=>$confirm])
-            @endcomponent
+
             <div class="panel panel-headline">
                 <div class="row">
-                    <div class="panel-heading col-md-2">
-                        <h3 class="panel-title">{{$admin?'Hour Pool':'Time History'}}</h3>
-                        <p class="panel-subtitle">{{$hours->total()}} results</p>
-                    </div>
-                    <div class="panel-body col-md-10">
-                        @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'hour'])
+                    @if($confirm)
+                        @component('components.confirm',['confirm'=>$confirm,'reports'=>$hours])
                         @endcomponent
-                    </div>
+                    @else
+                        <div class="panel-heading col-md-2">
+                            <h3 class="panel-title">{{$admin?'Hour Pool':'Time History'}}</h3>
+                            <p class="panel-subtitle">{{$hours->total()}} results</p>
+                        </div>
+                        <div class="panel-body col-md-10">
+                            @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'hour'])
+                            @endcomponent
+                        </div>
+                    @endif
                 </div>
                 <div class="panel-body no-padding">
                     <table class="table table-striped table-responsive">
@@ -52,11 +57,17 @@
                         <tr>
                             <th>#</th>
                             <th>Client</th>
-                            <th>Engagement</th>
-                            <th>Task</th>
+                            <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
+                                            class="fa fa-refresh" aria-hidden="true"></i></a></th>
+                            @if($confirm)
+                                <th>Paid</th>
+                                <th>Billing</th>
+                            @else
+                                <th>Task</th>
+                            @endif
                             <th>Billable Hours</th>
                             <th>Report Date</th>
-                            <th>{{$admin?'Consultant':'Description'}}</th>
+                            <th>{{$mcMode?'Consultant':'Description'}}</th>
                             <th>Status</th>
                             <th>Operate</th>
                         </tr>
@@ -75,11 +86,16 @@
                                 <td>
                                     <a href="{{str_replace_first('/','',route('hour.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,19)}}</a>
                                 </td>
-                                <td>{{str_limit($hour->task->getDesc(),23)}}</td>
+                                @if($confirm)
+                                    <td>${{number_format($hour->earned(),2)}}</td>
+                                    <td>${{number_format($hour->billClient(),2)}}</td>
+                                @else
+                                    <td>{{str_limit($hour->task->getDesc(),23)}}</td>
+                                @endif
                                 <td>{{number_format($hour->billable_hours,2)}}</td>
                                 <td>{{$hour->report_date}}</td>
                                 <td>
-                                    @if($admin)
+                                    @if($mcMode)
                                         <strong>{{str_limit($cname,25)}}</strong>
                                     @else
                                         {{str_limit($hour->description,29)}}
@@ -219,7 +235,7 @@
                             tr.find('td:nth-child(4)').html(feedback.record.task);
                             tr.find('td:nth-child(5)').html(feedback.record.billable_hours);
                             tr.find('td:nth-child(6)').html(feedback.record.report_date);
-                            @if(!$admin) tr.find('td:nth-child(7)').html(feedback.record.description);
+                            @if(!$mcMode) tr.find('td:nth-child(7)').html(feedback.record.description);
                             @endif
                             tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
                             tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
@@ -254,9 +270,9 @@
             margin-left: 1.5em;
         }
 
-        .panel tr td:nth-child(5) {
-            text-indent: 1.2em;
-            font-weight: bold;
+        .panel tr td:nth-child({{$confirm?6:5}}) {
+            text-indent: 1em;
+            font-weight: 600;
         }
     </style>
 @endsection

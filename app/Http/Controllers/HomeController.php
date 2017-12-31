@@ -56,24 +56,27 @@ class HomeController extends Controller
         $data['last_expense'] += Expense::reportedExpenses($consultant, $data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
         $data['last2_expense'] += Expense::reportedExpenses($consultant, $data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
 
-        foreach (Hour::monthlyHoursAndIncome($consultant, Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), 1)
+        $startMon = Carbon::now()->startOfMonth()->subMonth(12)->startOfDay();
+        $endMon = Carbon::now()->startOfMonth()->subMonth()->endOfMonth()->endOfDay();
+        foreach (Hour::monthlyHoursAndIncome($consultant, $startMon, $endMon, 1)
                  as $mon => $amounts) {
             $data['dates']['mon'][$mon][0] += $amounts[0];
             $data['dates']['mon'][$mon][1] += $amounts[1];
         }
-        foreach (Expense::monthlyExpenses($consultant, Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), 1)
+        foreach (Expense::monthlyExpenses($consultant, $startMon, $endMon, 1)
                  as $mon => $amount) {
             $data['dates']['mon'][$mon][1] += $amount;
         }
 
         foreach ($consultant->dev_clients()->withTrashed()->get() as $dev_client) {
-            foreach ($dev_client->engagements()->withTrashed()->get() as $engagement) {
+            $engagements = $dev_client->engagements()->withTrashed()->get();
+            foreach ($engagements as $engagement) {
                 if ($engagement->buz_dev_share == 0) continue;
                 $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
                 $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
+                //todo:: should also calculation last 12 months write buz_dev=>incomeForBuzDev(12 month)
             }
-            //todo:: should also calculation last 12 months write buz_dev=>incomeForBuzDev(12 month)
-            foreach (Hour::monthlyHoursAndIncome(null, Carbon::now()->subMonth(12)->startOfMonth()->startOfDay(), Carbon::now()->subMonth()->endOfMonth()->endOfDay(), 1, $dev_client)
+            foreach (Hour::monthlyHoursAndIncome(null, $startMon, $endMon, 1, $dev_client, $engagements->pluck('id'))
                      as $mon => $amounts) {
                 $data['dates']['mon'][$mon][1] += $amounts[1] * $engagement->buz_dev_share;
             }

@@ -219,7 +219,7 @@ class AccountingController extends Controller
                         array_push($content, [$client->name, $data['hrs'][$cid][0], $data['hrs'][$cid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($salary[0] + $salary[1], 2)]);
                     }
                     array_push($content, []);
-                    array_push($content, ['Engagement Total', $data['bill'][0], 'Expense Total', $data['bill'][1]]);
+                    array_push($content, ['Engagement Total($)', $data['bill'][0], 'Expense Total($)', $data['bill'][1]]);
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
@@ -293,7 +293,7 @@ class AccountingController extends Controller
                         array_push($content, [$consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)]);
                     }
                     array_push($content, []);
-                    array_push($content, ['Hourly Total', $data['income'][0], 'Expense Total', $data['income'][1], 'Buz Dev Total', $data['buz_devs']['total']]);
+                    array_push($content, ['Hourly Total($)', $data['income'][0], 'Expense Total($)', $data['income'][1], 'Buz Dev Total($)', $data['buz_devs']['total']]);
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
@@ -314,7 +314,7 @@ class AccountingController extends Controller
                     $content = [];
                     foreach ($data['hours'] as $i => $hour) {
                         $eng = $hour->arrangement->engagement;
-                        array_push($content, [$hour->client->name, $eng->name, $hour->report_date, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
+                        array_push($content, [$hour->client->name, $eng->name, $hour->report_date, number_format($hour->billable_hours,2), number_format($hour->non_billable_hours,2), $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
                             number_format($hour->share * 100, 1) . '%', number_format($hour->earned(), 2), $hour->description, $hour->getStatus()[0]]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
