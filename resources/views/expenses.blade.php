@@ -153,7 +153,7 @@
                             <th>Report Date</th>
                             <th>Total</th>
                             <th>Receipts</th>
-                            <th>{{$admin?'Consultant':'Description'}}</th>
+                            <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
                             <th>Status</th>
                             <th>Operate</th>
                         </tr>
@@ -189,7 +189,7 @@
                                 </td>
                                 <td>
                                     @if($mcMode)
-                                        <strong>{{str_limit($cname,25)}}</strong>
+                                        <a href="{{url()->current().'?'.http_build_query(Request::except('conid','page')).'&conid='.$expense->consultant_id}}">{{str_limit($cname,25)}}</a>
                                     @else
                                         {{str_limit($expense->description,37)}}
                                     @endif
@@ -418,6 +418,7 @@
             font-weight: bold;
         }
     </style>
+    @yield('confirm_module')
 @endsection()
 @section('special-css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.10/featherlight.min.css">

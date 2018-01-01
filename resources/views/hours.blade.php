@@ -67,7 +67,7 @@
                             @endif
                             <th>Billable Hours</th>
                             <th>Report Date</th>
-                            <th>{{$mcMode?'Consultant':'Description'}}</th>
+                            <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
                             <th>Status</th>
                             <th>Operate</th>
                         </tr>
@@ -96,7 +96,7 @@
                                 <td>{{$hour->report_date}}</td>
                                 <td>
                                     @if($mcMode)
-                                        <strong>{{str_limit($cname,25)}}</strong>
+                                        <a href="{{url()->current().'?'.http_build_query(Request::except('conid','page')).'&conid='.$hour->consultant_id}}">{{str_limit($cname,25)}}</a>
                                     @else
                                         {{str_limit($hour->description,29)}}
                                     @endif
@@ -280,4 +280,5 @@
             font-weight: 600;
         }
     </style>
+    @yield('confirm_module')
 @endsection

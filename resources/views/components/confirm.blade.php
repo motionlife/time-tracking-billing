@@ -14,6 +14,7 @@
                 <tr>
                     <th>Period</th>
                     <th>Listed Reports</th>
+                    <th>Consultants</th>
                     @if($isHour)
                         <th>Total Billable Hours</th>
                         <th>Payroll Amount</th>
@@ -30,6 +31,7 @@
                         <span class="label label-primary">{{$confirm['startOfLast']->toFormattedDateString().' - '.$confirm['endOfLast']->toFormattedDateString()}}</span>
                     </td>
                     <td><span class="badge bg-success">{{$reports->total()}}</span></td>
+                    <td>{{$confirm['reports']->pluck('consultant_id')->unique()->count()}}</td>
                     @if($isHour)
                         <td>{{$stat[0]}} Hours</td>
                         <th>${{number_format($stat[1],2)}}</th>
@@ -44,12 +46,36 @@
         </div>
         <div>
             <i class="fa fa-exclamation-triangle"></i>
-            Make sure there's no mistake about all the listed reports below and click the confirm button to submit.
+            After making sure there are no mistakes about the listed <strong>{{$reports->total()}}</strong> reports then
+            click the confirm button.
             <div class="form-group pull-right">
-                <a href="#" class="btn btn-primary">Confirm</a>
+                <a href="#" id="confirm_button" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing" class="btn btn-primary">Confirm</a>
                 <i>&nbsp;</i>
                 <a href="{{url()->current().'?summary=1'}}" class="btn btn-default">Back</a>
             </div>
         </div>
     </div>
 </div>
+@section('confirm_module')
+    <script>
+        $(function () {
+            $('#confirm_button').on('click', function () {
+                var confirm = $(this);
+                confirm.button('loading');
+               setTimeout(function () {
+                   confirm.button('reset');
+                   swal({
+                           title: "Success!",
+                           text: "The listed reports have been confirmed by you.",
+                           type: "success",
+                           confirmButtonColor: "#5adb76",
+                           confirmButtonText: "OK"
+                       },
+                       function () {
+                           location.reload();
+                       });
+               },1000);
+            });
+        });
+    </script>
+@endsection
