@@ -5,7 +5,6 @@ namespace newlifecfo\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class Report extends Model
 {
@@ -79,10 +78,10 @@ class Report extends Model
                 $status = ['Rejected', 'danger'];
                 break;
             case 3:
-                $status = ['Self_Confirmed', 'info'];
+                $status = ['Self_Confirmed', 'primary'];
                 break;
             case 4:
-                $status = ['Leader_Confirmed', 'primary'];
+                $status = ['Leader_Confirmed', 'info'];
                 break;
         }
         return $status;
