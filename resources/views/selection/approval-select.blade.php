@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="panel panel-headline">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Confirm Time Reports</h3>
+                    <h3 class="panel-title">Confirm {{$report=='time'?'Time':'Expense'}} Reports</h3>
                     <p class="panel-subtitle">Last paying period: <span class="badge bg-success">{{$confirm['startOfLast']->toFormattedDateString().' - '.$confirm['endOfLast']->toFormattedDateString()}}</span></p>
                 </div>
                 <div class="panel-body no-padding">
@@ -21,7 +21,7 @@
                             <a href="{{$report=='time'?'hour?reporter=team':'expense?reporter=team'}}" title="Approve my team's {{$report}} reports"><img src="/img/team{{$report}}.png" alt="{{$report}}"
                                                                          width="90px"><span class="badge bg-{{$confirm['count']['team']==0?'default':'danger'}}">{{$confirm['count']['team']}}</span></a>
                             <br>
-                            <p class="label label-success">Lead Engagements</p>
+                            <p class="label label-success">Led Engagements</p>
                         </div>
                     </div>
                 </div>

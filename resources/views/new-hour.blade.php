@@ -90,7 +90,7 @@
                                     @for($i=0;$i<7;$i++)
                                         @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
                                         <th>{{substr($date->addDay($i)->format('l'),0,3)}}
-                                            <br><span
+                                            <br><span class="week-date"
                                                     data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
                                         </th>
                                     @endfor
@@ -295,7 +295,7 @@
             }).on('changeDate', function (e) {
                 var weekinfo = $('#week-info');
                 var md = moment(e.date);
-                var spans = $('#hours-roll').find('thead tr span');
+                var spans = $('#hours-roll').find('span.week-date');
                 var firstDate = md.day(0).format("MM/DD/YYYY");
                 var lastDate = md.day(6).format("MM/DD/YYYY");
                 weekinfo.find('strong').empty().text(firstDate + " - " + lastDate);
@@ -326,7 +326,7 @@
             $('#matrix').on('submit', function (e) {
                 var data = [], json = [];
                 data.push({name: '_token', value: "{{csrf_token()}}"}, {name: 'week', value: true});
-                var spans = $('#hours-roll').find('thead tr span');
+                var spans = $('#hours-roll').find('span.week-date');
                 $('#hours-roll').find('tbody tr').each(function (i, r) {
                     var eid = $(this).data('eid');
                     var pid = $(this).data('pid');

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+    @php $mcMode = $admin||Request::get('reporter')=='team'; @endphp
     <div class="main-content" xmlns:javascript="https://www.w3.org/1999/xhtml">
         <div class="container-fluid">
             <div class="modal fade" id="expenseModal" tabindex="-1" role="dialog" aria-labelledby="expenseModalLabel"
@@ -137,8 +138,8 @@
                             @endif
                             @component('components.filter',['clientIds'=>$clientIds,'admin'=>$admin,'target'=>'expense'])
                             @endcomponent
-                            @endif
                         </div>
+                    @endif
                 </div>
                 <div class="panel-body no-padding">
                     <table class="table table-striped table-responsive">
@@ -165,7 +166,7 @@
                                 $eng = $arr->engagement;
                                 $cname =$expense->consultant->fullname();
                             @endphp
-                            <tr data-del="{{$admin||$expense->isPending()?1:0}}">
+                            <tr data-del="{{($admin||$expense->isPending())&&!$confirm?1:0}}">
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($expense->client->name,22)}}</td>
                                 <td>
@@ -187,7 +188,7 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    @if($admin)
+                                    @if($mcMode)
                                         <strong>{{str_limit($cname,25)}}</strong>
                                     @else
                                         {{str_limit($expense->description,37)}}
@@ -271,7 +272,7 @@
                                 tr.find('td:nth-child(5)').html(feedback.record.report_date);
                                 tr.find('td:nth-child(6)').html('$' + feedback.record.total);
                                 tr.find('td:nth-child(7)').empty().append(outputLink(feedback.record.receipts));
-                                @if(!$admin)
+                                @if(!$mcMode)
                                 tr.find('td:nth-child(8)').html(feedback.record.description);
                                 @endif
                                 tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
@@ -337,7 +338,12 @@
                     @endif
 
                 },
-                dataType: 'json'
+                dataType: 'json',
+                complete:function () {
+                    @if($confirm)
+                    $('#report-update').attr('disabled', true);
+                    @endif
+                }
             });
             $('#expenseModal').modal('toggle');
         }
@@ -374,7 +380,7 @@
                         });
                     });
             } else {
-                toastr.warning('Non-pending report can only be deleted by admin');
+                toastr.warning('Action not allowed here or admin priority is needed.');
             }
 
         }

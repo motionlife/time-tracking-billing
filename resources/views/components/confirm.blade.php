@@ -44,9 +44,10 @@
         </div>
         <div>
             <i class="fa fa-exclamation-triangle"></i>
-            You have unconfirmed time reports in last paying period.
+            Make sure there's no mistake about all the listed reports below and click the confirm button to submit.
             <div class="form-group pull-right">
                 <a href="#" class="btn btn-primary">Confirm</a>
+                <i>&nbsp;</i>
                 <a href="{{url()->current().'?summary=1'}}" class="btn btn-default">Back</a>
             </div>
         </div>

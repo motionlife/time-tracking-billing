@@ -29,9 +29,10 @@ class EngagementController extends Controller
     public function index(Request $request, $isAdmin = false)
     {
         $consultant = $isAdmin ? null : Auth::user()->consultant;
-        $engagements =$this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status')),20);
+        $engs = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status'));
+        $engagements =$this->paginate($engs,20);
         return view('engagements', ['engagements' => $engagements,
-            'clients' => $engagements->map(function ($item, $key) {
+            'clients' => $engs->map(function ($item) {
                 return $item->client;
             })->unique(),
             'leaders' => Engagement::all()->map(function ($item, $key) {
@@ -57,7 +58,7 @@ class EngagementController extends Controller
         return view('engagements', [
             'engagements' =>$this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status')),20),
             'leader' => $consultant,
-            'clients' => $consultant->lead_engagements->map(function ($item, $key) {
+            'clients' => $consultant->lead_engagements->map(function ($item) {
                 return $item->client;
             })->unique(), 'admin' => false]);
     }

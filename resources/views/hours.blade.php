@@ -105,7 +105,7 @@
                                 </td>
                                 <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i
                                                 class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"
-                                                                                         data-del="{{$admin||$hour->isPending()?1:0}}"><i
+                                                                                         data-del="{{($admin||$hour->isPending())&&!$confirm?1:0}}"><i
                                                 class="fa fa-times"></i></a></td>
                             </tr>
                         @endforeach
@@ -173,7 +173,12 @@
                         else $('#feedback-info').removeClass('alert alert-success').text('');
                         @endif
                     },
-                    dataType: 'json'
+                    dataType: 'json',
+                    complete:function () {
+                        @if($confirm)
+                        $('#report-update').attr('disabled', true);
+                        @endif
+                    }
                 });
                 $('#hourModal').modal('toggle');
             });
@@ -206,7 +211,7 @@
                             });
                         });
                 } else {
-                    toastr.warning('Non-pending report can only be deleted by admin')
+                    toastr.warning('Action not allowed here or admin priority is needed.')
                 }
             });
 
