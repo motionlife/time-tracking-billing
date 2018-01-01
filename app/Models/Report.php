@@ -101,19 +101,25 @@ class Report extends Model
         $confirm['count']['me'] = $myReports->count();
 
         $teamReports = collect();
-        foreach ($consultant->lead_engagements as $engagement) {
-            if (!$eid[0] || in_array($engagement->id, $eid))
-                foreach ($engagement->arrangements as $arrangement) {
-                    $teamReports = $teamReports->merge(self::reported($confirm['startOfLast'], $confirm['endOfLast'], [$engagement->id], $arrangement->consultant, 0));
-                }
+        $conid = $request->get('conid');
+        $consul = isset($conid) ? Consultant::find($conid) : null;
+        if ($consul) {
+            $eids = $eid[0] ? $eid : $consultant->lead_engagements->pluck('id')->toArray();
+            $teamReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eids, $consul, 0, null);
+        } else {
+            foreach ($consultant->lead_engagements as $engagement) {
+                if (!$eid[0] || in_array($engagement->id, $eid))
+                    foreach ($engagement->arrangements as $arrangement) {
+                        $teamReports = $teamReports->merge(self::reported($confirm['startOfLast'], $confirm['endOfLast'], [$engagement->id], $arrangement->consultant, 0));
+                    }
+            }
         }
         $confirm['count']['team'] = $teamReports->count();
-
         if ($request->get('reporter') == 'me') {
             $confirm['reports'] = $myReports;
         } else if ($request->get('reporter') == 'team') {
             $confirm['reports'] = $teamReports;
-        }else {
+        } else {
             $confirm['reports'] = collect();
         }
         return $confirm;
