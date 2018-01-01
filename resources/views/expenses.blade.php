@@ -166,7 +166,7 @@
                                 $eng = $arr->engagement;
                                 $cname =$expense->consultant->fullname();
                             @endphp
-                            <tr data-del="{{($admin||$expense->isPending())&&!$confirm?1:0}}">
+                            <tr data-del="{{($admin||!$expense->isApproved())&&!$confirm?1:0}}">
                                 <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{str_limit($expense->client->name,22)}}</td>
                                 <td>

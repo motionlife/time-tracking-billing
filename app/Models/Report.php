@@ -5,6 +5,7 @@ namespace newlifecfo\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class Report extends Model
 {
@@ -44,6 +45,21 @@ class Report extends Model
         return $this->review_state == 0 || $this->review_state == 3;
     }
 
+    public function selfConfirmed()
+    {
+        return $this->review_state == 3;
+    }
+
+    public function leaderConfirmed()
+    {
+        return $this->review_state == 4;
+    }
+
+    public function isApproved()
+    {
+        return $this->review_state ==1;
+    }
+
     public function unfinalized()
     {
         return $this->review_state == 0 || $this->review_state == 3;
@@ -72,17 +88,24 @@ class Report extends Model
         return $status;
     }
 
-    public static function reported($start = null, $end = null, $eid = null, $consultant = null, $review_state = null, $client = null)
+    public static function reported($start = null, $end = null, $eids = null, $consultant = null, $review_state = null, $client = null)
     {
         $reports = isset($consultant) ? $consultant->reports(get_called_class()) : (isset($client) ? $client->reports(get_called_class()) : self::query());
-        if ($eid[0]) {
-            $reports = $reports->whereIn('arrangement_id', Engagement::getAids($eid));
+        $eids = array_values(array_filter(is_array($eids) ? $eids : [], 'is_numeric'));
+        if (!empty($eids)) {
+            $reports = $reports->whereIn('arrangement_id', Engagement::getAids($eids));
         }
         if ($start || $end) {
             $reports = $reports->whereBetween('report_date', [$start ?: '1970-01-01', $end ?: '2038-01-19']);
         }
-        $reports = $reports->orderByRaw('report_date DESC, created_at DESC');
-        return isset($review_state) ? $reports->where('review_state', $review_state)->get() : $reports->get();
+        $review_state = $review_state == 7 ? [0, 3, 4] : $review_state;
+        if (is_numeric($review_state)) {
+            $reports = $reports->where('review_state', $review_state);
+        } else if (is_array($review_state)) {
+            $states = array_filter($review_state, 'is_numeric');
+            if (!empty($states)) $reports = $reports->whereIn('review_state', $states);
+        }
+        return $reports->orderByRaw('report_date DESC, created_at DESC')->get();
     }
 
     public static function confirmation($request, $consultant)
@@ -97,7 +120,7 @@ class Report extends Model
         }
         $eid = explode(',', $request->get('eid'));
 
-        $myReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, 0);
+        $myReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eid, $consultant, [0, 4]);
         $confirm['count']['me'] = $myReports->count();
 
         $teamReports = collect();
@@ -105,23 +128,42 @@ class Report extends Model
         $consul = isset($conid) ? Consultant::find($conid) : null;
         if ($consul) {
             $eids = $eid[0] ? $eid : $consultant->lead_engagements->pluck('id')->toArray();
-            $teamReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eids, $consul, 0, null);
+            $teamReports = self::reported($confirm['startOfLast'], $confirm['endOfLast'], $eids, $consul, [0, 3], null);
         } else {
             foreach ($consultant->lead_engagements as $engagement) {
                 if (!$eid[0] || in_array($engagement->id, $eid))
                     foreach ($engagement->arrangements as $arrangement) {
-                        $teamReports = $teamReports->merge(self::reported($confirm['startOfLast'], $confirm['endOfLast'], [$engagement->id], $arrangement->consultant, 0));
+                        $teamReports = $teamReports->merge(self::reported($confirm['startOfLast'], $confirm['endOfLast'], [$engagement->id], $arrangement->consultant, [0, 3]));
                     }
             }
         }
         $confirm['count']['team'] = $teamReports->count();
-        if ($request->get('reporter') == 'me') {
+        $confirm['reporter'] = $request->get('reporter');
+        if ($confirm['reporter'] == 'me') {
             $confirm['reports'] = $myReports;
-        } else if ($request->get('reporter') == 'team') {
+        } else if ($confirm['reporter'] == 'team') {
             $confirm['reports'] = $teamReports;
         } else {
             $confirm['reports'] = collect();
         }
         return $confirm;
+    }
+
+    public static function confirmReport($confirm)
+    {
+        $feedback = ['code' => 7, 'message' => 'Partially Failed'];
+        $reporter = $confirm['reporter'];
+        $confirm['reports']->each(function ($report) use ($feedback, $reporter) {
+            if ($reporter == 'me') {
+                if (!$report->update(['review_state' => $report->leaderConfirmed() ? 1 : 3])) {
+                    $feedback['code'] = 0;
+                }
+            } else if ($reporter == 'team') {
+                if (!$report->update(['review_state' => $report->selfConfirmed() ? 1 : 4])) {
+                    $feedback['code'] = 0;
+                }
+            }
+        });
+        return $feedback;
     }
 }

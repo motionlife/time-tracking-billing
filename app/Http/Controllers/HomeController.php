@@ -76,7 +76,7 @@ class HomeController extends Controller
                 $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
                 //todo:: should also calculation last 12 months write buz_dev=>incomeForBuzDev(12 month)
             }
-            foreach (Hour::monthlyHoursAndIncome(null, $startMon, $endMon, 1, $dev_client, $engagements->pluck('id'))
+            foreach (Hour::monthlyHoursAndIncome(null, $startMon, $endMon, 1, $dev_client, $engagements->pluck('id')->toArray())
                      as $mon => $amounts) {
                 $data['dates']['mon'][$mon][1] += $amounts[1] * $engagement->buz_dev_share;
             }

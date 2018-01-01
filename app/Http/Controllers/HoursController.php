@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Hour;
+use newlifecfo\Models\Report;
 use newlifecfo\Models\Setting;
 
 class HoursController extends Controller
@@ -23,11 +24,15 @@ class HoursController extends Controller
         $this->middleware('verifiedConsultant');
     }
 
-    public function index(Request $request, $isAdmin = false,$confirm =  false)
+    public function index(Request $request, $isAdmin = false, $confirm = false)
     {
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
         $eid = explode(',', $request->get('eid'));
         $reported = $confirm ? $confirm['reports'] : Hour::reported($request->get('start'), $request->get('end'), $eid, $consultant, $request->get('state'));
+
+        if ($request->ajax() && $confirm && $request->get('submit') == 'confirm') {
+            return Report::confirmReport($confirm);
+        }
         return view('hours', ['hours' => $this->paginate($reported, 30),
             'clientIds' => Engagement::groupedByClient($confirm ? null : $consultant),
             'admin' => $isAdmin,

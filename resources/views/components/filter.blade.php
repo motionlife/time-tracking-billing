@@ -34,7 +34,7 @@
             id="state-select" title="&#xf024; Status"
             data-live-search="true">
         <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
-        <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
+        <option value="7" {{Request('state')=="7"?'selected':''}}>Unapproved</option>
     </select>
     <i>&nbsp;</i>
     <input class="date-picker form-control" id="start-date" size="10"

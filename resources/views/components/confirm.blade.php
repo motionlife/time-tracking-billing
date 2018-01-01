@@ -49,7 +49,9 @@
             After making sure there are no mistakes about the listed <strong>{{$reports->total()}}</strong> reports then
             click the confirm button.
             <div class="form-group pull-right">
-                <a href="#" id="confirm_button" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing" class="btn btn-primary">Confirm</a>
+                <button id="confirm_button" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Processing"
+                        class="btn btn-primary" {{$reports->total()==0?'disabled':''}}>Confirm
+                </button>
                 <i>&nbsp;</i>
                 <a href="{{url()->current().'?summary=1'}}" class="btn btn-default">Back</a>
             </div>
@@ -62,19 +64,32 @@
             $('#confirm_button').on('click', function () {
                 var confirm = $(this);
                 confirm.button('loading');
-               setTimeout(function () {
-                   confirm.button('reset');
-                   swal({
-                           title: "Success!",
-                           text: "The listed reports have been confirmed by you.",
-                           type: "success",
-                           confirmButtonColor: "#5adb76",
-                           confirmButtonText: "OK"
-                       },
-                       function () {
-                           location.reload();
-                       });
-               },1000);
+                $.ajax({
+                    data: 'submit=confirm',
+                    success: function (feedback) {
+                        if (feedback.code === 7) {
+                            swal({
+                                    title: "Success!",
+                                    text: "The listed reports have been confirmed by you.",
+                                    type: "success",
+                                    confirmButtonColor: "#5adb76",
+                                    confirmButtonText: "OK"
+                                },
+                                function () {
+                                    location.reload();
+                                });
+                        } else {
+                            toastr.error('Confirmation Failed, ' + feedback.message);
+                        }
+                    },
+                    complete: function () {
+                        confirm.button('reset');
+                    },
+                    error:function () {
+                        toastr.error('Confirmation failed, something went wrong.');
+                    },
+                    dataType:'json'
+                });
             });
         });
     </script>

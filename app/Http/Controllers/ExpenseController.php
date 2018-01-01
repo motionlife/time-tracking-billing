@@ -9,6 +9,7 @@ use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Expense;
 use newlifecfo\Models\Receipt;
+use newlifecfo\Models\Report;
 
 class ExpenseController extends Controller
 {
@@ -31,6 +32,9 @@ class ExpenseController extends Controller
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
         $expenses = $this->paginate($confirm ? $confirm['reports'] : Expense::reported($request->get('start'),
             $request->get('end'), explode(',', $request->get('eid')), $consultant, $request->get('state')), 25);
+        if ($request->ajax() && $confirm && $request->get('submit') == 'confirm') {
+            return Report::confirmReport($confirm);
+        }
         return view('expenses', ['expenses' => $expenses,
             'clientIds' => Engagement::groupedByClient($consultant),
             'admin' => $isAdmin,
