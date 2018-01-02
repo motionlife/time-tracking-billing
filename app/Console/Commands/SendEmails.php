@@ -42,8 +42,8 @@ class SendEmails extends Command
     {
         //
         Consultant::recognized()->each(function ($consultant) {
-//            if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
-//                || ($consultant->first_name == 'John' && $consultant->last_name == 'Doe'))
+            if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
+                || ($consultant->first_name == 'John' && $consultant->last_name == 'Doe'))
                 $user = $consultant->user;
                 $user->notify(new ConfirmReports($user));
 

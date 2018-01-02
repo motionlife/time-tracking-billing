@@ -7,7 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use newlifecfo\Notifications\ApplicationPassed;
 
-class NotifyPassListener implements ShouldQueue
+class NotifyPassListener// implements ShouldQueue
 {
     /**
      * Create the event listener.
