@@ -26,7 +26,7 @@ class TestController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->get('token')=='haoxiong'){
+        if ($request->get('token') == 'haoxiong') {
 //        return Excel::create('TestExcelFile', function ($excel) {
 //            $excel->setTitle('Payroll Overview')
 //                ->setCreator('Hao Xiong')
@@ -42,12 +42,28 @@ class TestController extends Controller
 //
 //            });
 //        })->export('xlsx');
-       // return $this->numberTest($request);
+            // return $this->numberTest($request);
 
-    //Consultant::where('last_name','Xiong')->first()->user->notify(new ApplicationPassed(Consultant::where('last_name','Xiong')->first()->user));
-        //Mail::to(Consultant::where('last_name','Xiong')->first()->user)->send(new NewSystemReady());
-        $consultant = Consultant::where('last_name','Xiong')->first();
-        $consultant->user->notify(new ConfirmReports($consultant->user));
+            //Consultant::where('last_name','Xiong')->first()->user->notify(new ApplicationPassed(Consultant::where('last_name','Xiong')->first()->user));
+            //Mail::to(Consultant::where('last_name','Xiong')->first()->user)->send(new NewSystemReady());
+            $consultant = Consultant::where('last_name', 'Xiong')->first();
+            $consultant->user->notify(new ConfirmReports($consultant->user));
+            if ($request->get('launch') == 'true') {
+                if ('code' == 'xh123456') {
+                    Consultant::recognized()->each(function ($consultant) {
+                        $user = $consultant->user;
+                        $user->notify(new ConfirmReports($user));
+                    });
+                } else {
+                    Consultant::recognized()->each(function ($consultant) {
+                        if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
+                            || ($consultant->first_name == 'John' && $consultant->last_name == 'Doe')) {
+                            $user = $consultant->user;
+                            $user->notify(new ConfirmReports($user));
+                        }
+                    });
+                }
+            }
 
         }
         return 'success';
