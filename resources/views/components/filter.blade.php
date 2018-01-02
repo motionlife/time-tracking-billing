@@ -23,7 +23,7 @@
             <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
                     id="consultant-select" title="&#xf007; Consultant"
                     data-live-search="true">
-                @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
                     <option value="{{$consultant->id}}" {{Request('conid')==$consultant->id?'selected':''}}>{{$consultant->fullname()}}</option>
                 @endforeach
             </select>

@@ -45,7 +45,7 @@
                                         <span class="input-group-addon"><i class="fa fa-male" aria-hidden="true"></i>&nbsp; Leader:</span>
                                         <select class="selectpicker" name="leader_id" id="leader_id" data-width="auto"
                                                 disabled>
-                                            @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                            @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
                                                 <option value="{{$consultant->id}}" {{($manage&&$consultant->id==$leader->id)?'selected':''}}>{{$consultant->fullname()}}</option>
                                             @endforeach
                                         </select>
@@ -112,7 +112,7 @@
                                                         data-dropup-auto="false"
                                                         data-live-search="true"
                                                         required disabled>
-                                                    @foreach(\newlifecfo\Models\Consultant::all() as $consultant)
+                                                    @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
                                                         <option value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
                                                     @endforeach
                                                 </select>

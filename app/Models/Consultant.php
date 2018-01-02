@@ -24,7 +24,12 @@ class Consultant extends Model
     {
         return $this->first_name . ' ' . $this->last_name;
     }
-
+    public static function recognized()
+    {
+        return self::all()->filter(function ($consultant){
+            return $consultant->user->isVerified();
+        });
+    }
     //Get the corresponding system user of this consultant
     public function user()
     {

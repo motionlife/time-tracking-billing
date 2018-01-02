@@ -1,0 +1,1 @@
+php C:/Users/HaoXiong/PhpstormProjects/NewLifeCFO/artisan queue:work --tries=3 --timeout=60

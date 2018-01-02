@@ -3,7 +3,9 @@
 namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use newlifecfo\Mail\NewSystemReady;
 use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
@@ -11,6 +13,8 @@ use newlifecfo\Models\Engagement;
 use newlifecfo\Models\Templates\Position;
 use newlifecfo\Models\Templates\Task;
 use newlifecfo\Models\Templates\Taskgroup;
+use newlifecfo\Notifications\ApplicationPassed;
+use newlifecfo\Notifications\ConfirmReports;
 
 class TestController extends Controller
 {
@@ -38,7 +42,13 @@ class TestController extends Controller
 //
 //            });
 //        })->export('xlsx');
-        return $this->numberTest($request);
+       // return $this->numberTest($request);
+
+    //Consultant::where('last_name','Xiong')->first()->user->notify(new ApplicationPassed(Consultant::where('last_name','Xiong')->first()->user));
+        //Mail::to(Consultant::where('last_name','Xiong')->first()->user)->send(new NewSystemReady());
+//        $consultant = Consultant::where('last_name','Xiong')->first();
+//        $consultant->user->notify(new ConfirmReports($consultant->user));
+        return 'success';
     }
 
 
@@ -47,7 +57,7 @@ class TestController extends Controller
 
         if ($request->get('verify')) {
             $out = [];
-            foreach (Consultant::all() as $con) {
+            foreach (Consultant::recognized() as $con) {
                 $temp = $this->verify($con->fullname());
                 if ($temp)
                     array_push($out, [$con->fullname() => $temp]);
@@ -56,7 +66,7 @@ class TestController extends Controller
             return json_encode($out);
         }
 
-        $consultants = Consultant::all();
+        $consultants = Consultant::recognized();
         $output = [];
         //verify hourly payroll and expense payroll
         foreach ($consultants as $consultant) {
@@ -208,7 +218,7 @@ class TestController extends Controller
 
     public function get_consultant_id($name)
     {
-        return Consultant::all()->first(function ($con) use ($name) {
+        return Consultant::recognized()->first(function ($con) use ($name) {
             return $con->fullname() == $name;
         })->id;
     }

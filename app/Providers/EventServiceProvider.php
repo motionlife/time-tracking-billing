@@ -13,8 +13,8 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'newlifecfo\Events\Event' => [
-            'newlifecfo\Listeners\EventListener',
+        'newlifecfo\Events\ConsultantRecognizedEvent' => [
+            'newlifecfo\Listeners\NotifyPassListener',
         ],
     ];
 

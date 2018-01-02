@@ -4,6 +4,7 @@ namespace newlifecfo\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Events\ConsultantRecognizedEvent;
 use newlifecfo\User;
 
 class AdminController extends Controller
@@ -50,6 +51,7 @@ class AdminController extends Controller
             $target = User::find($request->get('uid'));
             $user = Auth::user();
             if ($user->priority > $target->priority) {
+                $pre = $target->priority;
                 if ($request->get('action') == 'delete') {
                     $target->delete();
                     $feedback['code'] = 7;
@@ -69,8 +71,14 @@ class AdminController extends Controller
                             break;
                     }
                     if ($user->priority > $target->priority) {
-                        $target->save();
-                        $feedback['code'] = 7;
+                        if ($target->save()) {
+                            $feedback['code'] = 7;
+                            if ($pre == 0 && $target->priority > 0) {
+                                //fire the event to notify user ready to use
+                                event(new ConsultantRecognizedEvent($target));
+                            }
+
+                        }
                     }
                 }
             }

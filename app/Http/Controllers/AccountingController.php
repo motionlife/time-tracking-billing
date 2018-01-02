@@ -57,7 +57,7 @@ class AccountingController extends Controller
                 $incomes = [];
                 $buz_dev_incomes = [];
                 $hourNumbers = [];
-                $consultants = Consultant::all();
+                $consultants = Consultant::recognized();
                 foreach ($consultants as $consultant) {
                     $id = $consultant->id;
                     $hourNumbers[$id] = [0, 0];

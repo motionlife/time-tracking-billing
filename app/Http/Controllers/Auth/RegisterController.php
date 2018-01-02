@@ -72,13 +72,13 @@ class RegisterController extends Controller
             'last_name' => $data['last_name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-            'role'=>$data['role']
+            'role'=>3
         ]);
-        $this->createRole($data, $user->id);
+        $this->createRole($data, $user);
         return $user;
     }
 
-    private function createRole($data, $uid)
+    private function createRole($data, $user)
     {
         $contact = Contact::create([
             'email'=>$data['email'],
@@ -86,10 +86,10 @@ class RegisterController extends Controller
             'city'=>'Dallas',
             'state_id'=>51
         ]);
-        switch ($data['role']) {
+        switch ($user->role) {
             case 3: //create consultant
                 Consultant::create([
-                    'user_id'=>$uid,
+                    'user_id'=>$user->id,
                     'contact_id'=>$contact->id,
                     'first_name'=>$data['first_name'],
                     'last_name' => $data['last_name'],
@@ -99,7 +99,7 @@ class RegisterController extends Controller
                 return 'Consultant';
             case 1:// create client
                     Client::create([
-                        'user_id'=>$uid,
+                        'user_id'=>$user->id,
                         'contact_id'=>$contact->id,
                         'industry_id'=>1,
                         'name'=>'Unknown Client'
@@ -107,7 +107,7 @@ class RegisterController extends Controller
                 return 'client';
             case 2://create outside referrer
                 Outreferrer::create([
-                    'user_id'=>$uid,
+                    'user_id'=>$user->id,
                     'contact_id'=>$contact->id,
                     'first_name'=>$data['first_name'],
                     'last_name' => $data['last_name'],
