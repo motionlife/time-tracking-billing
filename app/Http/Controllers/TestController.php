@@ -15,6 +15,7 @@ use newlifecfo\Models\Templates\Task;
 use newlifecfo\Models\Templates\Taskgroup;
 use newlifecfo\Notifications\ApplicationPassed;
 use newlifecfo\Notifications\ConfirmReports;
+use newlifecfo\Notifications\LaunchApp;
 
 class TestController extends Controller
 {
@@ -52,14 +53,14 @@ class TestController extends Controller
                 if ('code' == 'xh123456') {
                     Consultant::recognized()->each(function ($consultant) {
                         $user = $consultant->user;
-                        $user->notify(new ConfirmReports($user));
+                        $user->notify(new LaunchApp($user));
                     });
                 } else {
                     Consultant::recognized()->each(function ($consultant) {
                         if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
                             || ($consultant->first_name == 'John' && $consultant->last_name == 'Doe')) {
                             $user = $consultant->user;
-                            $user->notify(new ConfirmReports($user));
+                            $user->notify(new LaunchApp($user));
                         }
                     });
                 }
