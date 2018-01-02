@@ -1,0 +1,1 @@
+php C:/Users/HaoXiong/PhpstormProjects/NewLifeCFO/artisan email:send

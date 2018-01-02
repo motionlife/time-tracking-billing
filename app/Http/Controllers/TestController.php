@@ -26,7 +26,7 @@ class TestController extends Controller
 
     public function index(Request $request)
     {
-
+        if ($request->get('token')=='haoxiong'){
 //        return Excel::create('TestExcelFile', function ($excel) {
 //            $excel->setTitle('Payroll Overview')
 //                ->setCreator('Hao Xiong')
@@ -46,8 +46,10 @@ class TestController extends Controller
 
     //Consultant::where('last_name','Xiong')->first()->user->notify(new ApplicationPassed(Consultant::where('last_name','Xiong')->first()->user));
         //Mail::to(Consultant::where('last_name','Xiong')->first()->user)->send(new NewSystemReady());
-//        $consultant = Consultant::where('last_name','Xiong')->first();
-//        $consultant->user->notify(new ConfirmReports($consultant->user));
+        $consultant = Consultant::where('last_name','Xiong')->first();
+        $consultant->user->notify(new ConfirmReports($consultant->user));
+
+        }
         return 'success';
     }
 
