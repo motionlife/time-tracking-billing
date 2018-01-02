@@ -70,6 +70,15 @@ class Client extends Model
     {
         return $this->hasMany(Revenue::class);
     }
+    public function setRevenue($year,$rev,$ebi)
+    {
+        Revenue::updateOrCreate(['client_id'=>$this->id,'year'=>$year],['revenue'=>$rev,'ebit'=>$ebi]);
+    }
+    public function getRevenue($year, $type)
+    {
+        $rev = $this->revenues->where('year', $year)->first();
+        return $rev ? $rev->$type : null;
+    }
 
     //client belong to which industry
     public function industry()

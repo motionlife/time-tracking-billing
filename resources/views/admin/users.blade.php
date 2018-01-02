@@ -4,7 +4,7 @@
         <div class="container-fluid">
             @php $users = \newlifecfo\User::all()->sortByDesc('created_at'); @endphp
             <div class="panel panel-headline">
-                <div class="panel-title">
+                <div class="panel-title row" style="margin-left: 1em">
                     <h3>Registered Users</h3>
                     <h5>total:{{$users->count()}}</h5>
                 </div>

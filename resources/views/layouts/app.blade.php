@@ -148,7 +148,7 @@
                                         <li><a href="/admin/client"
                                                class="{{Request::is('admin/client') ?'active':''}}">Clients</a></li>
                                         <li><a href="/admin/miscellaneous"
-                                               class="{{Request::is('admin/other') ?'active':''}}">Other Resources</a>
+                                               class="{{Request::is('admin/miscellaneous') ?'active':''}}">Miscellaneous</a>
                                         </li>
                                     </ul>
                                 </div>
