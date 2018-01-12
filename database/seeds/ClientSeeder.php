@@ -34,11 +34,11 @@ class ClientSeeder extends Seeder
             $c = Client::create([
                 'contact_id' => $contact->id,
                 'industry_id' => Industry::where('name', $client['IndustryID'])->first()->id,
-                'buz_dev_person_id' => $client['BusinessDevelopmentPerson'] == 'New Life CFO' ? '' :
+                'buz_dev_person_id' => $client['BusinessDevelopmentPerson'] == 'New Life CFO' ? '0' :
                     Consultant::all()->first(function ($con, $key) use ($client) {
                         return $con->fullname() == $client['BusinessDevelopmentPerson'];
                     })->id,
-                'outreferrer_id' => $client['OutsideReferrerSource'] == 'None' ? '' :
+                'outreferrer_id' => $client['OutsideReferrerSource'] == 'None' ? '0' :
                     Outreferrer::all()->first(function ($out, $key) use ($client) {
                         return $out->fullname() == $client['OutsideReferrerSource'];
                     })->id,
