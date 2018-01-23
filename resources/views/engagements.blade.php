@@ -428,7 +428,8 @@
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(parseFloat(data.buz_dev_share * 100).toFixed(2));
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
-                        $('#billing-day').datepicker('setDate', new Date('2022-12-' + data.billing_day + ' 00:00'));
+                        var queryDate = '2022-12-'+data.billing_day+' 00:00', dateParts = queryDate.match(/(\d+)/g);
+                        $('#billing-day').datepicker('setDate',new Date(dateParts[0], dateParts[1] - 1, dateParts[2]));
                         $('#submit-modal').attr('disabled', @if($admin) false
                         @else data.status != 0  @endif );
                         @if($admin)
