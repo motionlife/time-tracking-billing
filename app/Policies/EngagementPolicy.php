@@ -71,7 +71,9 @@ class EngagementPolicy
         if ($engagement->isPending()) {
             return $user->isSupervisor();
         } else if ($engagement->isActive()) {
-            return $user->isSuperAdmin();
+            //return $user->isSuperAdmin();
+            //log: Change policy as the request from New Life CFO Jan 23, 2018
+            return $user->isSupervisor();
         }
         return false;
     }
