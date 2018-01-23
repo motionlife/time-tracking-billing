@@ -321,7 +321,7 @@
                     $('#input-meal').val(data.meal);
                     $('#input-office-supply').val(data.office_supply);
                     $('#input-car-rental').val(data.car_rental);
-                    $('#input-mileage-cost').val(data.mileage_cost / 0.54);
+                    $('#input-mileage-cost').val(parseFloat(data.mileage_cost / 0.54).toFixed(2));
                     $('#input-other').val(data.other);
                     $('#input-receipts').val('');
                     $('#description').val(data.description);
