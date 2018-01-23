@@ -423,7 +423,7 @@
                     success: function (data) {
                         $('#cycle-select').selectpicker('val', data.paying_cycle).trigger('change');
                         $('#engagement-name').val(data.name);
-                        $('#client-select').selectpicker('val', data.client_id);
+                        $('#client-select').selectpicker('val', data.client_id).trigger('change');
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(parseFloat(data.buz_dev_share * 100).toFixed(2));
