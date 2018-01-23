@@ -9,7 +9,7 @@
                 <div class="alert alert-success alert-dismissible">
                     <a class="panel-close close" data-dismiss="alert">×</a>
                     <i class="fa fa-info"></i>
-                    Please keep password and password confirmation blank if you do not want to change it
+                    Please leave the "password" and "password confirmation" field blank if you do not want to change it
                 </div>
                 <h3>Account info</h3>
                 <form class="form-horizontal" id="account-info-form">
