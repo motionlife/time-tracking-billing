@@ -74,13 +74,14 @@
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
                                                step="0.01" min="0">
-                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage Cost<a
-                                                    href="javascript:void(0)" title="number of mileage * $0.54"><i
+                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage<a
+                                                    href="javascript:void(0)"
+                                                    title="Mileage cost = number of miles * $0.54"><i
                                                         class="fa fa-info-circle" aria-hidden="true"></i></a>
-                                            :$</span>
+                                            :(miles)</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
                                                name="mileage_cost"
-                                               type="number" step="0.01" min="0" placeholder="numbers only">
+                                               type="number" step="0.1" min="0" placeholder="numbers only">
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -256,6 +257,7 @@
                 }
                 if (update) tr = $('a[href*="editExpense(' + expid + ')"]').parent().parent();
                 var formdata = new FormData($(this)[0]);
+                formdata.set('mileage_cost', formdata.get('mileage_cost') * 0.54);
                 formdata.append('_method', update ? 'put' : 'post');
                 $.ajax({
                     type: "POST",
@@ -319,7 +321,7 @@
                     $('#input-meal').val(data.meal);
                     $('#input-office-supply').val(data.office_supply);
                     $('#input-car-rental').val(data.car_rental);
-                    $('#input-mileage-cost').val(data.mileage_cost);
+                    $('#input-mileage-cost').val(data.mileage_cost / 0.54);
                     $('#input-other').val(data.other);
                     $('#input-receipts').val('');
                     $('#description').val(data.description);
@@ -339,7 +341,7 @@
 
                 },
                 dataType: 'json',
-                complete:function () {
+                complete: function () {
                     @if($confirm)
                     $('#report-update').attr('disabled', true);
                     @endif
@@ -390,6 +392,7 @@
             $('.input-numbers').each(function (i, n) {
                 var num = parseFloat($(n).val());
                 num = isNaN(num) ? 0 : num;
+                if ($(n).attr('id') === 'input-mileage-cost') num *= 0.54;
                 total += num;
             });
             $('#expense-total').val(total.toFixed(2));
