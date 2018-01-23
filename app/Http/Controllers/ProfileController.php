@@ -15,7 +15,7 @@ class ProfileController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function index(Request $request)
     {
@@ -43,6 +43,9 @@ class ProfileController extends Controller
                     $user->password = bcrypt($password);
                 }
                 if ($user->save()) {
+                    $consultant = $user->consultant;
+                    $consultant->contact->phone = $request->get('phone');
+                    $consultant->contact->save();
                     $feedback['code'] = 7;
                     $feedback['message'] = 'success';
                 } else {
