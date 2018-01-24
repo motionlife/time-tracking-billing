@@ -190,7 +190,7 @@
                                                                 class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>ENG. Status</th>
                                                 <th>Business Development Share</th>
-                                                <th>Total Billable Hours</th>
+                                                <th>Engagement Bill</th>
                                                 <th>Earned</th>
                                             </tr>
                                             </thead>
@@ -204,7 +204,7 @@
                                                         <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng[0]->id),false)).'&tab=3'}}">{{str_limit($eng[0]->name,32)}}</a>
                                                     </td>
                                                     <td>
-                                                        <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}}</span>
+                                                        <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}} </span>
                                                     </td>
                                                     <td>
                                                         @php $share = number_format($eng[0]->buz_dev_share*100,1) @endphp
@@ -217,7 +217,8 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td>{{$eng[2]}}</td>
+                                                    <td><a class="label label-info" data-toggle="popover" data-content="{{$eng[0]->summaryForBuzDev($eng[1]/$eng[0]->buz_dev_share)}}">
+                                                            ${{number_format($eng[1]/$eng[0]->buz_dev_share,2)}}</a> </td>
                                                     <td>${{number_format($eng[1],2)}}</td>
                                                 </tr>
                                             @endforeach
@@ -278,6 +279,12 @@
                     autoclose: true
                 }
             );
+            $('[data-toggle="popover"]').popover({
+                html: true,
+                container: '.main-content',
+                placement: 'top',
+                trigger: 'hover'
+            });
         });
 
     </script>
