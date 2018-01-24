@@ -180,11 +180,11 @@ class AccountingController extends Controller
                     $devs = $engagement->incomeForBuzDev($start, $end, $state);
                     if ($devs) {
                         $tbh = 0;
-                        foreach ($engagement->arrangements()->withTrashed()->get() as $arrangement) {
-                            foreach ($arrangement->hours as $hour) {
-                                $tbh += $hour->billable_hours;
-                            }
-                        }
+//                        foreach ($engagement->arrangements()->withTrashed()->get() as $arrangement) {
+//                            foreach ($arrangement->hours as $hour) {
+//                                $tbh += $hour->billable_hours;
+//                            }
+//                        }
                         array_push($engs, [$engagement, $devs, $tbh]);
                         $total += $devs;
                     }
@@ -345,7 +345,7 @@ class AccountingController extends Controller
 
                 $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Total Billable Hours', 'Earned'])
+                        ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Engagement Bill', 'Earned'])
                         ->setAllBorders('thin')
                         ->cells('A1:F1', function ($cells) {
                             $cells->setBackground('#3bd3f9');
@@ -357,7 +357,7 @@ class AccountingController extends Controller
                     foreach ($data['buz_devs']['engs'] as $i => $eng) {
                         array_push($content, [
                             $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
-                            number_format($eng[0]->buz_dev_share * 100, 1), $eng[2], number_format($eng[1], 2)
+                            number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1]/$eng[0]->buz_dev_share,2), number_format($eng[1], 2)
                         ]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
