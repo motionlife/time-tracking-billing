@@ -200,6 +200,7 @@
                                                     <td>{{$loop->index+1}}</td>
                                                     <td>{{str_limit($eng[0]->client->name,32)}}</td>
                                                     <td>
+                                                        <span class="badge bg-{{$eng[0]->paying_cycle==0?'default':($eng[0]->paying_cycle==1?'warning':'danger')}}">{{$eng[0]->paying_cycle==0?'H':($eng[0]->paying_cycle==1?'M':'Fixed')}}</span>
                                                         <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng[0]->id),false)).'&tab=3'}}">{{str_limit($eng[0]->name,32)}}</a>
                                                     </td>
                                                     <td>
