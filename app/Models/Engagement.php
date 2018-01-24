@@ -145,7 +145,7 @@ class Engagement extends Model
             return $billedMonths * $this->cycle_billing;
         } else if ($this->paying_cycle == 2 && $this->isClosed() && $this->hasReported($review_state)) {
             $start_day = Carbon::parse($this->start_date);
-            return (!$start && $start_day->diffInDays(Carbon::parse($start), false) >= 0) || (!$end && $start_day->diffInDays(Carbon::parse($end), false) <= 0) ? $this->cycle_billing : 0;
+            return (!$start && $start_day->diffInDays(Carbon::parse($start), false) < 0) || (!$end && $start_day->diffInDays(Carbon::parse($end), false) > 0) ? 0 : $this->cycle_billing;
         }
         return 0;
     }
