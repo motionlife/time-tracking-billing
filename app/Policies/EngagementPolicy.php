@@ -75,8 +75,9 @@ class EngagementPolicy
             //return $user->isSuperAdmin();
             //log: Change policy as the request from New Life CFO Jan 23, 2018
             return $user->isSupervisor();
+        }else{
+            return $user->isSupervisor();
         }
-        return false;
     }
 
     /**
