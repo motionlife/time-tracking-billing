@@ -116,7 +116,7 @@ class Engagement extends Model
     public function HourBilling($start = null, $end = null, $review_state = null)
     {
         if ($this->paying_cycle == 0) {
-            return Hour::reported($start,$end,[$this->id],null,$review_state,null)->sum(function ($hour){
+            return Hour::reported($start, $end, [$this->id], null, $review_state, null)->sum(function ($hour) {
                 return $hour->billClient();
             });
         } else {
@@ -157,8 +157,8 @@ class Engagement extends Model
     public function incomeForBuzDev($start = null, $end = null, $state = null)
     {
         return $this->buz_dev_share * ($this->paying_cycle == 0 ?
-                $this->HourBilling($start ?: '1970-01-01', $end ?: '2038-01-19', $state) :
-                $this->NonHourBilling($start ?: '1970-01-01', $end ?: '2038-01-19', $state));
+                $this->HourBilling($start, $end, $state) :
+                $this->NonHourBilling($start, $end, $state));
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
