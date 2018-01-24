@@ -93,7 +93,7 @@ class AccountingController extends Controller
                 $bill = [$hourBill[0], $expenseBill[0]];
 
                 if ($file == 'excel') return $this->exportExcel(['hours' => $hourBill[1], 'expenses' => $expenseBill[1], 'buz_devs' => null, 'bill' => $bill,
-                    'filename' => $this->filename($client, $start, $end, $state, $eid, 'Bill')],false,true);
+                    'filename' => $this->filename($client, $start, $end, $state, $eid, 'Bill')], false, true);
 
                 return view('bill', ['clientIds' => $client->getEngagementIdName(),
                         'hours' => $pg_hours, 'expenses' => $pg_expenses,
@@ -115,7 +115,7 @@ class AccountingController extends Controller
                 $sum = $this->sumIncome($bills, null);
                 if ($request->session()->has('data') && $file == 'excel') {
                     $data = $request->session()->get('data');
-                    return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'Bill')), true,true);
+                    return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'Bill')), true, true);
                 } else {
                     $data = ['admin' => $isAdmin,
                         'clients' => $clients,
@@ -230,17 +230,18 @@ class AccountingController extends Controller
 
                 $excel->sheet('Engagement Bill($' . number_format($data['bill'][0], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
-                        ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Billable Hours', 'Rate($)', 'Rate Type', 'Billed Type', 'Billed($)', 'Report Status'])
+                        ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Rate($)', 'Rate Type', 'Billed Type', 'Billed($)', 'Report Status'])
                         ->setAllBorders('thin')
-                        ->cells('A1:I1', function ($cells) {
+                        ->cells('A1:K1', function ($cells) {
                             $cells->setBackground('#3bd3f9');
                             $cells->setFontFamily('Calibri');
                             $cells->setFontWeight('bold');
                         });
                     $content = [];
                     foreach ($data['hours'] as $i => $hour) {
-                        $eng = $hour->arrangement->engagement;
-                        array_push($content, [$hour->consultant->fullname(), $eng->name, $hour->report_date, number_format($hour->billable_hours,2), $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'),
+                        $arr = $hour->arrangement;
+                        $eng = $arr->engagement;
+                        array_push($content, [$hour->consultant->fullname(), $eng->name, $hour->report_date,  $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'),
                             number_format($hour->billClient(), 2), $hour->getStatus()[0]]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
@@ -304,17 +305,18 @@ class AccountingController extends Controller
 
                 $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Billable Hours', 'Non-billable Hours', 'Rate($)', 'Rate Type', 'Share', 'Income($)', 'Description', 'Status'])
+                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate($)', 'Rate Type', 'Share', 'Income($)', 'Description', 'Status'])
                         ->setAllBorders('thin')
-                        ->cells('A1:K1', function ($cells) {
+                        ->cells('A1:M1', function ($cells) {
                             $cells->setBackground('#3bd3f9');
                             $cells->setFontFamily('Calibri');
                             $cells->setFontWeight('bold');
                         });
                     $content = [];
                     foreach ($data['hours'] as $i => $hour) {
-                        $eng = $hour->arrangement->engagement;
-                        array_push($content, [$hour->client->name, $eng->name, $hour->report_date, number_format($hour->billable_hours,2), number_format($hour->non_billable_hours,2), $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
+                        $arr = $hour->arrangement;
+                        $eng = $arr->engagement;
+                        array_push($content, [$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), number_format($hour->non_billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
                             number_format($hour->share * 100, 1) . '%', number_format($hour->earned(), 2), $hour->description, $hour->getStatus()[0]]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);

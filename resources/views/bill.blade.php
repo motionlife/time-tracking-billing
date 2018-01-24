@@ -54,10 +54,10 @@
                                     @php $activeTab = Request::get('tab')?:"1"; @endphp
                                     <li class="{{$activeTab=="1"?'active':''}}"><a href="#tab-left1" role="tab"
                                                                                    data-toggle="tab">Hourly
-                                            Income&nbsp;<span
+                                            Billing&nbsp;<span
                                                     class="badge bg-success">{{$hours->total()}}</span></a></li>
                                     <li class="{{$activeTab=="2"?'active':''}}"><a href="#tab-left2" role="tab"
-                                                                                   data-toggle="tab">Expense&nbsp;<span
+                                                                                   data-toggle="tab">Expense Billing&nbsp;<span
                                                     class="badge bg-warning">{{$expenses->total()}}</span></a>
                                     </li>
                                 @else
@@ -80,7 +80,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Consultant</th>
-                                                <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a></th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
                                                 <th>Rate</th>
@@ -107,7 +109,7 @@
                                                         <span class="badge bg-{{$hour->rate_type==0?'success':'danger'}}">{{$hour->rate_type==0?'B':'P'}}</span>${{number_format($hour->rate,2)}}
                                                     </td>
                                                     <td>
-                                                        ${{number_format($hour->billClient(),2)}}</td>
+                                                        {{$hour->rate_type==0? '$'.number_format($hour->billClient(),2):$eng->clientBilledType()}}</td>
                                                     <td>
                                                         <span class="label label-{{$hour->getStatus()[1]}}">{{$hour->getStatus()[0]}}</span>
                                                     </td>
@@ -128,7 +130,9 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Consultant</th>
-                                                <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a></th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Amount</th>
                                                 <th>Status</th>
