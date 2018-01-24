@@ -180,4 +180,15 @@ class Engagement extends Model
         }
         return $aids->flatten();
     }
+
+    public function summaryForBuzDev($billed)
+    {
+        return "Eng. Billed Type: <strong>" . $this->clientBilledType() . "</strong><br>" .
+            "Eng. Status: <strong>" . $this->state() . "</strong><br>" .
+            "Eng. Billed Amount: <strong> $" . number_format($billed, 2) . "</strong><br>" .
+            "Eng. Start Date: <strong>" . $this->start_date . "</strong><br>" .
+            "Eng. Closed Date: <strong>" . ($this->isClosed() ? $this->close_date : "N/A") . "</strong><br>" .
+            "Number of Consultants: <strong>" . $this->arrangements->count() . "</strong><br>";
+    }
+
 }
