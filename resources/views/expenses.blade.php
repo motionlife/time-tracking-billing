@@ -216,6 +216,7 @@
 @endsection
 @section('my-js')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.10/featherlight.min.js"></script>
+    <script src="/js/formdata.js"></script>
     <script>
         var update;
         var expid;
@@ -257,6 +258,7 @@
                 }
                 if (update) tr = $('a[href*="editExpense(' + expid + ')"]').parent().parent();
                 var formdata = new FormData($(this)[0]);
+                formdata.delete('total');
                 formdata.set('mileage_cost', formdata.get('mileage_cost') * 0.54);
                 formdata.append('_method', update ? 'put' : 'post');
                 $.ajax({
