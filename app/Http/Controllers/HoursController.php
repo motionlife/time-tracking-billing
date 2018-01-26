@@ -191,7 +191,7 @@ class HoursController extends Controller
                 $arr = $hour->arrangement;
                 $eng = $arr->engagement;
                 $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
-                return json_encode(['ename' => $eng->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
+                return json_encode(['ename' => $eng->name,'client'=>$hour->client->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
                     'billable_hours' => number_format($hour->billable_hours, 1), 'non_billable_hours' => number_format($hour->non_billable_hours, 1),
                     'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name, 'feedback' => $hour->feedback,
                     'rate' => $eng->paying_cycle == 0 ? $arr->billing_rate : $arr->pay_rate, 'share' => $eng->paying_cycle == 0 ? $arr->firm_share : 0, 'cname' => $arr->consultant->fullname()

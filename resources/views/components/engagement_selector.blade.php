@@ -7,7 +7,7 @@
             <optgroup label="" data-label="{{$cname}}"
                       data-subtext="<a href='#' class='group-client-name'><span class='label label-success'><strong>{{$cname}}</strong></span></a>">
                 @foreach($engagements as $eng)
-                    <option value="{{$eng[0]}}" data-tokens="{{$cname.' '.$eng[1]}}" title="{{'['.$cname.'] '.$eng[1]}}">{{$eng[1]}}</option>
+                    <option value="{{$eng[0]}}" data-tokens="{{$cname.' '.$eng[1]}}" title="{{'<strong>'.$cname.'</strong> '.$eng[1]}}">{{$eng[1]}}</option>
                 @endforeach
             </optgroup>
         @endforeach

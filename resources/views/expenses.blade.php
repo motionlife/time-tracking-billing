@@ -315,7 +315,7 @@
             $.get({
                 url: '/expense/' + id + '/edit',
                 success: function (data) {
-                    $('#client-engagement').html('<option selected>' + data.ename + '</option>').selectpicker('refresh');
+                    $('#client-engagement').html('<option selected>' + data.client + '/' + data.ename + '</option>').selectpicker('refresh');
                     $('#input-report-date').datepicker('setDate', data.report_date);
                     $('#input-company-paid').val(data.company_paid);
                     $('#input-hotel').val(data.hotel);

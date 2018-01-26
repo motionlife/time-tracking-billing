@@ -11,7 +11,7 @@
             <optgroup label=""
                       data-subtext="<a href='#' data-id='{{$engagements->map(function($e){return $e[0];})}}' class='group-client-name'><span class='label label-info'><strong>{{$cname}}</strong></span></a>">
                 @foreach($engagements as $eng)
-                    <option data-tokens="{{$cname.' '.$eng[1]}}"
+                    <option data-tokens="{{$cname.' '.$eng[1]}}" title="{{'<strong>'.$cname.'</strong> '.$eng[1]}}"
                             value="{{$eng[0]}}" {{in_array($eng[0],explode(',',Request('eid')))?'selected':''}}>{{$eng[1]}}</option>
                 @endforeach
             </optgroup>

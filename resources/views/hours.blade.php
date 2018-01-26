@@ -152,7 +152,7 @@
                     success: function (data) {
                         $('#income-estimate').attr({"data-br": data.rate, "data-fs": data.share});
                         $('#client-engagement').attr('disabled', true)
-                            .empty().append('<option selected>' + data.ename + '</option>').selectpicker('refresh');
+                            .empty().append('<option selected>' + data.client + '/' + data.ename + '</option>').selectpicker('refresh');
                         $('#position').attr('disabled', true)
                             .empty().append('<option>' + data.position + '</option>').selectpicker('refresh');
                         $('#task-id').selectpicker('val', data.task_id);
@@ -174,7 +174,7 @@
                         @endif
                     },
                     dataType: 'json',
-                    complete:function () {
+                    complete: function () {
                         @if($confirm)
                         $('#report-update').attr('disabled', true);
                         @endif
