@@ -128,7 +128,7 @@ class ExpenseController extends Controller
             if ($user->can('view', $expense)) {
                 $arr = $expense->arrangement;
                 $expense->report_date = Carbon::parse($expense->report_date)->format('m/d/Y');
-                return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name,'client'=>$expense->client->name, 'report_date' => $expense->report_date, 'description' => $expense->description,
+                return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name,'client'=>$expense->client->name, 'report_date' => $expense->report_date, 'company_paid'=>$expense->company_paid,'description' => $expense->description,
                     'review_state' => $expense->review_state, 'hotel' => $expense->hotel, 'flight' => $expense->flight, 'meal' => $expense->meal,
                     'office_supply' => $expense->office_supply, 'car_rental' => $expense->car_rental, 'mileage_cost' => $expense->mileage_cost, 'other' => $expense->other, 'total' => number_format($expense->total(), 2, '.', ''),
                     'cname' => $arr->consultant->fullname(), 'feedback' => $expense->feedback

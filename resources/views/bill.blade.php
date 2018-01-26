@@ -181,6 +181,7 @@
                                                             href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
                                                                 class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
+                                                <td>Company Paid</td>
                                                 <th>Amount</th>
                                                 <th>Status</th>
                                             </tr>
@@ -198,6 +199,7 @@
                                                         <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=3'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
                                                     <td>{{$expense->report_date}}</td>
+                                                    <td>{{$expense->company_paid?'Yes':'No'}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
                                                     <td>
                                                         <span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span>
@@ -271,8 +273,10 @@
         .tab-content tr td:nth-child(5) {
             font-weight: bold;
         }
-
-        #tab-left1 tr td:nth-child(5) {
+        #tab-left3 tr td:nth-child(6){
+            font-weight: bold;
+         }
+         #tab-left1 tr td:nth-child(5) {
             text-indent: 1.2em;
         }
 
@@ -289,7 +293,7 @@
             font-weight: normal;
         }
 
-        #tab-left2 tr td:last-child,#tab-left3 tr td:last-child {
+        #tab-left2 tr td:last-child{
             font-weight: bold;
         }
 
