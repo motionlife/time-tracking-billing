@@ -214,6 +214,7 @@
                             pos.append("<option value=" + arr.position.id + " data-br=" + arr.br + " data-fs=" + arr.fs + ">" + arr.position.name + "</option>");
                         });
                         pos.selectpicker('refresh');
+                        $('#billable-hours').trigger("change");
                     }
                 });
             });
