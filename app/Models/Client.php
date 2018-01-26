@@ -70,10 +70,12 @@ class Client extends Model
     {
         return $this->hasMany(Revenue::class);
     }
-    public function setRevenue($year,$rev,$ebi)
+
+    public function setRevenue($year, $rev, $ebi)
     {
-        Revenue::updateOrCreate(['client_id'=>$this->id,'year'=>$year],['revenue'=>$rev,'ebit'=>$ebi]);
+        Revenue::updateOrCreate(['client_id' => $this->id, 'year' => $year], ['revenue' => $rev, 'ebit' => $ebi]);
     }
+
     public function getRevenue($year, $type)
     {
         $rev = $this->revenues->where('year', $year)->first();
@@ -107,20 +109,28 @@ class Client extends Model
         return $this->hasMany($class);
     }
 
-    public function hourBill($start = null, $end = null, $state = null, $eid = null)
+    public function engagementBill($start = null, $end = null, $state = null, $eid = null)
     {
-        $hours = Hour::reported($start, $end, $eid, null, $state, $this);
+        $hours = Hour::reported($start, $end, $eid, null, $state, $this)->filter(function ($value) {
+            return $value->rate_type == 0;
+        });
+
         $sumHours = $hours->reduce(function ($carry, $hour) {
             return [$carry[0] + $hour->billable_hours, $carry[1] + $hour->non_billable_hours, $carry[2] + $hour->billClient()];
         });
         $sumHours = [$sumHours[0] ?: 0, $sumHours[1] ?: 0, $sumHours[2] ?: 0];
+        $NonHourlyEngagements = collect();
         foreach ($this->engagements()->withTrashed()->get() as $engagement) {
             if (!$eid[0] || in_array($engagement->id, $eid)) {
-                $sumHours[2] += $engagement->NonHourBilling($start, $end, $state);
+                $billed = $engagement->NonHourBilling($start, $end, $state);
+                if($billed){
+                    $sumHours[2] += $billed;
+                    $NonHourlyEngagements->push([$engagement,$billed]);
+                }
             }
         }
 
-        return [$sumHours[2], $hours, $sumHours[0], $sumHours[1]];
+        return [$sumHours[2], $hours, $sumHours[0], $sumHours[1], 'NonHourlyEngagement' => $NonHourlyEngagements];
     }
 
     public function expenseBill($start = null, $end = null, $state = null, $eid = null)

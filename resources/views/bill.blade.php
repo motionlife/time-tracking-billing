@@ -53,12 +53,16 @@
                                 @if(isset($client))
                                     @php $activeTab = Request::get('tab')?:"1"; @endphp
                                     <li class="{{$activeTab=="1"?'active':''}}"><a href="#tab-left1" role="tab"
-                                                                                   data-toggle="tab">Hourly
+                                                                                   data-toggle="tab">Hourly Engagement
                                             Billing&nbsp;<span
                                                     class="badge bg-success">{{$hours->total()}}</span></a></li>
                                     <li class="{{$activeTab=="2"?'active':''}}"><a href="#tab-left2" role="tab"
+                                                                                   data-toggle="tab">Non-hourly Engagement Billing<span
+                                                    class="badge bg-warning">{{$fm_engagements->total()}}</span></a>
+                                    </li>
+                                    <li class="{{$activeTab=="3"?'active':''}}"><a href="#tab-left3" role="tab"
                                                                                    data-toggle="tab">Expense Billing&nbsp;<span
-                                                    class="badge bg-warning">{{$expenses->total()}}</span></a>
+                                                    class="badge bg-default">{{$expenses->total()}}</span></a>
                                     </li>
                                 @else
                                     <li class="active"><a href="#tab-left1" role="tab"
@@ -85,7 +89,7 @@
                                                                 class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
-                                                <th>Rate</th>
+                                                <th>Billing Rate</th>
                                                 <th>Billed</th>
                                                 <th>Status</th>
                                             </tr>
@@ -129,6 +133,49 @@
                                             <thead>
                                             <tr>
                                                 <th>#</th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
+                                                <th>Billed Type</th>
+                                                <th>Started Date</th>
+                                                <th>Closed Date</th>
+                                                <th>Status</th>
+                                                <th>Billed Amount</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php $offset = ($fm_engagements->currentPage() - 1) * $fm_engagements->perPage() + 1;?>
+                                            @foreach($fm_engagements as $eng)
+                                                <tr>
+                                                    <th scope="row">{{$loop->index+$offset}}</th>
+                                                    <td>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng[0]->id),false)).'&tab=2'}}">{{str_limit($eng[0]->name,30)}}</a>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-{{$eng[0]->paying_cycle==0?'default':($eng[0]->paying_cycle==1?'warning':'danger')}}">{{$eng[0]->clientBilledType()}}</span>
+                                                    </td>
+                                                    <td>{{$eng[0]->start_date}}</td>
+                                                    <td>{{$eng[0]->close_date}}</td>
+                                                    <td>
+                                                        <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}} </span>
+                                                    </td>
+                                                    <td>${{number_format($eng[1],2)}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="pull-right pagination">
+                                        {{$fm_engagements->appends(array_add(Request::except('page','tab'),'tab',2))->withPath('bill')->links()}}
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade {{$activeTab=="3"?' in active':''}}" id="tab-left3">
+                                    <div class="table-responsive">
+                                        <table class="table project-table">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
                                                 <th>Consultant</th>
                                                 <th>Engagement<a
                                                             href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
@@ -148,7 +195,7 @@
                                                     <th scope="row">{{$loop->index+$offset}}</th>
                                                     <td>{{str_limit($expense->consultant->fullname(),30)}}</td>
                                                     <td>
-                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
+                                                        <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=3'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
                                                     <td>{{$expense->report_date}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
@@ -161,7 +208,7 @@
                                         </table>
                                     </div>
                                     <div class="pull-right pagination">
-                                        {{$expenses->appends(array_add(Request::except('page'),'tab',2))->withPath('bill')->links()}}
+                                        {{$expenses->appends(array_add(Request::except('page','tab'),'tab',3))->withPath('bill')->links()}}
                                     </div>
                                 </div>
                             </div>
@@ -242,7 +289,7 @@
             font-weight: normal;
         }
 
-        #tab-left3 tr td:last-child {
+        #tab-left2 tr td:last-child,#tab-left3 tr td:last-child {
             font-weight: bold;
         }
 

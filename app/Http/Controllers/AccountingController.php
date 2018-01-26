@@ -28,13 +28,16 @@ class AccountingController extends Controller
         $client_id = $request->get('cid');
         $file = $request->get('file');
         $user = Auth::user();
+        $tab = $request->get('tab');
+        $perpage = $request->get('perpage');
+        $page = $request->get('page');
         if ($payroll) {
             $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
             if ($consultant) {
                 $hourReports = Hour::reported($start, $end, $eid, $consultant, $state);
                 $expenseReports = Expense::reported($start, $end, $eid, $consultant, $state);
-                $pg_hours = $this->paginate($hourReports, $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
-                $pg_expenses = $this->paginate($expenseReports, $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
+                $pg_hours = $this->paginate($hourReports, $perpage ?: 20, $tab == 2 ?: $page);
+                $pg_expenses = $this->paginate($expenseReports, $perpage ?: 20, $tab != 2 ?: $page);
                 $income = [$hourReports->sum(function ($hour) {
                     return $hour->earned();
                 }), $expenseReports->sum(function ($exp) {
@@ -85,19 +88,20 @@ class AccountingController extends Controller
             $client = Client::find($client_id);
             if ($client) {
                 //bill for the specific client
-                $hourBill = $client->hourBill($start, $end, $state, $eid);
+                $engagementBill = $client->engagementBill($start, $end, $state, $eid);
                 $expenseBill = $client->expenseBill($start, $end, $state, $eid);
+                $pg_hours = $this->paginate($engagementBill[1], $perpage ?: 20, $tab == 2 || $tab == 3 ?: $page);
+                $fm_engagments = $this->paginate($engagementBill['NonHourlyEngagement'], $perpage ?: 20, $tab != 2 ?: $page);
+                $pg_expenses = $this->paginate($expenseBill[1], $perpage ?: 20, $tab != 3 ?: $page);
+                $bill = [$engagementBill[0], $expenseBill[0]];
 
-                $pg_hours = $this->paginate($hourBill[1], $request->get('perpage') ?: 20, $request->get('tab') == 2 ?: $request->get('page'));
-                $pg_expenses = $this->paginate($expenseBill[1], $request->get('perpage') ?: 20, $request->get('tab') != 2 ?: $request->get('page'));
-                $bill = [$hourBill[0], $expenseBill[0]];
-
-                if ($file == 'excel') return $this->exportExcel(['hours' => $hourBill[1], 'expenses' => $expenseBill[1], 'buz_devs' => null, 'bill' => $bill,
+                if ($file == 'excel') return $this->exportExcel(['hours' => $engagementBill[1], 'fm_engagements' => $engagementBill['NonHourlyEngagement'], 'expenses' => $expenseBill[1], 'buz_devs' => null, 'bill' => $bill,
                     'filename' => $this->filename($client, $start, $end, $state, $eid, 'Bill')], false, true);
 
                 return view('bill', ['clientIds' => $client->getEngagementIdName(),
                         'hours' => $pg_hours, 'expenses' => $pg_expenses,
                         'bill' => $bill,
+                        'fm_engagements' => $fm_engagments,
                         'admin' => $isAdmin,
                         'client' => $client]
                 );
@@ -132,11 +136,11 @@ class AccountingController extends Controller
 
     private function getBills(Client $client, $start, $end, $eid, $state, &$hrs = null)
     {
-        $hourBill = $client->hourBill($start, $end, $state, $eid);;
+        $engagementBill = $client->engagementBill($start, $end, $state, $eid);;
         $expenseBill = $client->expenseBill($start, $end, $state, $eid);
-        $hrs[0] = $hourBill[2];
-        $hrs[1] = $hourBill[3];
-        return [$hourBill[0], $expenseBill[0]];
+        $hrs[0] = $engagementBill[2];//hours only in the hourly-engagement
+        $hrs[1] = $engagementBill[3];
+        return [$engagementBill[0], $expenseBill[0]];
     }
 
     private function sumIncome($incomes, $buz_dev_incomes)
@@ -228,7 +232,11 @@ class AccountingController extends Controller
                     ->setCompany('New Life CFO')
                     ->setDescription('Your Bill under the specified condition(file name)');
 
-                $excel->sheet('Engagement Bill($' . number_format($data['bill'][0], 2) . ')', function ($sheet) use ($data) {
+                $nheng_total = $data['fm_engagements']->sum(function ($comb) {
+                    return $comb[1];
+                });
+
+                $excel->sheet('Hourly Eng.($' . number_format($data['bill'][0] - $nheng_total, 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Rate($)', 'Rate Type', 'Billed Type', 'Billed($)', 'Report Status'])
                         ->setAllBorders('thin')
@@ -241,8 +249,25 @@ class AccountingController extends Controller
                     foreach ($data['hours'] as $i => $hour) {
                         $arr = $hour->arrangement;
                         $eng = $arr->engagement;
-                        array_push($content, [$hour->consultant->fullname(), $eng->name, $hour->report_date,  $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'),
-                            number_format($hour->billClient(), 2), $hour->getStatus()[0]]);
+                        if ($hour->rate_type == 0) {
+                            array_push($content, [$hour->consultant->fullname(), $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'),
+                                number_format($hour->billClient(), 2), $hour->getStatus()[0]]);
+                        }
+                    }
+                    $sheet->fromArray($content, null, "A2", true, false);
+                });
+                $excel->sheet('Non-hourly Eng.($' . number_format($nheng_total, 2) . ')', function ($sheet) use ($data) {
+                    $sheet->freezeFirstRow()
+                        ->row(1, ['Engagement', 'Billed Type', 'Started Date', 'Closed Date', 'Status', 'Billed Amount($)'])
+                        ->setAllBorders('thin')
+                        ->cells('A1:F1', function ($cells) {
+                            $cells->setBackground('#3bd3f9');
+                            $cells->setFontFamily('Calibri');
+                            $cells->setFontWeight('bold');
+                        });
+                    $content = [];
+                    foreach ($data['fm_engagements'] as $i => $eng) {
+                        array_push($content, [$eng[0]->name, $eng[0]->clientBilledType(), $eng[0]->start_date, $eng[0]->close_date, $eng[0]->state(), number_format($eng[1], 2)]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
@@ -357,7 +382,7 @@ class AccountingController extends Controller
                     foreach ($data['buz_devs']['engs'] as $i => $eng) {
                         array_push($content, [
                             $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
-                            number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1]/$eng[0]->buz_dev_share,2), number_format($eng[1], 2)
+                            number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1] / $eng[0]->buz_dev_share, 2), number_format($eng[1], 2)
                         ]);
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
