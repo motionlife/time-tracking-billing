@@ -14,10 +14,14 @@ class Expense extends Report
 
     public function total()
     {
-        return $this->company_paid ? 0 : $this->hotel + $this->flight + $this->meal + $this->office_supply
+        return $this->hotel + $this->flight + $this->meal + $this->office_supply
             + $this->car_rental + $this->mileage_cost + $this->other;
     }
 
+    public function payConsultant()
+    {
+        return $this->company_paid ? 0 : $this->total();
+    }
 
     public static function monthlyExpenses($consultant = null, $start = null, $end = null, $review_state = null)
     {

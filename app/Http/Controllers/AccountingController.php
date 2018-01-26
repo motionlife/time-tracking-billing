@@ -41,7 +41,7 @@ class AccountingController extends Controller
                 $income = [$hourReports->sum(function ($hour) {
                     return $hour->earned();
                 }), $expenseReports->sum(function ($exp) {
-                    return $exp->total();
+                    return $exp->payConsultant();
                 })];
                 $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
 
@@ -169,7 +169,7 @@ class AccountingController extends Controller
         $hrs[0] = $sumHours[0] ?: 0;
         $hrs[1] = $sumHours[1] ?: 0;
         return [$sumHours[2], $expenseReports->sum(function ($exp) {
-            return $exp->total();
+            return $exp->payConsultant();
         })];
     }
 
