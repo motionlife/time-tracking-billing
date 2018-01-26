@@ -566,7 +566,7 @@
 @section('special-css')
     <style>
         .arrangement-table {
-            margin-top: -3.8%;
+            margin-top: -3.1%;
         }
 
         .engagement-table {

@@ -38,8 +38,8 @@ class ArrangementPolicy
         //
         $consultant = $user->consultant;
         $engagement = $arrangement->engagement;
-        return ($user->isSupervisor() && $this->inAdminMode) || $consultant->id == $arrangement->consultant_id ||
-            ($engagement->isPending() && $engagement->leader_id == $consultant->id);
+        return ($user->isSupervisor() && $this->inAdminMode) || $consultant->id == $arrangement->consultant_id || $engagement->leader_id == $consultant->id;
+            //($engagement->isPending() && $engagement->leader_id == $consultant->id);
     }
 
     /**
