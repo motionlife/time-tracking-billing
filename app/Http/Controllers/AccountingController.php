@@ -35,7 +35,9 @@ class AccountingController extends Controller
             $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : $user->consultant;
             if ($consultant) {
                 $hourReports = Hour::reported($start, $end, $eid, $consultant, $state);
-                $expenseReports = Expense::reported($start, $end, $eid, $consultant, $state);
+                $expenseReports = Expense::reported($start, $end, $eid, $consultant, $state)->filter(function ($value) {
+                    return $value->company_paid == 0;
+                });
                 $pg_hours = $this->paginate($hourReports, $perpage ?: 20, $tab == 2 ?: $page);
                 $pg_expenses = $this->paginate($expenseReports, $perpage ?: 20, $tab != 2 ?: $page);
                 $income = [$hourReports->sum(function ($hour) {
