@@ -69,9 +69,11 @@
 
             $(function () {
                 var groupClientNameSelected;
-                $('.group-client-name').on('click', function () {
-                    groupClientNameSelected = groupClientNameSelected === $(this).data('id') ? '' : $(this).data('id');
-                    $('#client-engagements').selectpicker('val', groupClientNameSelected);
+                $('#client-engagements').on('loaded.bs.select', function () {
+                    $('a.group-client-name').on('click', function () {
+                        groupClientNameSelected = groupClientNameSelected === $(this).data('id') ? '' : $(this).data('id');
+                        $('#client-engagements').selectpicker('val', groupClientNameSelected);
+                    });
                 });
             });
         </script>
