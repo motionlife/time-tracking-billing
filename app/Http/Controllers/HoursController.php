@@ -133,6 +133,7 @@ class HoursController extends Controller
                         $feedback['code'] = 2;
                         $feedback['message'] = 'You are not in this engagement';
                     } else {
+                        if(!$request->get('billable_hours')) $request->merge(['billable_hours'=>0]);
                         $hour = (new Hour(['arrangement_id' => $arr->id, 'consultant_id' => $arr->consultant_id]))->fill($request->except(['eid', 'pid', 'review_state']));
                         $hour->rate = $eng->isHourlyBilling() ? $arr->billing_rate : $arr->pay_rate;
                         $hour->rate_type = $eng->isHourlyBilling() ? 0 : 1;

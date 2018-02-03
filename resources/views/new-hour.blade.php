@@ -55,7 +55,9 @@
                                             <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours+$hour->non_billable_hours,1)}}</strong></a>
                                         </div>
                                         <p>hours reported to
-                                            <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<br>Billable:{{number_format($hour->billable_hours,1)}}; Non-billable:{{number_format($hour->non_billable_hours,1)}}<span
+                                            <strong>{{$eng->name}}</strong> ({{$eng->client->name}}
+                                            )<br>Billable:{{number_format($hour->billable_hours,1)}};
+                                            Non-billable:{{number_format($hour->non_billable_hours,1)}}<span
                                                     class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}
                                                 <a href="javascript:deleteTodaysReport({{$hour->id}});"><i
                                                             class="fa fa-times pull-right"></i></a></span>
@@ -233,50 +235,54 @@
                 $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
-                var eid = $('#client-engagement').selectpicker('val');
-                var token = "{{ csrf_token() }}";
-                $.ajax({
-                    type: "POST",
-                    url: "/hour",
-                    data: {
-                        _token: token,
-                        eid: eid ? eid : '',
-                        pid: $('#position').selectpicker('val'),
-                        report_date: $('#report-date').val(),
-                        task_id: $('#task-id').selectpicker('val'),
-                        billable_hours: $('#billable-hours').val(),
-                        non_billable_hours: $('#non-billable-hours').val(),
-                        description: $('#description').val()
-                    },
-                    dataType: 'json',
-                    success: function (feedback) {
-                        if (feedback.code == 7) {
-                            toastr.success('Success! Report has been saved!');
-                            $('#billable-hours').val('');
-                            $('#non-billable-hours').val('');
-                            $totalhours = parseFloat(feedback.data.billable_hours) + parseFloat(feedback.data.non_billable_hours);
-                            $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>'
-                                + ($totalhours) + '</strong></a></div><p>hours reported to <strong>'
-                                + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<br>Billable:' + feedback.data.billable_hours + '; Non-billable: '
-                                + feedback.data.non_billable_hours + '<span class="timestamp">'
-                                + feedback.data.created_at + '<a href="javascript:deleteTodaysReport('
-                                + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
-                                .prependTo('#today-board').hide().fadeIn(1500);
-                        } else {
-                            toastr.error('Error! Saving record failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message);
+                if (parseFloat($('#billable-hours').val() + $('#non-billable-hours').val()) > 0) {
+                    var eid = $('#client-engagement').selectpicker('val');
+                    var token = "{{ csrf_token() }}";
+                    $.ajax({
+                        type: "POST",
+                        url: "/hour",
+                        data: {
+                            _token: token,
+                            eid: eid ? eid : '',
+                            pid: $('#position').selectpicker('val'),
+                            report_date: $('#report-date').val(),
+                            task_id: $('#task-id').selectpicker('val'),
+                            billable_hours: $('#billable-hours').val(),
+                            non_billable_hours: $('#non-billable-hours').val(),
+                            description: $('#description').val()
+                        },
+                        dataType: 'json',
+                        success: function (feedback) {
+                            if (feedback.code == 7) {
+                                toastr.success('Success! Report has been saved!');
+                                $('#billable-hours').val('');
+                                $('#non-billable-hours').val('');
+                                $totalhours = parseFloat(feedback.data.billable_hours) + parseFloat(feedback.data.non_billable_hours);
+                                $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>'
+                                    + ($totalhours) + '</strong></a></div><p>hours reported to <strong>'
+                                    + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<br>Billable:' + feedback.data.billable_hours + '; Non-billable: '
+                                    + feedback.data.non_billable_hours + '<span class="timestamp">'
+                                    + feedback.data.created_at + '<a href="javascript:deleteTodaysReport('
+                                    + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
+                                    .prependTo('#today-board').hide().fadeIn(1500);
+                            } else {
+                                toastr.error('Error! Saving record failed, code: ' + feedback.code +
+                                    ', message: ' + feedback.message);
+                            }
+                        },
+                        error: function (feedback) {
+                            toastr.error('Oh Noooooooo..' + feedback.message);
+                        },
+                        beforeSend: function () {
+                            $("#report-button").button('loading');
+                        },
+                        complete: function () {
+                            $("#report-button").button('reset');
                         }
-                    },
-                    error: function (feedback) {
-                        toastr.error('Oh Noooooooo..' + feedback.message);
-                    },
-                    beforeSend: function () {
-                        $("#report-button").button('loading');
-                    },
-                    complete: function () {
-                        $("#report-button").button('reset');
-                    }
-                });
+                    });
+                } else {
+                    toastr.warning("Well, you should at least input some hours...");
+                }
                 e.preventDefault();
             });
             $('#report-date').datepicker({

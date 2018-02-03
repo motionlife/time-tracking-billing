@@ -25,7 +25,7 @@
     <input class="form-control" id="billable-hours" name="billable_hours" type="number"
            placeholder="numbers only"
            step="0.1" min="0"
-           max="24" required>
+           max="24">
 
     <span class="input-group-addon"><i
                 class="fa fa-hourglass-start"></i>&nbsp;Non-billable Hours:</span>

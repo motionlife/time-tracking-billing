@@ -216,55 +216,59 @@
             });
 
             $('#hour-form').on('submit', function (e) {
-                var token = "{{ csrf_token() }}";
-                $.ajax({
-                    type: "POST",
-                    url: "/hour/" + hid,
-                    data: {
-                        _token: token,
-                        _method: 'put',
-                        report_date: $('#report-date').val(),
-                        task_id: $('#task-id').selectpicker('val'),
-                        billable_hours: $('#billable-hours').val(),
-                        non_billable_hours: $('#non-billable-hours').val(),
-                        description: $('#description').val(),
-                        @if($admin)
-                        review_state: $("input[name=review_state]:checked").val(),
-                        feedback: $('#hour-feedback').val()
-                        @endif
-                    },
-                    dataType: 'json',
-                    success: function (feedback) {
-                        if (feedback.code == 7) {
-                            toastr.success('Success! Report has been updated!');
-                            tr.find('td:nth-child(4)').html(feedback.record.task);
-                            tr.find('td:nth-child(5)').html(feedback.record.billable_hours);
-                            tr.find('td:nth-child(6)').html(feedback.record.report_date);
-                            @if(!$mcMode) tr.find('td:nth-child(7)').html(feedback.record.description);
+                if (parseFloat($('#billable-hours').val() + $('#non-billable-hours').val()) > 0) {
+                    var token = "{{ csrf_token() }}";
+                    $.ajax({
+                        type: "POST",
+                        url: "/hour/" + hid,
+                        data: {
+                            _token: token,
+                            _method: 'put',
+                            report_date: $('#report-date').val(),
+                            task_id: $('#task-id').selectpicker('val'),
+                            billable_hours: $('#billable-hours').val(),
+                            non_billable_hours: $('#non-billable-hours').val(),
+                            description: $('#description').val(),
+                            @if($admin)
+                            review_state: $("input[name=review_state]:checked").val(),
+                            feedback: $('#hour-feedback').val()
                             @endif
-                            tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
-                            tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
-                            var flash = tr;
-                            flash.addClass('update-highlight');
-                            setTimeout(function () {
-                                flash.removeClass('update-highlight');
-                            }, 2100);
-                        } else {
-                            toastr.error('Error! Updating failed, code: ' + feedback.code +
-                                ', message: ' + feedback.message);
+                        },
+                        dataType: 'json',
+                        success: function (feedback) {
+                            if (feedback.code == 7) {
+                                toastr.success('Success! Report has been updated!');
+                                tr.find('td:nth-child(4)').html(feedback.record.task);
+                                tr.find('td:nth-child(5)').html(feedback.record.billable_hours);
+                                tr.find('td:nth-child(6)').html(feedback.record.report_date);
+                                @if(!$mcMode) tr.find('td:nth-child(7)').html(feedback.record.description);
+                                @endif
+                                tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
+                                tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
+                                var flash = tr;
+                                flash.addClass('update-highlight');
+                                setTimeout(function () {
+                                    flash.removeClass('update-highlight');
+                                }, 2100);
+                            } else {
+                                toastr.error('Error! Updating failed, code: ' + feedback.code +
+                                    ', message: ' + feedback.message);
+                            }
+                        },
+                        error: function (feedback) {
+                            toastr.error('Oh NOooooooo...' + feedback.message);
+                        },
+                        beforeSend: function () {
+                            $("#report-update").button('loading');
+                        },
+                        complete: function () {
+                            $("#report-update").button('reset');
+                            $('#hourModal').modal('toggle');
                         }
-                    },
-                    error: function (feedback) {
-                        toastr.error('Oh NOooooooo...' + feedback.message);
-                    },
-                    beforeSend: function () {
-                        $("#report-update").button('loading');
-                    },
-                    complete: function () {
-                        $("#report-update").button('reset');
-                        $('#hourModal').modal('toggle');
-                    }
-                });
+                    });
+                } else {
+                    toastr.warning("Well, you should at least input some hours...");
+                }
                 e.preventDefault();
             });
         });
