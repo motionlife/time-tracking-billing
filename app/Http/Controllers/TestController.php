@@ -221,7 +221,7 @@ class TestController extends Controller
     public function get_task_id($group, $desc)
     {
         if ($group == '' || $group == ' ' || str_contains($group, 'blank')) {
-            $group = 'Other';
+            $group = 'Common';
         }
         if ($desc == '' || $desc == ' ' || str_contains($desc, 'blank')) {
             $desc = 'Other';
