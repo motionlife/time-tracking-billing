@@ -23,7 +23,7 @@
                                 <div class="panel-body">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client:</span>
-                                        <select id="client-select" class="selectpicker" data-width="auto"
+                                        <select id="client-select" class="selectpicker" data-width="22%"
                                                 data-live-search="true"
                                                 name="client_id" title="select the client" required>
                                             @foreach(\newlifecfo\Models\Client::all()->pluck('name','id') as $id=>$client)
@@ -32,7 +32,7 @@
                                             @endforeach
                                         </select>
                                         <span class="input-group-addon"><i class="fa fa-briefcase"
-                                                                           aria-hidden="true"></i>&nbsp;Name:</span>
+                                                                           aria-hidden="true"></i>&nbsp;Engagement Name:</span>
                                         <input type="text" list="engagement-names" class="form-control flexdatalist"
                                                id="engagement-name" name="name"
                                                placeholder="input a name" data-selection-required='true'
