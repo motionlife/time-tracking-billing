@@ -216,7 +216,7 @@
             });
 
             $('#hour-form').on('submit', function (e) {
-                if (parseFloat($('#billable-hours').val() + $('#non-billable-hours').val()) > 0) {
+                if (parseFloat($('#billable-hours').val()) + parseFloat($('#non-billable-hours').val()) > 0) {
                     var token = "{{ csrf_token() }}";
                     $.ajax({
                         type: "POST",

@@ -235,7 +235,7 @@
                 $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
-                if (parseFloat($('#billable-hours').val() + $('#non-billable-hours').val()) > 0) {
+                if (parseFloat($('#billable-hours').val()) + parseFloat($('#non-billable-hours').val()) > 0) {
                     var eid = $('#client-engagement').selectpicker('val');
                     var token = "{{ csrf_token() }}";
                     $.ajax({
