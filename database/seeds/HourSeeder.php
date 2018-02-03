@@ -142,7 +142,7 @@ class HourSeeder extends Seeder
     {
         if($group==''||$group==' '||str_contains($group,'blank'))
         {
-            $group = 'Other';
+            $group = 'Common';
         }
         if($desc==''||$desc==' '||str_contains($desc,'blank'))
         {
