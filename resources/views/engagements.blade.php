@@ -55,6 +55,7 @@
                                             <option value="Business Intelligence Services">
                                             <option value="Investor Services"></option>
                                             <option value="Tip of the Spear Services"></option>
+                                            <option value="New Life Admin"></option>
                                         </datalist>
                                         <span class="input-group-addon"><i class="fa fa-male"
                                                                            aria-hidden="true"></i>&nbsp; Leader:</span>
