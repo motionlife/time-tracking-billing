@@ -41,14 +41,29 @@ class User extends Authenticatable
 
     const ROLES = ['Unassigned', 'Client', 'Outside Referrer', 'Consultant', 'General Admin', 'Super Admin', 'root'];
 
+    public function unRecognized()
+    {
+        return $this->priority == 0;
+    }
+
     public function isVerified()
     {
-        return $this->priority != 0;
+        return !$this->unRecognized() && !$this->isInactive();
+    }
+
+    public function isInactive()
+    {
+        return $this->priority > 0 && $this->priority < 3;
     }
 
     public function isNormalUser()
     {
-        return $this->priority > 0 && $this->priority < 10;
+        return $this->priority > 2 && $this->priority < 5;
+    }
+
+    public function isLeaderCandidate()
+    {
+        return $this->priority > 4 && $this->priority < 10;
     }
 
     public function isSupervisor()

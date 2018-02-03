@@ -56,8 +56,12 @@ class AdminController extends Controller
             if ($user->priority > $target->priority) {
                 $pre = $target->priority;
                 if ($request->get('action') == 'delete') {
-                    $target->delete();
-                    $feedback['code'] = 7;
+                    if ($pre == 0) {
+                        $target->delete();
+                        $feedback['code'] = 7;
+                    } else {
+                        $feedback['code'] = 0;
+                    }
                 } else if ($request->get('action') == 'update') {
                     switch ($request->get('role')) {
                         case 0:
@@ -67,16 +71,22 @@ class AdminController extends Controller
                             $target->priority = 1;
                             break;
                         case 2:
-                            $target->priority = 11;
+                            $target->priority = 3;
                             break;
                         case 3:
+                            $target->priority = 5;
+                            break;
+                        case 4:
+                            $target->priority = 11;
+                            break;
+                        case 5:
                             $target->priority = 51;
                             break;
                     }
                     if ($user->priority > $target->priority) {
                         if ($target->save()) {
                             $feedback['code'] = 7;
-                            if ($pre == 0 && $target->priority > 0) {
+                            if ($pre == 0 && $target->priority > 1) {
                                 //fire the event to notify user ready to use
                                 event(new ConsultantRecognizedEvent($target));
                             }
@@ -116,9 +126,9 @@ class AdminController extends Controller
                 }
             } else if ($request->get('action') == 'update') {
                 $client = Client::find($request->get('cid'));
-                if ($client->update(['industry_id'=>$request->get('industry_id'),'buz_dev_person_id'=>$request->get('buz_dev_person_id'),'outreferrer_id'=>$request->get('outreferrer_id'),'name'=>$request->get('name'),
-                    'complex_structure'=>$request->get('complex_structure'),'messy_accounting_at_begin'=>$request->get('messy_accounting_at_begin')
-                    ])) {
+                if ($client->update(['industry_id' => $request->get('industry_id'), 'buz_dev_person_id' => $request->get('buz_dev_person_id'), 'outreferrer_id' => $request->get('outreferrer_id'), 'name' => $request->get('name'),
+                    'complex_structure' => $request->get('complex_structure'), 'messy_accounting_at_begin' => $request->get('messy_accounting_at_begin')
+                ])) {
                     $client->setRevenue(2015, $request->get('revenue2015'), $request->get('ebit2015'));
                     $client->setRevenue(2016, $request->get('revenue2016'), $request->get('ebit2016'));
                     $client->setRevenue(2017, $request->get('revenue2017'), $request->get('ebit2017'));
