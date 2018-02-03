@@ -40,7 +40,9 @@
                                         <datalist id="engagement-names">
                                             <option value="CFO Services">
                                             <option value="Controller Services">
-                                            <option value="Business Intelligence">
+                                            <option value="Business Intelligence Services">
+                                            <option value="Investor Services"></option>
+                                            <option value="Tip of the Spear Services"></option>
                                         </datalist>
                                         <span class="input-group-addon"><i class="fa fa-male" aria-hidden="true"></i>&nbsp; Leader:</span>
                                         <select class="selectpicker" name="leader_id" id="leader_id" data-width="auto"
