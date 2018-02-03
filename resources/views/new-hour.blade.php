@@ -78,7 +78,7 @@
                         <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
                             Week
                             <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong><i
-                                    class="pull-right">Input Billable Hours</i>
+                                    class="pull-right">Input <strong>Billable</strong> Hours</i>
                         </div>
                     </div>
                     <form id="matrix">
