@@ -68,7 +68,7 @@
                                                     class="badge bg-warning">{{$expenses->total()}}</span></a>
                                     </li>
                                     <li class="{{$activeTab=="3"?'active':''}}"><a href="#tab-left3" role="tab"
-                                                                                   data-toggle="tab">Buz Dev
+                                                                                   data-toggle="tab">Biz Dev
                                             Income&nbsp;<span
                                                     class="badge bg-danger">{{sizeof($buz_devs['engs'])}}</span></a>
                                     </li>
@@ -237,7 +237,7 @@
                                     <th>Non-billable Hours</th>
                                     <th>Hourly Income</th>
                                     <th>Expense</th>
-                                    <th>Buz Dev Income</th>
+                                    <th>Biz Dev Income</th>
                                     <th>Total</th>
                                 </tr>
                                 </thead>

@@ -247,7 +247,7 @@
                                         <tr>
                                             <th>Leader</th>
                                             <th>Started</th>
-                                            <th>Buz Dev Share</th>
+                                            <th>Biz Dev Share</th>
                                             <th>Billed Type</th>
                                             <th>Status</th>
                                         </tr>
