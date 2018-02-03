@@ -23,21 +23,7 @@
                 </div>
                 <div id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i
-                                        class="lnr lnr-question-circle"></i> <span>Help</span> <i
-                                        class="icon-submenu lnr lnr-chevron-down"></i></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#" class="notification-item"><span class="dot bg-warning"></span>Basic Use</a>
-                                </li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-danger"></span>Working
-                                        With Data</a></li>
-                                <li><a href="#" class="notification-item"><span
-                                                class="dot bg-success"></span>Security</a></li>
-                                <li><a href="#" class="notification-item"><span class="dot bg-info"></span>Troubleshooting</a>
-                                </li>
-                            </ul>
-                        </li>
+
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"><img src="/img/user.png"
                                                                                             class="img-circle"
@@ -46,8 +32,7 @@
                                         class="icon-submenu lnr lnr-chevron-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="/profile"><i class="lnr lnr-user"></i> <span>My Profile</span></a></li>
-                                <li><a href="/message"><i class="lnr lnr-envelope"></i> <span>Message</span></a></li>
-                                <li><a href="#"><i class="lnr lnr-cog"></i> <span>Settings</span></a></li>
+
                                 <li>
                                     <a href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
@@ -147,9 +132,7 @@
                                         </li>
                                         <li><a href="/admin/client"
                                                class="{{Request::is('admin/client') ?'active':''}}">Clients</a></li>
-                                        <li><a href="/admin/miscellaneous"
-                                               class="{{Request::is('admin/miscellaneous') ?'active':''}}">Miscellaneous</a>
-                                        </li>
+
                                     </ul>
                                 </div>
                             </li>
