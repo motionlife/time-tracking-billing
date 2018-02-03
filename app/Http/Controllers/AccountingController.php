@@ -36,7 +36,7 @@ class AccountingController extends Controller
             if ($consultant) {
                 $hourReports = Hour::reported($start, $end, $eid, $consultant, $state);
                 $expenseReports = Expense::reported($start, $end, $eid, $consultant, $state)->filter(function ($value) {
-                    return $value->company_paid == 0;
+                    return !$value->company_paid;
                 });
                 $pg_hours = $this->paginate($hourReports, $perpage ?: 20, $tab == 2 ?: $page);
                 $pg_expenses = $this->paginate($expenseReports, $perpage ?: 20, $tab != 2 ?: $page);
