@@ -34,7 +34,14 @@ class TaskgroupSeeder extends Seeder
         (new Taskgroup(['name'=>'NLCFO - Networking & Marketing']))->save();//19
         (new Taskgroup(['name'=>'NLCFO - Prospects & Proposals']))->save();//20
 
-        (new Taskgroup(['name'=>'Other']))->save();//21
+        (new Taskgroup(['name'=>'CFO Services']))->save();//21
+        (new Taskgroup(['name'=>'Controller Services']))->save();//22
+        (new Taskgroup(['name'=>'Business Intelligence Services']))->save();//23
+        (new Taskgroup(['name'=>'Investor Services']))->save();//24
+        (new Taskgroup(['name'=>'Tip of the Spear Services']))->save();//25
+        (new Taskgroup(['name'=>'New Life Admin']))->save();//26
+
+        (new Taskgroup(['name'=>'Common']))->save();//27
 
     }
 }

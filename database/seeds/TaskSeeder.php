@@ -138,6 +138,51 @@ class TaskSeeder extends Seeder
         (new Task(['taskgroup_id'=>20,'description'=>'Present Value Builder']))->save();
         (new Task(['taskgroup_id'=>20,'description'=>'Other']))->save();
 
-        (new Task(['taskgroup_id'=>21,'description'=>'Other']))->save();//the default one tid=107
+        (new Task(['taskgroup_id'=>21,'description'=>'Recurring CFO Hourly Services']))->save();
+        (new Task(['taskgroup_id'=>21,'description'=>'Recurring CFO Monthly Retainer']))->save();
+//        (new Task(['taskgroup_id'=>21,'description'=>'Out of Scope Hourly Work']))->save();
+//        (new Task(['taskgroup_id'=>21,'description'=>'One time Project - Hourly']))->save();
+//        (new Task(['taskgroup_id'=>21,'description'=>'One Time Project - Flat Fee']))->save();
+
+        (new Task(['taskgroup_id'=>22,'description'=>'Monthly Controller Recurring Services']))->save();
+        (new Task(['taskgroup_id'=>22,'description'=>'Accounting Wellness Assessment']))->save();
+        (new Task(['taskgroup_id'=>22,'description'=>'GL Catch-up/Clean-up']))->save();
+        (new Task(['taskgroup_id'=>22,'description'=>'Process Re-Engineering']))->save();
+//        (new Task(['taskgroup_id'=>22,'description'=>'Out of Scope Hourly Controller Services']))->save();
+//        (new Task(['taskgroup_id'=>22,'description'=>'One time Project - Hourly']))->save();
+//        (new Task(['taskgroup_id'=>22,'description'=>'One Time Project - Flat Fee']))->save();
+
+        (new Task(['taskgroup_id'=>23,'description'=>'Dashboard Services - Onboarding']))->save();
+        (new Task(['taskgroup_id'=>23,'description'=>'Dashboard Services - Retainer']))->save();
+        (new Task(['taskgroup_id'=>23,'description'=>'Dashboard Services - Other']))->save();
+        (new Task(['taskgroup_id'=>23,'description'=>'Reporting Portal']))->save();
+        (new Task(['taskgroup_id'=>23,'description'=>'Investor Corral']))->save();
+//        (new Task(['taskgroup_id'=>23,'description'=>'One time Project - Hourly']))->save();
+//        (new Task(['taskgroup_id'=>23,'description'=>'One Time Project - Flat Fee']))->save();
+
+        (new Task(['taskgroup_id'=>24,'description'=>'G.A.P.']))->save();
+        (new Task(['taskgroup_id'=>24,'description'=>'i.V.O.S.']))->save();
+//        (new Task(['taskgroup_id'=>24,'description'=>'Out of Scope Hourly Controller Services']))->save();
+//        (new Task(['taskgroup_id'=>24,'description'=>'One Time Project - Flat Fee']))->save();
+//        (new Task(['taskgroup_id'=>24,'description'=>'One time Project - Hourly']))->save();
+
+        (new Task(['taskgroup_id'=>25,'description'=>'Accounting Assessment']))->save();
+        (new Task(['taskgroup_id'=>25,'description'=>'Value Builder']))->save();
+        (new Task(['taskgroup_id'=>25,'description'=>'Vision Goals & Accountability']))->save();
+        (new Task(['taskgroup_id'=>25,'description'=>'Benchmarking Services']))->save();
+
+        (new Task(['taskgroup_id'=>26,'description'=>'Business Development & Marketing']))->save();
+        (new Task(['taskgroup_id'=>26,'description'=>'Systems & Infrastructure']))->save();
+        (new Task(['taskgroup_id'=>26,'description'=>'Accounting, Payroll & Billings etc']))->save();
+        (new Task(['taskgroup_id'=>26,'description'=>'Company Meetings & Events']))->save();
+        (new Task(['taskgroup_id'=>26,'description'=>'Legal']))->save();
+        (new Task(['taskgroup_id'=>26,'description'=>'Training']))->save();
+
+
+        (new Task(['taskgroup_id'=>27,'description'=>'Out of Scope Hourly Service']))->save();
+        (new Task(['taskgroup_id'=>27,'description'=>'One time Project - Hourly']))->save();
+        (new Task(['taskgroup_id'=>27,'description'=>'One Time Project - Flat Fee']))->save();
+        (new Task(['taskgroup_id'=>27,'description'=>'Travel']))->save();
+        (new Task(['taskgroup_id'=>27,'description'=>'Other']))->save();
     }
 }
