@@ -52,10 +52,10 @@
                                     <li>
                                         <?php $eng = $hour->arrangement->engagement ?>
                                         <div class="pull-left avatar">
-                                            <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours,1)}}</strong></a>
+                                            <a href="javascript:void(0);"><strong>{{number_format($hour->billable_hours+$hour->non_billable_hours,1)}}</strong></a>
                                         </div>
-                                        <p> billable hours reported for the work of
-                                            <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<span
+                                        <p>hours reported to
+                                            <strong>{{$eng->name}}</strong> ({{$eng->client->name}})<br>Billable:{{number_format($hour->billable_hours,1)}}; Non-billable:{{number_format($hour->non_billable_hours,1)}}<span
                                                     class="timestamp">{{\Carbon\Carbon::parse($hour->created_at)->diffForHumans()}}
                                                 <a href="javascript:deleteTodaysReport({{$hour->id}});"><i
                                                             class="fa fa-times pull-right"></i></a></span>
@@ -91,7 +91,7 @@
                                         @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
                                         <th>{{substr($date->addDay($i)->format('l'),0,3)}}
                                             <br><span class="week-date"
-                                                    data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
+                                                      data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
                                         </th>
                                     @endfor
                                     <th></th>
@@ -99,23 +99,25 @@
                                 </thead>
                                 <tbody>
                                 @foreach($defaultTasks as $key=>$ids)
-                                        @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
-                                        <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
-                                            <th scope="row"><span
-                                                        class="label label-success">{{$eng->client->name}}</span><span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span><a
-                                                        href="javascript:void(0);" class="mark-fav-task" title="Mark as your favorite task for automatic display."
-                                                        data-state="{{$fav?'on':'off'}}"><i class="fa fa-star{{$fav?'':'-o'}}" aria-hidden="true"></i></a>
-                                            </th>
-                                            @for($i=0;$i<7;$i++)
-                                                <td><input class='form-control input-sm' type='number' min="0"
-                                                           step="0.1" max="24"/>
-                                                    <a href="javascript:void(0);" title="Add description" ref="popover"
-                                                       data-desc="">
-                                                        <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
-                                            @endfor
-                                            <td><a href="javascript:void(0)" class="deletable-row"><i
-                                                            class="fa fa-times" aria-hidden="true"></i></a></td>
-                                        </tr>
+                                    @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
+                                    <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
+                                        <th scope="row"><span
+                                                    class="label label-success">{{$eng->client->name}}</span><span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span><a
+                                                    href="javascript:void(0);" class="mark-fav-task"
+                                                    title="Mark as your favorite task for automatic display."
+                                                    data-state="{{$fav?'on':'off'}}"><i
+                                                        class="fa fa-star{{$fav?'':'-o'}}" aria-hidden="true"></i></a>
+                                        </th>
+                                        @for($i=0;$i<7;$i++)
+                                            <td><input class='form-control input-sm' type='number' min="0"
+                                                       step="0.1" max="24"/>
+                                                <a href="javascript:void(0);" title="Add description" ref="popover"
+                                                   data-desc="">
+                                                    <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
+                                        @endfor
+                                        <td><a href="javascript:void(0)" class="deletable-row"><i
+                                                        class="fa fa-times" aria-hidden="true"></i></a></td>
+                                    </tr>
                                 @endforeach
                                 </tbody>
                             </table>
@@ -139,8 +141,10 @@
             <tbody>
             <tr>
                 <th scope="row"><span class="label label-success"></span><span></span><br><span></span><a
-                            href="javascript:void(0);" class="mark-fav-task"  title="Mark as your favorite task for automatic display." data-state="off"><i class="fa fa-star-o"
-                                                                                                 aria-hidden="true"></i></a>
+                            href="javascript:void(0);" class="mark-fav-task"
+                            title="Mark as your favorite task for automatic display." data-state="off"><i
+                                class="fa fa-star-o"
+                                aria-hidden="true"></i></a>
                 </th>
                 @for($i=0;$i<7;$i++)
                     <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
@@ -250,9 +254,11 @@
                             toastr.success('Success! Report has been saved!');
                             $('#billable-hours').val('');
                             $('#non-billable-hours').val('');
+                            $totalhours = parseFloat(feedback.data.billable_hours) + parseFloat(feedback.data.non_billable_hours);
                             $('<li><div class="pull-left avatar"><a href="javascript:void(0);"><strong>'
-                                + feedback.data.billable_hours + '</strong></a></div><p>billable hours reported for the work of <strong>'
-                                + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<span class="timestamp">'
+                                + ($totalhours) + '</strong></a></div><p>hours reported to <strong>'
+                                + feedback.data.ename + '</strong>(' + feedback.data.cname + ')<br>Billable:' + feedback.data.billable_hours + '; Non-billable: '
+                                + feedback.data.non_billable_hours + '<span class="timestamp">'
                                 + feedback.data.created_at + '<a href="javascript:deleteTodaysReport('
                                 + feedback.data.hid + ');"><i class="fa fa-times pull-right"></i></a></span></p></li>')
                                 .prependTo('#today-board').hide().fadeIn(1500);

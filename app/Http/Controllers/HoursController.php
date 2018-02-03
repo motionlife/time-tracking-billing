@@ -142,6 +142,7 @@ class HoursController extends Controller
                             $feedback['code'] = 7;
                             $feedback['message'] = 'success';
                             $feedback['data'] = ['billable_hours' => number_format($hour->billable_hours, 1),
+                                'non_billable_hours' => number_format($hour->non_billable_hours, 1),
                                 'created_at' => Carbon::parse($hour->created_at)->diffForHumans(),
                                 'ename' => $eng->name, 'cname' => $eng->client->name, 'hid' => $hour->id];
                         } else {
