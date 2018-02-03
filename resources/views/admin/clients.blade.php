@@ -24,7 +24,7 @@
                             </select>
                             <br>
                             <br>
-                            <label for="buz_dev_person_id">Business Develop Persion:</label>
+                            <label for="buz_dev_person_id">Business Develop Person:</label>
                             <select name="buz_dev_person_id" id="buz-dev-person-id" data-live-search="true"
                                     class="selectpicker form-control" title="select business Develop person" required>
                                 <option value="0"  {{$create?'':(0 ==$client->buz_dev_person_id?'selected':'')}}>New Life CFO</option>
@@ -36,7 +36,7 @@
                             <br>
                             <label for="outreferrer_id">Outside Referrer:</label>
                             <select name="outreferrer_id" id="outreferrer-id" data-live-search="true"
-                                    class="selectpicker form-control" title="select outsider referer" required>
+                                    class="selectpicker form-control" title="select outside referrer" required>
                                 <option value="0"  {{$create?'':(0 ==$client->outreferrer_id?'selected':'')}}>N/A</option>
                                 @foreach(\newlifecfo\Models\Outreferrer::all() as $out)
                                     <option value="{{$out->id}}"{{$create?'':($out->id==$client->outreferrer_id?'selected':'')}}>{{$out->fullname()}}</option>
