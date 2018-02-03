@@ -2,9 +2,20 @@
 @section('popup-container')
     <div id="billing-day-container"></div>
 @endsection
+@if(isset($blocked))
 @section('content')
-    @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
     <div class="main-content">
+        <div class="alert alert-danger">
+            <i class="fa fa-exclamation-triangle"></i>
+            <strong>Can't Create Engagement!</strong><br>
+            In order to create an engagement, you must be set as <strong>'Leader Candidate'</strong> first, please contact the administrator.
+        </div>
+    </div>
+@endsection
+@else
+@section('content')
+    <div class="main-content">
+        @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
         @if($manage||$admin)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
                  aria-labelledby="engagementModalLabel" data-backdrop="static" data-keyboard="false"
@@ -22,7 +33,8 @@
                             <div class="modal-body">
                                 <div class="panel-body">
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client:</span>
+                                                <span class="input-group-addon"><i
+                                                            class="fa fa-users"></i>&nbsp; Client:</span>
                                         <select id="client-select" class="selectpicker" data-width="22%"
                                                 data-live-search="true"
                                                 name="client_id" title="select the client" required>
@@ -44,8 +56,10 @@
                                             <option value="Investor Services"></option>
                                             <option value="Tip of the Spear Services"></option>
                                         </datalist>
-                                        <span class="input-group-addon"><i class="fa fa-male" aria-hidden="true"></i>&nbsp; Leader:</span>
-                                        <select class="selectpicker" name="leader_id" id="leader_id" data-width="auto"
+                                        <span class="input-group-addon"><i class="fa fa-male"
+                                                                           aria-hidden="true"></i>&nbsp; Leader:</span>
+                                        <select class="selectpicker" name="leader_id" id="leader_id"
+                                                data-width="auto"
                                                 disabled>
                                             @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
                                                 <option value="{{$consultant->id}}" {{($manage&&$consultant->id==$leader->id)?'selected':''}}>{{$consultant->fullname()}}</option>
@@ -54,13 +68,14 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i
-                                                    class="fa fa-calendar"></i>&nbsp; Start Date</span>
+                                            <span class="input-group-addon"><i
+                                                        class="fa fa-calendar"></i>&nbsp; Start Date</span>
                                         <input class="date-picker form-control" id="start-date" name="start_date"
                                                placeholder="mm/dd/yyyy" type="text" required/>
                                         <span class="input-group-addon"><i class="fa fa-handshake-o"
                                                                            aria-hidden="true"></i>&nbsp; Buziness Dev:</span>
-                                        <input type="text" class="form-control" id="buz_dev_person" value="New Life CFO"
+                                        <input type="text" class="form-control" id="buz_dev_person"
+                                               value="New Life CFO"
                                                disabled>
                                         <span class="input-group-addon"><i class="fa fa-pie-chart"></i>&nbsp;Dev Share:</span>
                                         <input class="form-control" id="buz_dev_share" name="buz_dev_share"
@@ -73,8 +88,8 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-hourglass-half"
-                                                                           aria-hidden="true"></i>&nbsp;Client Billed Type:</span>
+                                            <span class="input-group-addon"><i class="fa fa-hourglass-half"
+                                                                               aria-hidden="true"></i>&nbsp;Client Billed Type:</span>
                                         <select id="cycle-select" class="selectpicker" data-width="auto"
                                                 name="paying_cycle" required>
                                             <option value="0">Hourly</option>
@@ -127,8 +142,10 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td><input type="number" step=0.01 min=0 class="form-control b-rate"></td>
-                                            <td><input type="number" step=0.01 min=0 class="form-control p-rate"></td>
+                                            <td><input type="number" step=0.01 min=0 class="form-control b-rate">
+                                            </td>
+                                            <td><input type="number" step=0.01 min=0 class="form-control p-rate">
+                                            </td>
                                             <td><input type="number" step=0.01 min=0 max=100
                                                        class="form-control f-share"></td>
                                             <td><a href="javascript:void(0);"><i class="fa fa-minus-circle"
@@ -215,7 +232,8 @@
                                placeholder="&#xf073; Start after"
                                value="{{Request('start')}}"
                                type="text"/>
-                        <a href="javascript:void(0)" type="button" class="btn btn-info" id="filter-button">Filter</a>
+                        <a href="javascript:void(0)" type="button" class="btn btn-info"
+                           id="filter-button">Filter</a>
                     </div>
                 </div>
             </div>
@@ -232,7 +250,8 @@
                                             <div class="pull-right">
                                                 <a href="javascript:void(0)" class="eng-edit"
                                                    data-id="{{$engagement->id}}"><i
-                                                            class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                                                            class="fa fa-pencil-square-o"
+                                                            aria-hidden="true"></i></a>
                                                 <span>&nbsp;|&nbsp;</span>
                                                 <a href="javascript:void(0)" class="eng-delete"
                                                    data-del="{{!$engagement->isPending()&&$manage?'0':'1'}}"
@@ -241,7 +260,8 @@
                                             </div>
                                         @endif
                                     </h3>
-                                    <div class="panel-subtitle">Client: <strong>{{$engagement->client->name}}</strong>
+                                    <div class="panel-subtitle">Client:
+                                        <strong>{{$engagement->client->name}}</strong>
                                         <span class="label label-info pull-right">Total Members: <strong>{{$engagement->arrangements->count()}}</strong></span>
                                     </div>
                                     <table class="table table-striped table-bordered table-responsive">
@@ -617,3 +637,4 @@
         }
     </style>
 @endsection
+@endif

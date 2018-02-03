@@ -30,7 +30,7 @@ class EngagementController extends Controller
     {
         $consultant = $isAdmin ? null : Auth::user()->consultant;
         $engs = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status'));
-        $engagements =$this->paginate($engs,20);
+        $engagements = $this->paginate($engs, 20);
         return view('engagements', ['engagements' => $engagements,
             'clients' => $engs->map(function ($item) {
                 return $item->client;
@@ -54,13 +54,18 @@ class EngagementController extends Controller
             if ($request->get('fetch') == 'business')
                 return Client::find($request->get('cid'))->whoDevelopedMe();
         }
-        $consultant = Auth::user()->consultant;
-        return view('engagements', [
-            'engagements' =>$this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status')),20),
-            'leader' => $consultant,
-            'clients' => $consultant->lead_engagements->map(function ($item) {
-                return $item->client;
-            })->unique(), 'admin' => false]);
+        $user = Auth::user();
+        $consultant = $user->consultant;
+        if ($user->isLeaderCandidate() || $user->isSupervisor()) {
+            return view('engagements', [
+                'engagements' => $this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status')), 20),
+                'leader' => $consultant,
+                'clients' => $consultant->lead_engagements->map(function ($item) {
+                    return $item->client;
+                })->unique(), 'admin' => false]);
+        } else {
+            return view('engagements', ['blocked' => true]);
+        }
     }
 
     /**
@@ -182,7 +187,7 @@ class EngagementController extends Controller
                         $opened = !$eng->isClosed();
                         $status = $request->get('status');
                         if (isset($status)) $eng->update(['status' => $status]);
-                        if($opened&&$eng->isClosed()) $eng->update(['close_date'=>Carbon::now()->toDateString('Y-m-d')]);
+                        if ($opened && $eng->isClosed()) $eng->update(['close_date' => Carbon::now()->toDateString('Y-m-d')]);
                     } else {
                         $feedback['code'] = 5;
                         $feedback['message'] = 'Status updating failed, no authorization';
@@ -252,12 +257,12 @@ class EngagementController extends Controller
         $bs = $request->get('billing_rates');
         $ps = $request->get('pay_rates');
         foreach ($eng->arrangements as $arr) {
-            $keys = array_keys($cids,$arr->consultant_id);
-            if(!$keys){
+            $keys = array_keys($cids, $arr->consultant_id);
+            if (!$keys) {
                 $arr->delete();
-            }else{
-                $pos = array_values(array_only($pids,$keys));
-                if (!in_array($arr->position_id,$pos)) $arr->delete();
+            } else {
+                $pos = array_values(array_only($pids, $keys));
+                if (!in_array($arr->position_id, $pos)) $arr->delete();
             }
         }
         //add new one if exist and update the old guys
