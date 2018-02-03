@@ -199,9 +199,9 @@
                                     <span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span>
                                 </td>
                                 <td><a href=" javascript:editExpense({{$expense->id}})"><i
-                                                class="fa fa-pencil-square-o"></i></a><a
-                                            href="javascript:deleteExpense({{$expense->id}})"><i
-                                                class="fa fa-times"></i></a></td>
+                                                class="fa fa-pencil-square-o"></i></a>
+                                   {!!Request::get('reporter')?'':'<a href="javascript:deleteExpense('.$expense->id.')"><i class="fa fa-times"></i></a>'!!}
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>
