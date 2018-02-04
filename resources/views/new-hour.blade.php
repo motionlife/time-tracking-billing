@@ -24,7 +24,7 @@
                         </div>
                         <form method="POST" id="hour-form" action="/hour">
                             <div class="panel-body">
-                                @component('components.hour-form',['clientIds'=>$clientIds])
+                                @component('components.hour-form',['clientIds'=>$clientIds,'withOldTasks'=>false])
                                 @endcomponent
                             </div>
                             <div class="panel-footer">
@@ -182,7 +182,7 @@
                         </div>
                         <br>
                         <div class="input-group form-group-sm">
-                            @component('components.task_selector',['dom_id'=>'task-id-addrow'])
+                            @component('components.task_selector',['dom_id'=>'task-id-addrow','withOldTasks'=>false])
                             @endcomponent
                         </div>
                     </div>

@@ -12,10 +12,16 @@ class Taskgroup extends Model
     //all the tasks belong to this group
     public function tasks()
     {
-        return $this->hasMany(Task::class,'taskgroup_id');
+        return $this->hasMany(Task::class, 'taskgroup_id');
     }
-    public static function newGroups()
+
+    public static function getGroups($withOld = false)
     {
-        return Taskgroup::where('id','>',20)->get();
+        if ($withOld) {
+            return self::all();
+        } else {
+
+            return Taskgroup::where('id', '>', 20)->get();
+        }
     }
 }

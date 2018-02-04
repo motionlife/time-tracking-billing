@@ -2,8 +2,8 @@
 <select id="{{$dom_id}}" class="selectpicker show-sub-text form-control form-control-sm"
         data-live-search="true"
         data-width="100%" name="task_id" data-dropup-auto="false"
-        title="Select your task" required>
-    @foreach(\newlifecfo\Models\Templates\Taskgroup::newGroups() as $tgroup)
+        title="Select your task" required {{$withOldTasks?'disabled':''}}>
+    @foreach(\newlifecfo\Models\Templates\Taskgroup::getGroups($withOldTasks) as $tgroup)
         <?php $gname = $tgroup->name?>
         <option disabled data-content="────────────────<span class='label label-info'>{{$gname}}</span>────────────────"></option>
         @foreach($tgroup->tasks as $task)

@@ -19,7 +19,7 @@
                         <form action="" id="hour-form">
                             <div class="modal-body">
                                 <div class="panel-body">
-                                    @component('components.hour-form',['admin'=>$admin,'clientIds'=>null])
+                                    @component('components.hour-form',['admin'=>$admin,'clientIds'=>null,'withOldTasks'=>true])
                                     @endcomponent
                                 </div>
                             </div>

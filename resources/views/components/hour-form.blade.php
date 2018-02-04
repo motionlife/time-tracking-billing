@@ -15,7 +15,7 @@
 </div>
 <br>
 <div class="input-group">
-    @component('components.task_selector',['dom_id'=>'task-id'])
+    @component('components.task_selector',['dom_id'=>'task-id','withOldTasks'=>$withOldTasks])
     @endcomponent
 </div>
 <br>
