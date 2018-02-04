@@ -14,4 +14,8 @@ class Taskgroup extends Model
     {
         return $this->hasMany(Task::class,'taskgroup_id');
     }
+    public static function newGroups()
+    {
+        return Taskgroup::where('id','>',20)->get();
+    }
 }
