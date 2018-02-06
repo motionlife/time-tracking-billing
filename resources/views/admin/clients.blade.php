@@ -26,7 +26,7 @@
                             <br>
                             <label for="buz_dev_person_id">Business Develop Person:</label>
                             <select name="buz_dev_person_id" id="buz-dev-person-id" data-live-search="true"
-                                    class="selectpicker form-control" title="select business Develop person" required>
+                                    class="selectpicker form-control" title="select business develop person" required>
                                 <option value="0"  {{$create?'':(0 ==$client->buz_dev_person_id?'selected':'')}}>New Life CFO</option>
                                 @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
                                     <option value="{{$consultant->id}}" {{$create?'':($consultant->id ==$client->buz_dev_person_id?'selected':'')}}>{{$consultant->fullname()}}</option>
