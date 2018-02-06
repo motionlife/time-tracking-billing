@@ -232,7 +232,7 @@
                 var br = opt.attr('data-br');
                 var fs = opt.attr('data-fs');
                 var bh = $(this).val();
-                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
+                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + ((1 - fs) * 100).toFixed(2) + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
                 if (parseFloat($('#billable-hours').val()+$('#non-billable-hours').val()) > 0) {

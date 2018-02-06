@@ -140,7 +140,7 @@
                 var br = income.attr('data-br');
                 var fs = income.attr('data-fs');
                 var bh = $(this).val();
-                income.val(bh + 'h  x  $' + br + '/hr  x  ' + (1 - fs) * 100 + '% = $' + (bh * br * (1 - fs)).toFixed(2));
+                income.val(bh + 'h  x  $' + br + '/hr  x  ' + ((1 - fs) * 100).toFixed(2) + '% = $' + (bh * br * (1 - fs)).toFixed(2));
             });
 
             $('tr td:last-child a:nth-child(1)').on('click', function () {
