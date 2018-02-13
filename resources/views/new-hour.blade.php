@@ -447,7 +447,7 @@
                 }
             });
         });
-
+        @yield('task_selector')
         function deleteTodaysReport(hid) {
             var li = $('a[href*="deleteTodaysReport(' + hid + ')"]').parent().parent().parent();
             swal({
