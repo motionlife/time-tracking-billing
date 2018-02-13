@@ -97,7 +97,12 @@ class AdminController extends Controller
             }
             return json_encode($feedback);
         } else {
-            return view('admin.users');
+            $fo = $request->get('fo');
+            $lo = $request->get('lo');
+            $default = !isset($fo) && !isset($lo);
+            $allUsers = User::query()->orderBy($default ? "created_at" : (isset($fo)?"first_name":"last_name"), $fo=="1"||$lo=="0"?"asc":"desc")->get();
+            $users = $this->paginate($allUsers,40);
+            return view('admin.users', ['users' => $users]);
         }
 
     }

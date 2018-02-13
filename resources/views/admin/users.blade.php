@@ -2,19 +2,18 @@
 @section('content')
     <div class="main-content">
         <div class="container-fluid">
-            @php $users = \newlifecfo\User::all()->sortByDesc('created_at'); @endphp
             <div class="panel panel-headline">
                 <div class="panel-title row" style="margin-left: 1em">
                     <h3>Registered Users</h3>
-                    <h5>total:{{$users->count()}}</h5>
+                    <h5>total:{{$users->total()}}</h5>
                 </div>
                 <div class="panel-body">
                     <table class="table table-responsive">
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>First Name <a href="?fo={{Request::get('fo')=="1"?"0":"1"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
+                            <th>Last Name <a href="?lo={{Request::get('lo')=="1"?"0":"1"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Email</th>
                             <th>Type</th>
                             <th>Set Role</th>
@@ -22,9 +21,10 @@
                         </tr>
                         </thead>
                         <tbody>
+                        <?php $offset = ($users->currentPage() - 1) * $users->perPage() + 1;?>
                         @foreach($users as $user)
                             <tr data-id="{{$user->id}}">
-                                <th>{{$loop->index + 1}}</th>
+                                <th scope="row">{{$loop->index+$offset}}</th>
                                 <td>{{$user->first_name}}</td>
                                 <td>{{$user->last_name}}</td>
                                 <td><a href="mailto:{{$user->email}}"><i class="fa fa-envelope" aria-hidden="true">&nbsp;{{$user->email}}</i></a></td>
@@ -61,6 +61,9 @@
                         @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="pull-right pagination">
+                    {{ $users->appends(Request::all())->withPath('/admin/user')->links() }}
                 </div>
             </div>
         </div>
