@@ -13,6 +13,8 @@ use newlifecfo\Models\Hour;
 
 class AccountingController extends Controller
 {
+    const ACCOUNTING_FORMAT = '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)';
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -236,45 +238,35 @@ class AccountingController extends Controller
                         ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Rate($)', 'Rate Type', 'Billed Type', 'Billed($)', 'Report Status'])
                         ->cells('A1:K1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        });
-                    $content = [];
+                        })->setColumnFormat(['F' => '0.00', 'G' => self::ACCOUNTING_FORMAT, 'J' => self::ACCOUNTING_FORMAT]);
                     foreach ($data['hours'] as $i => $hour) {
                         $arr = $hour->arrangement;
                         $eng = $arr->engagement;
                         if ($hour->rate_type == 0) {
-                            array_push($content, [$hour->consultant->fullname(), $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'),
-                                number_format($hour->billClient(), 2), $hour->getStatus()[0]]);
+                            $sheet->appendRow([$hour->consultant->fullname(), $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing rate' : 'Pay rate', $eng->paying_cycle == 0 ? 'Hourly' : ($eng->paying_cycle == 1 ? 'Monthly' : 'Fixed'), $hour->billClient(), $hour->getStatus()[0]]);
                         }
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 });
                 $excel->sheet('Non-hourly Eng.($' . number_format($nheng_total, 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Engagement', 'Billed Type', 'Started Date', 'Closed Date', 'Status', 'Billed Amount($)'])
                         ->cells('A1:F1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        });
-                    $content = [];
+                        })->setColumnFormat(['F' => self::ACCOUNTING_FORMAT]);
                     foreach ($data['fm_engagements'] as $i => $eng) {
-                        array_push($content, [$eng[0]->name, $eng[0]->clientBilledType(), $eng[0]->start_date, $eng[0]->close_date, $eng[0]->state(), number_format($eng[1], 2)]);
+                        $sheet->appendRow([$eng[0]->name, $eng[0]->clientBilledType(), $eng[0]->start_date, $eng[0]->close_date, $eng[0]->state(), $eng[1]]);
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 });
                 $excel->sheet('Expenses($' . number_format($data['bill'][1], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)', 'Car Rental($)', 'Mileage Cost($)', 'Other($)', 'Total($)', 'Description', 'Status'])
                         ->cells('A1:N1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        });
-                    $content = [];
+                        })->setColumnFormat(['E:L' => self::ACCOUNTING_FORMAT]);
                     foreach ($data['expenses'] as $i => $expense) {
                         $eng = $expense->arrangement->engagement;
-                        array_push($content, [
-                            $expense->consultant->fullname(), $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
-                            number_format($expense->total(), 2), $expense->description, $expense->getStatus()[0]
-                        ]);
+                        $sheet->appendRow([$expense->consultant->fullname(), $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other, $expense->total(), $expense->description, $expense->getStatus()[0]]);
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 })->setActiveSheetIndex(0);
             })->export('xlsx');
         } else {
@@ -286,12 +278,7 @@ class AccountingController extends Controller
                         ->row($rowNum++, ['Name', 'Engagement Name', 'Engagement Lead', 'Position', 'Billable Hours', 'Non-billable Hours', 'Billing Rate', 'Pay Rate', 'Hourly Pay', 'Expense', 'Biz Dev %', 'Biz Dev Income', 'Grand Total'])
                         ->cells('A1:M1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        })->setColumnFormat([
-                                'G:J' => '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)',
-                                'K' => '0%',
-                                'L:M' => '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)',
-                            ]
-                        );
+                        })->setColumnFormat(['E:F' => '0.00', 'G:J' => self::ACCOUNTING_FORMAT, 'K' => '0.0%', 'L:M' => self::ACCOUNTING_FORMAT]);
                     $BTotal = 0;
                     $NbTotal = 0;
                     $HpTotal = 0;
@@ -346,50 +333,43 @@ class AccountingController extends Controller
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Payroll Overview');
                 $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
-                    $sheet->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate($)', 'Rate Type', 'Share', 'Income($)', 'Description', 'Status'])
+                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'J' => '0.0%', 'K' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate', 'Rate Type', 'Share', 'Income', 'Description', 'Status'])
                         ->cells('A1:M1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
-                    $content = [];
                     foreach ($data['hours'] as $i => $hour) {
                         $arr = $hour->arrangement;
                         $eng = $arr->engagement;
-                        array_push($content, [$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, number_format($hour->billable_hours, 2), number_format($hour->non_billable_hours, 2), $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
-                            number_format($hour->share * 100, 1) . '%', number_format($hour->earned(), 2), $hour->description, $hour->getStatus()[0]]);
+                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
+                            $hour->share, $hour->earned(), $hour->description, $hour->getStatus()[0]]);
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 });
                 $excel->sheet('Expenses($' . number_format($data['income'][1], 2) . ')', function ($sheet) use ($data) {
-                    $sheet->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)', 'Car Rental($)', 'Mileage Cost($)', 'Other($)', 'Total($)', 'Description', 'Status'])
+                    $sheet->setColumnFormat(['E:L' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Company Paid', 'Hotel', 'Flight', 'Meal', 'Office Supply', 'Car Rental', 'Mileage Cost', 'Other', 'Total', 'Description', 'Status'])
                         ->cells('A1:N1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
-                    $content = [];
                     foreach ($data['expenses'] as $i => $expense) {
                         $eng = $expense->arrangement->engagement;
-                        array_push($content, [
-                            $expense->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
-                            number_format($expense->total(), 2), $expense->description, $expense->getStatus()[0]
+                        $sheet->appendRow([$expense->client->name, $eng->name, $expense->report_date, $expense->company_paid ? 'Yes' : 'No', $expense->hotel, $expense->flight, $expense->meal, $expense->office_supply, $expense->car_rental, $expense->mileage_cost, $expense->other,
+                            $expense->payConsultant(), $expense->description, $expense->getStatus()[0]
                         ]);
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 });
                 $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
-                    $sheet->freezeFirstRow()
+                    $sheet->setColumnFormat(['D' => '0.0%', 'E:F' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Engagement Bill', 'Earned'])
                         ->cells('A1:F1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
-                    $content = [];
                     foreach ($data['buz_devs']['engs'] as $i => $eng) {
-                        array_push($content, [
+                        $sheet->appendRow([
                             $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
-                            number_format($eng[0]->buz_dev_share * 100, 1), number_format($eng[1] / $eng[0]->buz_dev_share, 2), number_format($eng[1], 2)
+                            $eng[0]->buz_dev_share, $eng[1] / $eng[0]->buz_dev_share, $eng[1]
                         ]);
                     }
-                    $sheet->fromArray($content, null, "A2", true, false);
                 })->setActiveSheetIndex(0);
             })->export('xlsx');
         }

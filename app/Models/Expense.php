@@ -36,7 +36,7 @@ class Expense extends Report
     public static function reportedExpenses($consultant = null, $start = null, $end = null, $review_state = null, $eid = null, $client = null)
     {
         return self::reported($start, $end, $eid, $consultant, $review_state, $client)->sum(function ($exp) {
-            return $exp->total();
+            return $exp->payConsultant();
         });
     }
 }
