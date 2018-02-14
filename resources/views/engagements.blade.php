@@ -98,9 +98,9 @@
                                             <option value="2">Fixed Fee Project</option>
                                         </select>
                                         <span class="input-group-addon"><i
-                                                    class="fa fa-money"></i>&nbsp;Billing Amount:<strong>$</strong></span>
-                                        <input class="form-control" id="billing_amount" name="cycle_billing"
-                                               type="number" step="0.1" min="0" placeholder="N/A">
+                                                    class="fa fa-money"></i>&nbsp;Billing Amount:</span>
+                                        <input class="form-control us-currency" id="billing_amount" name="cycle_billing"
+                                               type="text" placeholder="N/A">
                                         <span class="input-group-addon"><i
                                                     class="fa fa-calendar-check-o"></i>&nbsp; Billing Day</span>
                                         <input class="form-control" id="billing-day" name="billing_day"
@@ -117,8 +117,8 @@
                                         <tr>
                                             <th>Consultant</th>
                                             <th>Position</th>
-                                            <th>Billing Rate</th>
-                                            <th>Pay Rate</th>
+                                            <th>Billing Rate($)</th>
+                                            <th>Pay Rate($)</th>
                                             <th>Firm Share%</th>
                                             <th></th>
                                         </tr>
@@ -333,10 +333,12 @@
     </div>
 @endsection
 @section('my-js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autonumeric/4.1.0/autoNumeric.min.js"></script>
     <script>
         $(function () {
             var update;
             var eid;
+            var curFormatter;
             toastr.options = {
                 "positionClass": "toast-top-right",
                 "timeOut": "3000"
@@ -404,6 +406,7 @@
             $('#build-engagement').on('click', function () {
                 update = false;
                 initModal(false);
+                curFormatter = new AutoNumeric('#billing_amount',{'currencySymbol':'$','unformatOnSubmit':true});
                 $('#engagementModal').modal('toggle');
             });
             $('.eng-delete').on('click', function () {
@@ -451,6 +454,7 @@
                         $('#start-date').val(data.start_date);
                         $('#buz_dev_share').val(parseFloat(data.buz_dev_share * 100).toFixed(2));
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
+                        curFormatter = new AutoNumeric('#billing_amount',{'currencySymbol':'$','unformatOnSubmit':true});
                         var queryDate = '2022-12-' + data.billing_day + ' 00:00', dateParts = queryDate.match(/(\d+)/g);
                         $('#billing-day').datepicker('setDate', data.paying_cycle == 1 ? new Date(dateParts[0], dateParts[1] - 1, dateParts[2]) : null);
                         $('#submit-modal').attr('disabled', @if($admin) false
@@ -481,9 +485,12 @@
                 eid = $(this).attr('data-id');
                 update = true;
             });
-
+            $('#engagementModal').on('hidden.bs.modal', function (e) {
+                curFormatter.remove();
+            });
             $('#engagement-form').on('submit', function (e) {
                 e.preventDefault();
+                curFormatter.unformat();
                 formdata = $(this).serializeArray();
                 formdata.push({name: '_token', value: "{{csrf_token()}}"}, {
                     name: 'leader_id', value: $('#leader_id').selectpicker('val')
@@ -628,11 +635,12 @@
         .fancy-radio .label {
             font-size: small;
         }
-
+        input.us-currency {
+            text-align:right;
+        }
         #members-table tr td input[type='number'] {
             text-align: center;
         }
-
         #billing-day-container div.datepicker-days thead {
             display: none;
         }

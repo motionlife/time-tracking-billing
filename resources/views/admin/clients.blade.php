@@ -54,22 +54,22 @@
                             </label>
                             <br>
                             <div class="input-group">
-                                <span class="input-group-addon">2015 Revenue <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2015 revenue" value="{{$create?'':$client->getRevenue(2015,'revenue')}}" type="number" name="revenue2015">
-                                <span class="input-group-addon">2015 EBIT <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2015 ebit" value="{{$create?'':$client->getRevenue(2015,'ebit')}}" type="number" name="ebit2015">
+                                <span class="input-group-addon">2015 Revenue:</span>
+                                <input class="form-control currency" placeholder="2015 revenue" value="{{$create?'':$client->getRevenue(2015,'revenue')}}" type="text" name="revenue2015">
+                                <span class="input-group-addon">2015 EBIT:</span>
+                                <input class="form-control currency" placeholder="2015 ebit" value="{{$create?'':$client->getRevenue(2015,'ebit')}}" type="text" name="ebit2015">
                             </div>
                             <div class="input-group">
-                                <span class="input-group-addon">2016 Revenue <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2016 revenue" value="{{$create?'':$client->getRevenue(2016,'revenue')}}" type="number" name="revenue2016">
-                                <span class="input-group-addon">2016 EBIT <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2016 ebit" value="{{$create?'':$client->getRevenue(2016,'ebit')}}" type="number" name="ebit2016">
+                                <span class="input-group-addon">2016 Revenue:</span>
+                                <input class="form-control currency" placeholder="2016 revenue" value="{{$create?'':$client->getRevenue(2016,'revenue')}}" type="text" name="revenue2016">
+                                <span class="input-group-addon">2016 EBIT:</span>
+                                <input class="form-control currency" placeholder="2016 ebit" value="{{$create?'':$client->getRevenue(2016,'ebit')}}" type="text" name="ebit2016">
                             </div>
                             <div class="input-group">
-                                <span class="input-group-addon">2017 Revenue <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2017 revenue" value="{{$create?'':$client->getRevenue(2017,'revenue')}}" type="number" name="revenue2017">
-                                <span class="input-group-addon">2017 EBIT <i class="fa fa-dollar"></i></span>
-                                <input class="form-control" placeholder="2017 ebit" value="{{$create?'':$client->getRevenue(2017,'ebit')}}" type="number" name="ebit2017">
+                                <span class="input-group-addon">2017 Revenue:</span>
+                                <input class="form-control currency" placeholder="2017 revenue" value="{{$create?'':$client->getRevenue(2017,'revenue')}}" type="text" name="revenue2017">
+                                <span class="input-group-addon">2017 EBIT:</span>
+                                <input class="form-control currency" placeholder="2017 ebit" value="{{$create?'':$client->getRevenue(2017,'ebit')}}" type="text" name="ebit2017">
                             </div>
                         </div>
                         <div class="panel-footer">
@@ -137,7 +137,9 @@
 
 @endsection
 @section('my-js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/autonumeric/4.1.0/autoNumeric.min.js"></script>
     <script>
+        AutoNumeric.multiple('input.currency',{'currencySymbol':'$','unformatOnSubmit':true});
         $(function () {
             $('[data-toggle="popover"]').popover({
                 html: true,
@@ -158,6 +160,9 @@
     <style>
         tr td a.label-info:last-child {
             margin-left: 0.5em;
+        }
+        input.currency {
+            text-align:right;
         }
     </style>
 @endsection
