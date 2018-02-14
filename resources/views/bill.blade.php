@@ -53,15 +53,14 @@
                                 @if(isset($client))
                                     @php $activeTab = Request::get('tab')?:"1"; @endphp
                                     <li class="{{$activeTab=="1"?'active':''}}"><a href="#tab-left1" role="tab"
-                                                                                   data-toggle="tab">Hourly Engagement
-                                            Billing&nbsp;<span
+                                                                                   data-toggle="tab">Hourly Engagement Bill&nbsp;<span
                                                     class="badge bg-success">{{$hours->total()}}</span></a></li>
                                     <li class="{{$activeTab=="2"?'active':''}}"><a href="#tab-left2" role="tab"
-                                                                                   data-toggle="tab">Non-hourly Engagement Billing<span
+                                                                                   data-toggle="tab">Non-hourly Engagement Bill<span
                                                     class="badge bg-warning">{{$fm_engagements->total()}}</span></a>
                                     </li>
                                     <li class="{{$activeTab=="3"?'active':''}}"><a href="#tab-left3" role="tab"
-                                                                                   data-toggle="tab">Expense Billing&nbsp;<span
+                                                                                   data-toggle="tab">Expense Bill&nbsp;<span
                                                     class="badge bg-default">{{$expenses->total()}}</span></a>
                                     </li>
                                 @else
