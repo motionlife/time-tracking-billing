@@ -213,20 +213,21 @@ class AccountingController extends Controller
             return $all ? Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Billing Overview');
                 $excel->sheet('Client Bill', function ($sheet) use ($data) {
+                    $rowNum = 1;
                     $sheet->freezeFirstRow()
-                        ->row(1, ['Client', 'Billable Hours', 'Non-billable Hours', 'Engagement Bill($)', 'Expense Bill($)', 'Total($)'])
+                        ->row($rowNum++, ['Client', 'Billable Hours', 'Non-billable Hours', 'Engagement Bill($)', 'Expense Bill($)', 'Total($)'])
                         ->cells('A1:F1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        });
-                    $content = [];
+                        })->setColumnFormat(['B:C' => '0.00', 'D:F' => self::ACCOUNTING_FORMAT]);
                     foreach ($data['clients'] as $client) {
                         $cid = $client->id;
                         $salary = $data['bills'][$cid];
-                        array_push($content, [$client->name, $data['hrs'][$cid][0], $data['hrs'][$cid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($salary[0] + $salary[1], 2)]);
+                        $sheet->row($rowNum++, [$client->name, $data['hrs'][$cid][0], $data['hrs'][$cid][1], $salary[0], $salary[1], $salary[0] + $salary[1]]);
                     }
-                    array_push($content, []);
-                    array_push($content, ['Engagement Total($)', $data['bill'][0], 'Expense Total($)', $data['bill'][1]]);
-                    $sheet->fromArray($content, null, "A2", true, false);
+                    $sheet->appendRow(['Engagement Total:', null, null, $data['bill'][0]])->appendRow(['Expense Total:', null, null, null, $data['bill'][1]])
+                        ->cells('A' . $rowNum . ':F' . ($rowNum + 1), function ($cells) {
+                            $cells->setBackground('#bfffe8')->setFontWeight('bold')->setFontSize('12');
+                        });;
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Billing Overview');
