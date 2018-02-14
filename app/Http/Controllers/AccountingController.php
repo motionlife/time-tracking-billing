@@ -59,21 +59,26 @@ class AccountingController extends Controller
                 );
 
             } else {
-                $incomes = [];
-                $buz_dev_incomes = [];
-                $hourNumbers = [];
-                $consultants = Consultant::recognized();
-                foreach ($consultants as $consultant) {
-                    $id = $consultant->id;
-                    $hourNumbers[$id] = [0, 0];
-                    $incomes[$id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
-                    $buz_dev_incomes[$id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
-                }
-                $sum = $this->sumIncome($incomes, $buz_dev_incomes);
-                if ($request->session()->has('data') && $file == 'excel') {
-                    $data = $request->session()->get('data');
+                if ($file == 'excel') {
+                    $data = [];
+                    $consultants = Consultant::recognized();
+                    foreach ($consultants as $consultant) {
+                        $id = $consultant->id;
+                        $data['payroll'][$id] = [$consultant->fullname(), $consultant->getPayroll($start, $end, $state, $eid)];
+                    }
                     return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'PAYROLL')), true);
                 } else {
+                    $incomes = [];
+                    $buz_dev_incomes = [];
+                    $hourNumbers = [];
+                    $consultants = Consultant::recognized();
+                    foreach ($consultants as $consultant) {
+                        $id = $consultant->id;
+                        $hourNumbers[$id] = [0, 0];
+                        $incomes[$id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
+                        $buz_dev_incomes[$id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
+                    }
+                    $sum = $this->sumIncome($incomes, $buz_dev_incomes);
                     $data = ['admin' => $isAdmin,
                         'consultants' => $consultants,
                         'incomes' => $incomes,
@@ -81,7 +86,6 @@ class AccountingController extends Controller
                         'hrs' => $hourNumbers,
                         'income' => [$sum[0], $sum[1]],
                         'buz_devs' => ['total' => $sum[2]]];
-                    $request->session()->put('data', $data);
                     return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
                 }
             }
@@ -185,13 +189,14 @@ class AccountingController extends Controller
                     if ($engagement->buz_dev_share == 0) continue;
                     $devs = $engagement->incomeForBuzDev($start, $end, $state);
                     if ($devs) {
-                        $tbh = 0;
+//                        $tbh = 0;
 //                        foreach ($engagement->arrangements()->withTrashed()->get() as $arrangement) {
 //                            foreach ($arrangement->hours as $hour) {
 //                                $tbh += $hour->billable_hours;
 //                            }
 //                        }
-                        array_push($engs, [$engagement, $devs, $tbh]);
+//                        array_push($engs, [$engagement, $devs, $tbh]);
+                        array_push($engs, [$engagement, $devs]);
                         $total += $devs;
                     }
                 }
@@ -203,20 +208,13 @@ class AccountingController extends Controller
     private function exportExcel($data, $all = false, $bill = false)
     {
         if ($bill) {
-            $all ? Excel::create($data['filename'], function ($excel) use ($data) {
-                $excel->setTitle('Billing Overview')
-                    ->setCreator('Hao Xiong')
-                    ->setCompany('New Life CFO')
-                    ->setDescription('All the Billing under the specified condition(file name)');
+            return $all ? Excel::create($data['filename'], function ($excel) use ($data) {
+                $this->setExcelProperties($excel, 'Billing Overview');
                 $excel->sheet('Client Bill', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Client', 'Billable Hours', 'Non-billable Hours', 'Engagement Bill($)', 'Expense Bill($)', 'Total($)'])
-                        ->setAllBorders('thin')
                         ->cells('A1:F1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
-                            $cells->setAlignment('center');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['clients'] as $client) {
@@ -229,23 +227,15 @@ class AccountingController extends Controller
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
-                $excel->setTitle('Billing Overview')
-                    ->setCreator('Hao Xiong')
-                    ->setCompany('New Life CFO')
-                    ->setDescription('Your Bill under the specified condition(file name)');
-
+                $this->setExcelProperties($excel, 'Billing Overview');
                 $nheng_total = $data['fm_engagements']->sum(function ($comb) {
                     return $comb[1];
                 });
-
                 $excel->sheet('Hourly Eng.($' . number_format($data['bill'][0] - $nheng_total, 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Rate($)', 'Rate Type', 'Billed Type', 'Billed($)', 'Report Status'])
-                        ->setAllBorders('thin')
                         ->cells('A1:K1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['hours'] as $i => $hour) {
@@ -261,11 +251,8 @@ class AccountingController extends Controller
                 $excel->sheet('Non-hourly Eng.($' . number_format($nheng_total, 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Engagement', 'Billed Type', 'Started Date', 'Closed Date', 'Status', 'Billed Amount($)'])
-                        ->setAllBorders('thin')
                         ->cells('A1:F1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['fm_engagements'] as $i => $eng) {
@@ -273,16 +260,11 @@ class AccountingController extends Controller
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
-
                 $excel->sheet('Expenses($' . number_format($data['bill'][1], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Consultant', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)', 'Car Rental($)', 'Mileage Cost($)', 'Other($)', 'Total($)', 'Description', 'Status'])
-                        ->setAllBorders('thin')
                         ->cells('A1:N1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
-                            $cells->setAlignment('center');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['expenses'] as $i => $expense) {
@@ -294,50 +276,80 @@ class AccountingController extends Controller
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
                 })->setActiveSheetIndex(0);
-
             })->export('xlsx');
-
-
-        } else
+        } else {
             return $all ? Excel::create($data['filename'], function ($excel) use ($data) {
-                $excel->setTitle('Payroll Overview')
-                    ->setCreator('Hao Xiong')
-                    ->setCompany('New Life CFO')
-                    ->setDescription('All the Payroll under the specified condition(file name)');
+                $this->setExcelProperties($excel, 'Payroll Overview');
                 $excel->sheet('Consultant Payroll', function ($sheet) use ($data) {
+                    $rowNum = 1;
                     $sheet->freezeFirstRow()
-                        ->row(1, ['Name', 'Billable Hours', 'Non-billable Hours', 'Hourly Income($)', 'Expense($)', 'Buz Dev Income($)'])
-                        ->setAllBorders('thin')
-                        ->cells('A1:F1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
-                            $cells->setAlignment('center');
-                        });
-                    $content = [];
-                    foreach ($data['consultants'] as $consultant) {
-                        $conid = $consultant->id;
-                        $salary = $data['incomes'][$conid];
-                        array_push($content, [$consultant->fullname(), $data['hrs'][$conid][0], $data['hrs'][$conid][1], number_format($salary[0], 2), number_format($salary[1], 2), number_format($data['buzIncomes'][$conid], 2)]);
+                        ->row($rowNum++, ['Name', 'Engagement Name', 'Engagement Lead', 'Position', 'Billable Hours', 'Non-billable Hours', 'Billing Rate', 'Pay Rate', 'Hourly Pay', 'Expense', 'Biz Dev %', 'Biz Dev Income', 'Grand Total'])
+                        ->cells('A1:M1', function ($cells) {
+                            $this->setTitleCellsStyle($cells);
+                        })->setColumnFormat([
+                                'G:J' => '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)',
+                                'K' => '0%',
+                                'L:M' => '_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)',
+                            ]
+                        );
+                    $BTotal = 0;
+                    $NbTotal = 0;
+                    $HpTotal = 0;
+                    $ExpTotal = 0;
+                    $BizTotal = 0;
+                    $Total = 0;
+                    foreach ($data['payroll'] as $id => $payroll) {
+                        if ($payroll[1]->count()) {
+                            $sheet->row($rowNum++, [$payroll[0]]);
+                            $gTotal = 0;
+                            foreach ($payroll[1] as $aid => $pay) {
+                                //$rowSum = (isset($pay['hourlyPay']) ? $pay['hourlyPay'] : 0) + (isset($pay['expense']) ? $pay['expense'] : 0) + (isset($pay['bizDevIncome']) ? $pay['bizDevIncome'] : 0);
+                                $rowSum = $pay['hourlyPay'] + $pay['expense'] + $pay['bizDevIncome'];
+                                $gTotal += $rowSum;
+                                $sheet->row($rowNum, [null, $pay['ename'], $pay['elead'], $pay['position'], $pay['bhours'], $pay['nbhours'], $pay['brate'], $pay['prate'], $pay['hourlyPay'], $pay['expense'], $pay['bizDevShare'], $pay['bizDevIncome'], $rowSum]);
+                                if ($aid < 0) {
+                                    $sheet->cells('A' . $rowNum . ':M' . $rowNum, function ($cells) {
+                                        $cells->setFontColor('#ff0000');
+                                    });
+                                } else if ($pay['bizDevShare'] > 0 || $pay['bizDevIncome'] > 0) {
+                                    $sheet->cells('K' . $rowNum . ':L' . $rowNum, function ($cells) {
+                                        $cells->setBackground('##faff02');
+                                    });
+                                }
+                                $rowNum++;
+                            }
+                            $bhours = $payroll[1]->sum('bhours');
+                            $nbhours = $payroll[1]->sum('nbhours');
+                            $hourpay = $payroll[1]->sum('hourlyPay');
+                            $expense = $payroll[1]->sum('expense');
+                            $bizdev = $payroll[1]->sum('bizDevIncome');
+                            $BTotal += $bhours;
+                            $NbTotal += $nbhours;
+                            $HpTotal += $hourpay;
+                            $ExpTotal += $expense;
+                            $BizTotal += $bizdev;
+                            $Total += $gTotal;
+                            $sheet->row($rowNum, [$payroll[0] . ' Total', null, null, null, $bhours, $nbhours, null, null, $hourpay, $expense, null, $bizdev, $gTotal])
+                                ->cells('A' . $rowNum . ':M' . $rowNum, function ($cells) {
+                                    $cells->setBackground('#c5cddb')->setFontWeight('bold');
+                                });
+                            $rowNum++;
+                        }
                     }
-                    array_push($content, []);
-                    array_push($content, ['Hourly Total($)', $data['income'][0], 'Expense Total($)', $data['income'][1], 'Buz Dev Total($)', $data['buz_devs']['total']]);
-                    $sheet->fromArray($content, null, "A2", true, false);
+                    $rowNum++;
+                    $sheet->row($rowNum, ['Hourly Total', null, null, null, $BTotal, $NbTotal])
+                        ->row($rowNum + 1, ['Dollar Total', null, null, null, null, null, null, null, $HpTotal, $ExpTotal, null, $BizTotal, $Total])
+                        ->cells('A' . $rowNum . ':M' . ($rowNum + 1), function ($cells) {
+                            $cells->setBackground('#bfffe8')->setFontWeight('bold')->setFontSize('12');
+                        });
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
-                $excel->setTitle('Payroll Overview')
-                    ->setCreator('Hao Xiong')
-                    ->setCompany('New Life CFO')
-                    ->setDescription('Your Payroll under the specified condition(file name)');
-
+                $this->setExcelProperties($excel, 'Payroll Overview');
                 $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate($)', 'Rate Type', 'Share', 'Income($)', 'Description', 'Status'])
-                        ->setAllBorders('thin')
                         ->cells('A1:M1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['hours'] as $i => $hour) {
@@ -348,16 +360,11 @@ class AccountingController extends Controller
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
-
                 $excel->sheet('Expenses($' . number_format($data['income'][1], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Report Date', 'Company Paid', 'Hotel($)', 'Flight($)', 'Meal($)', 'Office Supply($)', 'Car Rental($)', 'Mileage Cost($)', 'Other($)', 'Total($)', 'Description', 'Status'])
-                        ->setAllBorders('thin')
                         ->cells('A1:N1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
-                            $cells->setAlignment('center');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['expenses'] as $i => $expense) {
@@ -369,16 +376,11 @@ class AccountingController extends Controller
                     }
                     $sheet->fromArray($content, null, "A2", true, false);
                 });
-
                 $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
                     $sheet->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Engagement Bill', 'Earned'])
-                        ->setAllBorders('thin')
                         ->cells('A1:F1', function ($cells) {
-                            $cells->setBackground('#3bd3f9');
-                            $cells->setFontFamily('Calibri');
-                            $cells->setFontWeight('bold');
-                            $cells->setAlignment('center');
+                            $this->setTitleCellsStyle($cells);
                         });
                     $content = [];
                     foreach ($data['buz_devs']['engs'] as $i => $eng) {
@@ -390,6 +392,7 @@ class AccountingController extends Controller
                     $sheet->fromArray($content, null, "A2", true, false);
                 })->setActiveSheetIndex(0);
             })->export('xlsx');
+        }
     }
 
     private function filename($entity, $start, $end, $state, $eid, $type)
@@ -400,4 +403,16 @@ class AccountingController extends Controller
         return $type . '_' . (isset($entity) ? ($type == 'PAYROLL' ? $entity->fullname() : $entity->name) : 'ALL') . '_START-' . $start . '_END-' . $end . '_STATUS-' . $status . '_ENGAGEMENT-' . $engname;
     }
 
+    private function setExcelProperties($excel, $title)
+    {
+        $excel->setTitle($title)
+            ->setCreator('Hao Xiong')
+            ->setCompany('New Life CFO')
+            ->setDescription('The filtering condition is in file name');
+    }
+
+    private function setTitleCellsStyle($cells)
+    {
+        $cells->setBackground('#3bd3f9')->setFontFamily('Calibri')->setFontWeight('bold')->setAlignment('center');
+    }
 }
