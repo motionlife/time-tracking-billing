@@ -156,6 +156,7 @@ class Consultant extends Model
             if ($expense) {
                 $payRow = $payByArrangement->get($aid);
                 if (empty($payRow)) {
+                    $payRow = collect();
                     $arrangement = Arrangement::find($aid);
                     $engagement = $arrangement->engagement;
                     $payRow['ename'] = '[' . $engagement->client->name . ']' . $engagement->name;
@@ -177,6 +178,7 @@ class Consultant extends Model
         foreach ($this->getBuzDev($start, $end, $state, $eid) as $aid => $devPay) {
             $payRow = $payByArrangement->get($aid);
             if (empty($payRow)) {
+                $payRow = collect();
                 $payRow['ename'] = $devPay['ename'];
                 $payRow['elead'] = $devPay['elead'];
                 $payRow['position'] = $devPay['position'];
