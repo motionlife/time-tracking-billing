@@ -115,31 +115,34 @@ class AccountingController extends Controller
                 );
 
             } else {
-                //all client bill review
-                $bills = [];
-                $hourNumbers = [];
-                $clients = Client::all();
-                foreach ($clients as $client) {
-                    $id = $client->id;
-                    $hourNumbers[$id] = [0, 0];
-                    $bills[$id] = $this->getBills($client, $start, $end, $eid, $state, $hourNumbers[$id]);
-                }
-                $sum = $this->sumIncome($bills, null);
-                if ($request->session()->has('data') && $file == 'excel') {
-                    $data = $request->session()->get('data');
+                if ($file == 'excel') {
+                    $data = [];
+                    foreach (Client::all() as $client) {
+                        $id = $client->id;
+                        $data['bill'][$id] = [$client->name, $client->constructBills($start, $end, $state, $eid)];
+                    }
                     return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'Bill')), true, true);
                 } else {
+                    //all client bill review
+                    $bills = [];
+                    $hourNumbers = [];
+                    $clients = Client::all();
+                    foreach ($clients as $client) {
+                        $id = $client->id;
+                        $hourNumbers[$id] = [0, 0];
+                        $bills[$id] = $this->getBills($client, $start, $end, $eid, $state, $hourNumbers[$id]);
+                    }
+                    $sum = $this->sumIncome($bills, null);
+
                     $data = ['admin' => $isAdmin,
                         'clients' => $clients,
                         'bills' => $bills,
                         'hrs' => $hourNumbers,
                         'bill' => [$sum[0], $sum[1]]];
-                    $request->session()->put('data', $data);
                     return view('bill', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
                 }
             }
         }
-
     }
 
     private function getBills(Client $client, $start, $end, $eid, $state, &$hrs = null)
@@ -215,19 +218,72 @@ class AccountingController extends Controller
                 $excel->sheet('Client Bill', function ($sheet) use ($data) {
                     $rowNum = 1;
                     $sheet->freezeFirstRow()
-                        ->row($rowNum++, ['Client', 'Billable Hours', 'Non-billable Hours', 'Engagement Bill($)', 'Expense Bill($)', 'Total($)'])
-                        ->cells('A1:F1', function ($cells) {
+                        ->row($rowNum++, ['Client', 'Engagement', 'Position', 'Consultant', 'Billable Hours', 'Non-billable Hours', 'Billing Rate', 'Billed Type', 'Engagement Bill', 'Expense Bill', 'Total'])
+                        ->cells('A1:K1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        })->setColumnFormat(['B:C' => '0.00', 'D:F' => self::ACCOUNTING_FORMAT]);
-                    foreach ($data['clients'] as $client) {
-                        $cid = $client->id;
-                        $salary = $data['bills'][$cid];
-                        $sheet->row($rowNum++, [$client->name, $data['hrs'][$cid][0], $data['hrs'][$cid][1], $salary[0], $salary[1], $salary[0] + $salary[1]]);
+                        })->setColumnFormat(['E:F' => '0.00', 'G' => self::ACCOUNTING_FORMAT, 'I:K' => self::ACCOUNTING_FORMAT]);
+                    $BTotal = 0;
+                    $NbTotal = 0;
+                    $EngTotal = 0;
+                    $ExpTotal = 0;
+                    $Total = 0;
+                    foreach ($data['bill'] as $cid => $clientBill) {
+                        if ($clientBill[1]->count()) {
+                            $sheet->row($rowNum++, [$clientBill[0]]);
+                            $cBTotal = 0;
+                            $cNbTotal = 0;
+                            $cEngTotal = 0;
+                            $cExpTotal = 0;
+                            $cTotal = 0;
+                            foreach ($clientBill[1] as $eid => $engGroups) {
+                                if ($engGroups->count() > 0) {
+                                    $sheet->row($rowNum++, [null, $engGroups[0]['ename']]);
+                                    $engTotal = 0;
+                                    foreach ($engGroups as $bill) {
+                                        $rowTotal = $bill['engBill'] + $bill['expBill'];
+                                        $engTotal += $rowTotal;
+                                        $sheet->row($rowNum, [null, null, $bill['position'], $bill['consultant'], $bill['bhours'], $bill['nbhours'], $bill['brate'], $bill['bType'], $bill['engBill'], $bill['expBill'], $rowTotal]);
+                                        if ($bill['bType'] != 'Hourly') {
+                                            $sheet->cell('H' . $rowNum, function ($cell) {
+                                                $cell->setFontColor('#ff0000')->setFontWeight('bold');
+                                            });
+                                        }
+                                        $rowNum++;
+                                    }
+                                    $engBh = $engGroups->sum('bhours');
+                                    $engNbh = $engGroups->sum('nbhours');
+                                    $engBill = $engGroups->sum('engBill');
+                                    $engExp = $engGroups->sum('expBill');
+                                    $cBTotal += $engBh;
+                                    $cNbTotal += $engNbh;
+                                    $cEngTotal += $engBill;
+                                    $cExpTotal += $engExp;
+                                    $cTotal += $engTotal;
+                                    $sheet->row($rowNum, [null, $engGroups[0]['ename'] . ' Total', null, null, $engBh, $engNbh, null, null, $engBill, $engExp, $engTotal])
+                                        ->cells('B' . $rowNum . ':K' . $rowNum, function ($cells) {
+                                            $cells->setBackground('#e1e3e8')->setFontWeight('bold');
+                                        });
+                                    $rowNum++;
+                                }
+                            }
+                            $BTotal += $cBTotal;
+                            $NbTotal += $cNbTotal;
+                            $EngTotal += $cEngTotal;
+                            $ExpTotal += $cExpTotal;
+                            $Total += $cTotal;
+                            $sheet->row($rowNum, [$clientBill[0] . ' Total', null, null, null, $cBTotal, $cNbTotal, null, null, $cEngTotal, $cExpTotal, $cTotal])
+                                ->cells('A' . $rowNum . ':K' . $rowNum, function ($cells) {
+                                    $cells->setBackground('#befcab')->setFontWeight('bold');
+                                });
+                            $rowNum++;
+                        }
                     }
-                    $sheet->appendRow(['Engagement Total:', null, null, $data['bill'][0]])->appendRow(['Expense Total:', null, null, null, $data['bill'][1]])
-                        ->cells('A' . $rowNum . ':F' . ($rowNum + 1), function ($cells) {
-                            $cells->setBackground('#bfffe8')->setFontWeight('bold')->setFontSize('12');
-                        });;
+                    $rowNum++;
+                    $sheet->row($rowNum, ['Hourly Total', null, null, null, $BTotal, $NbTotal])
+                        ->row($rowNum + 1, ['Dollar Total', null, null, null, null, null, null, null, $EngTotal, $ExpTotal, $Total])
+                        ->cells('A' . $rowNum . ':K' . ($rowNum + 1), function ($cells) {
+                            $cells->setBackground('#7cfcff')->setFontWeight('bold')->setFontSize('12');
+                        });
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Billing Overview');
