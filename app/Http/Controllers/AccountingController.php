@@ -246,7 +246,7 @@ class AccountingController extends Controller
                                         $billedType = $bill['bType'];
                                         if ($billedType && $billedType != 'Hourly') {
                                             $sheet->cells('C' . $rowNum . ':H' . $rowNum, function ($cells) use ($billedType) {
-                                                $cells->setFontColor($billedType == 'Monthly Retainer' ? '#1180ff':'#ff0000')->setFontWeight('bold');
+                                                $cells->setFontColor($billedType == 'Monthly Retainer' ? '#ff0000':'##0000ff')->setFontWeight('bold');
                                             });
                                         }
                                         $rowNum++;
