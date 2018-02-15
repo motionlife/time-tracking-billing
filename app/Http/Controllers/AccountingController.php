@@ -243,9 +243,10 @@ class AccountingController extends Controller
                                         $rowTotal = $bill['engBill'] + $bill['expBill'];
                                         $engTotal += $rowTotal;
                                         $sheet->row($rowNum, [null, null, $bill['position'], $bill['consultant'], $bill['bhours'], $bill['nbhours'], $bill['brate'], $bill['bType'], $bill['engBill'], $bill['expBill'], $rowTotal]);
-                                        if ($bill['bType'] != 'Hourly') {
-                                            $sheet->cell('H' . $rowNum, function ($cell) {
-                                                $cell->setFontColor('#ff0000')->setFontWeight('bold');
+                                        $billedType = $bill['bType'];
+                                        if ($billedType && $billedType != 'Hourly') {
+                                            $sheet->cells('C' . $rowNum . ':H' . $rowNum, function ($cells) use ($billedType) {
+                                                $cells->setFontColor($billedType == 'Monthly Retainer' ? '#1180ff':'#ff0000')->setFontWeight('bold');
                                             });
                                         }
                                         $rowNum++;

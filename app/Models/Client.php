@@ -187,14 +187,14 @@ class Client extends Model
                     $NonHourlyEngagements->push([
                         'eid' => $engagement->id,
                         'ename' => $engagement->name,
-                        'position' => null,
-                        'consultant' => null,
+                        'position' => 'Multiple',
+                        'consultant' => 'Multiple',
                         'bhours' => null,
                         'nbhours' => null,
                         'brate' => null,
                         'bType' => $engagement->clientBilledType(),
                         'engBill' => $billed,
-                        'expBill' => null,
+                        'expBill' => 0,
                     ]);
                 }
             }
@@ -219,11 +219,12 @@ class Client extends Model
                     $billRow['ename'] = $engagement->name;
                     $billRow['position'] = $arrangement->position->name;
                     $billRow['consultant'] = $arrangement->consultant->fullname();
-                    $billRow['bhours'] = null;
-                    $billRow['nbhours'] = null;
+                    $billRow['bhours'] = 0;
+                    $billRow['nbhours'] = 0;
                     $billRow['brate'] = $engagement->isHourlyBilling() ? $arrangement->billing_rate : 0;
-                    $billRow['bType'] = $engagement->clientBilledType();
-                    $billRow['engBill'] = null;
+                    //$billRow['bType'] = $engagement->clientBilledType();
+                    $billRow['bType'] = null;
+                    $billRow['engBill'] = 0;
                 }
                 $billRow['expBill'] = $expense;
                 $billByArrangement->put($aid, $billRow);
