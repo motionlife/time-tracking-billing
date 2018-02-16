@@ -29,7 +29,7 @@ class Consultant extends Model
     {
         return self::all()->filter(function ($consultant) {
             return $consultant->user->isVerified();
-        });
+        })->sortBy('first_name');
     }
 
     //Get the corresponding system user of this consultant

@@ -38,7 +38,7 @@
                                         <select id="client-select" class="selectpicker" data-width="22%"
                                                 data-live-search="true"
                                                 name="client_id" title="select the client" required>
-                                            @foreach(\newlifecfo\Models\Client::all()->pluck('name','id') as $id=>$client)
+                                            @foreach(\newlifecfo\Models\Client::all()->sortBy('name')->pluck('name','id') as $id=>$client)
                                                 <option value="{{$id}}"
                                                         data-content="<strong>{{$client}}</strong>"></option>
                                             @endforeach

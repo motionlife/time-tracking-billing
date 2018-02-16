@@ -34,10 +34,10 @@ class EngagementController extends Controller
         return view('engagements', ['engagements' => $engagements,
             'clients' => $engs->map(function ($item) {
                 return $item->client;
-            })->unique(),
+            })->sortBy('name')->unique(),
             'leaders' => Engagement::all()->map(function ($item, $key) {
                 return $item->leader;
-            })->unique(),
+            })->sortBy('first_name')->unique(),
             'admin' => $isAdmin
         ]);
     }
