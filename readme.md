@@ -1,4 +1,4 @@
-<p align="center">Time Tracking System</p>
+<h2 align="center">Time Tracking System</h2>
 
 ## Screenshots of the System
 
@@ -7,7 +7,6 @@
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img2.png)
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img3.png)
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img4.png)
-![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img5.png)
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img6.png)
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img7.png)
 ![alt text](https://raw.githubusercontent.com/motionlife/NewLifeCFO/master/storage/framework/screenshots/img8.png)
