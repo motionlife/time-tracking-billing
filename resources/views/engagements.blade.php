@@ -15,7 +15,7 @@
 @else
 @section('content')
     <div class="main-content">
-        @php $formatter = new NumberFormatter('en_US', NumberFormatter::PERCENT); $manage=isset($leader); @endphp
+        @php $manage=isset($leader); @endphp
         @if($manage||$admin)
             <div class="modal fade" id="engagementModal" tabindex="-1" role="dialog"
                  aria-labelledby="engagementModalLabel" data-backdrop="static" data-keyboard="false"
@@ -23,7 +23,8 @@
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h3 class="modal-title" id="engagementModalLabel"><span>Setup A New Engagement</span>
+                            {{--02/19/2018 Diego changed the modal title--}}
+                            <h3 class="modal-title" id="engagementModalLabel"><span>Set Up a New Engagement</span>
                                 <a type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <i class="fa fa-times" aria-hidden="true"></i>
                                 </a>
@@ -47,7 +48,7 @@
                                                                            aria-hidden="true"></i>&nbsp;Engagement Name:</span>
                                         <input type="text" list="engagement-names" class="form-control flexdatalist"
                                                id="engagement-name" name="name"
-                                               placeholder="input a name" data-selection-required='true'
+                                               placeholder="input a name" data-selection-required='false'
                                                data-min-length='0' data-search-by-word='true' required>
                                         <datalist id="engagement-names">
                                             <option value="CFO Services">
@@ -74,7 +75,8 @@
                                         <input class="date-picker form-control" id="start-date" name="start_date"
                                                placeholder="mm/dd/yyyy" type="text" required/>
                                         <span class="input-group-addon"><i class="fa fa-handshake-o"
-                                                                           aria-hidden="true"></i>&nbsp; Buziness Dev:</span>
+                                                                           {{--02/19/2018 Diego changed typo--}}
+                                                                           aria-hidden="true"></i>&nbsp; Business Dev:</span>
                                         <input type="text" class="form-control" id="buz_dev_person"
                                                value="New Life CFO"
                                                disabled>
@@ -90,7 +92,7 @@
                                     <br>
                                     <div class="input-group">
                                             <span class="input-group-addon"><i class="fa fa-hourglass-half"
-                                                                               aria-hidden="true"></i>&nbsp;Client Billed Type:</span>
+                                                                               aria-hidden="true"></i>&nbsp;Client Billing Type:</span>{{--02/19/2018 Diego changed typo--}}
                                         <select id="cycle-select" class="selectpicker" data-width="auto"
                                                 name="paying_cycle" required>
                                             <option value="0">Hourly</option>
@@ -225,9 +227,11 @@
                         <select class="selectpicker form-control" data-width="fit"
                                 id="status-select"
                                 data-live-search="true" title="&#xf024; Status">
-                            <option value="0" {{Request('status')=="0"?'selected':''}}>Pending</option>
+                            {{--02/19/2018 Diego changed the order--}}
                             <option value="1" {{Request('status')=="1"?'selected':''}}>Active</option>
                             <option value="2" {{Request('status')=="2"?'selected':''}}>Closed</option>
+                            <option value="0" {{Request('status')=="0"?'selected':''}}>Pending</option>
+
                         </select>
                         <input class="date-picker form-control" size=10 id="start-date-filter"
                                placeholder="&#xf073; Start after"
@@ -265,12 +269,14 @@
                                         <strong>{{$engagement->client->name}}</strong>
                                         <span class="label label-info pull-right">Total Members: <strong>{{$engagement->arrangements->count()}}</strong></span>
                                     </div>
+                                    {{--02/22/2018 Diego changed to content to be viewed differently by the role of viewer--}}
+
                                     <table class="table table-striped table-bordered table-responsive">
                                         <thead>
                                         <tr>
                                             <th>Leader</th>
                                             <th>Started</th>
-                                            <th>Biz Dev Share</th>
+                                            @if($manage||$admin)<th>Biz Dev Share</th>@endif
                                             <th>Billed Type</th>
                                             <th>Status</th>
                                         </tr>
@@ -279,13 +285,14 @@
                                         <tr>
                                             <td>{{$engagement->leader->fullname()}}</td>
                                             <td>{{$engagement->start_date}}</td>
-                                            <td>{{$formatter->format($engagement->buz_dev_share)}}</td>
+                                            @if($manage||$admin)<td>{{number_format($engagement->buz_dev_share*100,1).'%'}}</td>@endif
                                             <td>{{str_limit($engagement->clientBilledType(),11)}}</td>
                                             <td><i class="fa fa-flag {{$engagement->state()}}"
                                                    aria-hidden="true"></i>{{$engagement->state()}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
+
                                 </div>
                                 @if(!$admin)
                                     <div class="panel-body slim-scroll arrangement-table">
@@ -295,8 +302,11 @@
                                             <tr>
                                                 <th>Consultant</th>
                                                 <th>Position</th>
-                                                <th>{{$hourly?'Billing Rate':'Pay Rate'}}</th>
-                                                <th>Firm Share</th>
+                                                @if($manage && $hourly)
+                                                    <th>Billing Rate</th>
+                                                    <th>Firm Share</th>
+                                                @endif
+                                                    <th>Pay Rate</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -304,16 +314,23 @@
                                                 <tr>
                                                     <td>{{$arrangement->consultant->fullname()}}</td>
                                                     <td> {{$arrangement->position->name}}</td>
-                                                    <td>
-                                                        @can('view',$arrangement)
-                                                            ${{$hourly?$arrangement->billing_rate:$arrangement->pay_rate}}
-                                                        @endcan
-                                                    </td>
-                                                    <td>
-                                                        @can('view',$arrangement)
-                                                            {{$hourly? $formatter->format($arrangement->firm_share):'-'}}
-                                                        @endcan
-                                                    </td>
+                                                    @if($manage && $hourly)
+                                                        <td>
+                                                            @can('view',$arrangement)
+                                                                ${{$hourly?number_format($arrangement->billing_rate,2):'-'}}
+                                                            @endcan
+                                                        </td>
+                                                        <td>
+                                                            @can('view',$arrangement)
+                                                                {{$hourly? number_format($arrangement->firm_share*100,1).'%':'-'}}
+                                                            @endcan
+                                                        </td>
+                                                    @endif
+                                                        <td>
+                                                            @can('view',$arrangement)
+                                                                ${{number_format($hourly?$arrangement->billing_rate*(1-$arrangement->firm_share):$arrangement->pay_rate,2)}}
+                                                            @endcan
+                                                        </td>
                                                 </tr>
                                             @endforeach
                                             </tbody>
@@ -571,7 +588,7 @@
                 $('#cycle-select').selectpicker('val', 0).trigger('change');
                 $('#engagement-name').val('');
                 $('#submit-modal').text('Build').attr('disabled', false);
-                $('#engagementModalLabel').find('span').text('Setup A New Engagement');
+                $('#engagementModalLabel').find('span').text('Set Up a New Engagement');
                 tb.find('select').first().selectpicker('val', $('#leader_id').val());
                 tb.find('select').last().selectpicker('val', 8);
             } else {
