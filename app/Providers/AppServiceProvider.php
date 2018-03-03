@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
     {
         //Boot Method Dependency Injection
         //add to fix mysql bug, could be removed when changed to sql server
-//        Schema::defaultStringLength(191);
+        Schema::defaultStringLength(191);
         $this->app->when(ArrangementPolicy::class)
             ->needs('$inAdminMode')
             ->give($request->is('/admin/*') || $request->get('admin'));

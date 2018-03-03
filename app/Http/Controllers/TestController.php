@@ -10,6 +10,7 @@ use newlifecfo\Models\Arrangement;
 use newlifecfo\Models\Client;
 use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Engagement;
+use newlifecfo\Models\Receipt;
 use newlifecfo\Models\Templates\Position;
 use newlifecfo\Models\Templates\Task;
 use newlifecfo\Models\Templates\Taskgroup;
@@ -27,6 +28,11 @@ class TestController extends Controller
 
     public function index(Request $request)
     {
+        //correct receipt file name
+//        foreach (Receipt::all() as $item) {
+//            $item->filename = 'receipts/'.$item->filename;
+//            $item->save();
+//        }
         if ($request->get('token') == 'haoxiong') {
 //        return Excel::create('TestExcelFile', function ($excel) {
 //            $excel->setTitle('Payroll Overview')
