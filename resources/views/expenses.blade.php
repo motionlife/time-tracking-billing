@@ -21,11 +21,8 @@
                                 <div class="panel-body">
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-users"></i>&nbsp; Client and Engagement:</span>
-                                        <select id="client-engagement" class="selectpicker" data-width="auto"
-                                                name="eid"
-                                                data-live-search="true"
-                                                title="The engagements your expense related to" required>
-                                        </select>
+                                        @component('components.engagement_selector',['dom_id'=>"client-engagement",'clientIds'=>$clientIds])
+                                        @endcomponent
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -76,7 +73,7 @@
                                                step="0.01" min="0">
                                         <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage<a
                                                     href="javascript:void(0)"
-                                                    title="Mileage cost = number of miles * $0.54"><i
+                                                    title="Mileage cost = number of miles * $0.545"><i
                                                         class="fa fa-info-circle" aria-hidden="true"></i></a>
                                             :(miles)</span>
                                         <input class="form-control input-numbers" id="input-mileage-cost"
@@ -238,7 +235,6 @@
             );
             $('#add-expense').on('click', function () {
                 $('#expenseModal').modal('toggle');
-                $('#client-engagement').html($('#client-engagements').html()).selectpicker('refresh');
                 $('form .input-group input').val('');
                 $('#description').val('');
                 $('#input-report-date').datepicker('setDate', new Date());
@@ -259,7 +255,7 @@
                 if (update) tr = $('a[href*="editExpense(' + expid + ')"]').parent().parent();
                 var formdata = new FormData($(this)[0]);
                 formdata.delete('total');
-                formdata.set('mileage_cost', formdata.get('mileage_cost') * 0.54);
+                formdata.set('mileage_cost', (formdata.get('mileage_cost') * 0.545).toFixed(2));
                 formdata.append('_method', update ? 'put' : 'post');
                 $.ajax({
                     type: "POST",
@@ -323,7 +319,7 @@
                     $('#input-meal').val(data.meal);
                     $('#input-office-supply').val(data.office_supply);
                     $('#input-car-rental').val(data.car_rental);
-                    $('#input-mileage-cost').val(parseFloat(data.mileage_cost / 0.54).toFixed(1));
+                    $('#input-mileage-cost').val(parseFloat(data.mileage_cost / 0.545).toFixed(1));
                     $('#input-other').val(data.other);
                     $('#input-receipts').val('');
                     $('#description').val(data.description);
@@ -394,10 +390,11 @@
             $('.input-numbers').each(function (i, n) {
                 var num = parseFloat($(n).val());
                 num = isNaN(num) ? 0 : num;
-                if ($(n).attr('id') === 'input-mileage-cost') num *= 0.54;
+                if ($(n).attr('id') === 'input-mileage-cost') num *= 0.545;
                 total += num;
             });
             $('#expense-total').val(total.toFixed(2));
+
         }
 
         function outputLink(receipts) {

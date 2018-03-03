@@ -1,6 +1,6 @@
 <select id="{{$dom_id}}"
         class="selectpicker show-tick form-control form-control-sm" data-width="100%"
-        data-dropup-auto="false" data-live-search="true"  name="eid" title="Select the engagements" required>
+        data-dropup-auto="false" data-live-search="true"  name="eid" title="Select the engagement" required>
     @if(isset($clientIds))
         @foreach($clientIds as $cid=>$engagements)
             @php $cname=newlifecfo\Models\Client::find($cid)->name;@endphp
