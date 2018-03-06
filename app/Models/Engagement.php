@@ -176,7 +176,8 @@ class Engagement extends Model
     {
         $aids = collect();
         foreach ($eids as $eid) {
-            $aids->push(self::find($eid)->arrangements()->withTrashed()->get()->pluck('id'));
+            $engagement = self::find($eid);
+            if($engagement) $aids->push($engagement->arrangements()->withTrashed()->get()->pluck('id'));
         }
         return $aids->flatten();
     }

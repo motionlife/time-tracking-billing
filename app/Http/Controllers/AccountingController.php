@@ -50,7 +50,9 @@ class AccountingController extends Controller
                 $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
 
                 if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
+                    //02/20/2018 Diego testing the file name also use to check the versio 03012018
                     'filename' => $this->filename($consultant, $start, $end, $state, $eid, 'PAYROLL')]);
+//                    'filename' => 'Diego Testing']);
 
                 return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
                         'hours' => $pg_hours, 'expenses' => $pg_expenses,
@@ -68,7 +70,9 @@ class AccountingController extends Controller
                         $id = $consultant->id;
                         $data['payroll'][$id] = [$consultant->fullname(), $consultant->getPayroll($start, $end, $state, $eid)];
                     }
+                    //02/20/2018 Diego testing the file name
                     return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'PAYROLL')), true);
+//                    return $this->exportExcel(array_add($data, 'filename', 'Diego Testing 2'), true);
                 } else {
                     $incomes = [];
                     $buz_dev_incomes = [];

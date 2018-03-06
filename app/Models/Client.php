@@ -161,8 +161,8 @@ class Client extends Model
         if (!$billByArrangement->count()) $billByArrangement = collect();//fix Illuminate\Database\Eloquent\Collection bugs
         $billByArrangement = $billByArrangement->groupBy('arrangement_id')->map(function ($group, $aid) {
             $row = [];
-            $arrangement = Arrangement::find($aid);
-            $engagement = $arrangement->engagement;
+            $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
+            $engagement = $arrangement->engagement()->withTrashed()->first();
             $row['eid'] = $engagement->id;
             $row['ename'] = $engagement->name;
             $row['position'] = $arrangement->position->name;
@@ -213,8 +213,8 @@ class Client extends Model
                 $billRow = $billByArrangement->get($aid);
                 if (empty($billRow)) {
                     $billRow = [];
-                    $arrangement = Arrangement::find($aid);
-                    $engagement = $arrangement->engagement;
+                    $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
+                    $engagement = $arrangement->engagement()->withTrashed()->first();
                     $billRow['eid'] = $engagement->id;
                     $billRow['ename'] = $engagement->name;
                     $billRow['position'] = $arrangement->position->name;

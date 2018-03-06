@@ -135,8 +135,8 @@ class Consultant extends Model
             });
         $payByArrangement = $hourReports->groupBy('arrangement_id')->map(function ($group, $aid) {
             $row = [];
-            $arrangement = Arrangement::find($aid);
-            $engagement = $arrangement->engagement;
+            $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
+            $engagement = $arrangement->engagement()->withTrashed()->first();
             $row['ename'] = '[' . $engagement->client->name . ']' . $engagement->name;
             $row['elead'] = $engagement->leader->fullname();
             $row['position'] = $arrangement->position->name;
@@ -157,8 +157,8 @@ class Consultant extends Model
                 $payRow = $payByArrangement->get($aid);
                 if (empty($payRow)) {
                     $payRow = [];
-                    $arrangement = Arrangement::find($aid);
-                    $engagement = $arrangement->engagement;
+                    $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
+                    $engagement = $arrangement->engagement()->withTrashed()->first();
                     $payRow['ename'] = '[' . $engagement->client->name . ']' . $engagement->name;
                     $payRow['elead'] = $engagement->leader->fullname();
                     $payRow['position'] = $arrangement->position->name;
