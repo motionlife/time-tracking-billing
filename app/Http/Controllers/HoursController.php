@@ -58,6 +58,11 @@ class HoursController extends Controller
                 $pid = $request->get('pid');
                 $tid = $request->get('tid');
                 return ['code' => $this->updateSettings($consultant, 'fav_task', $eid . '-' . $pid . '-' . $tid) ? 7 : 0];
+            }else if($request->get('interface')){
+                Setting::updateOrCreate(
+                    ['consultant_id' => $consultant->id, 'key' => 'hour_input_interface'],
+                    ['value' => $request->get('interface')]
+                );
             }
         } else {
             $favTasks = [''];
@@ -68,14 +73,17 @@ class HoursController extends Controller
                 $recentTasks = $favTasks;
                 $fav = true;
             } else {
-                $recentTasks = $consultant->getRecentInputTask(5)->keys();
+                //02/20/2018 Diego turn off the default 5 tasks
+                $recentTasks = $consultant->getRecentInputTask(0)->keys();
                 $fav = false;
             }
+            $interfaceSetting = $consultant->settings()->where('key','hour_input_interface')->first();
             return view('new-hour', [
                 'hours' => $hours,
                 'clientIds' => Engagement::groupedByClient($consultant),
                 'defaultTasks' => $recentTasks,
-                'fav' => $fav
+                'fav' => $fav,
+                'interface'=>$interfaceSetting?$interfaceSetting->value:'weekly'
             ]);
         }
     }

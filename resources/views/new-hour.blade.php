@@ -16,7 +16,7 @@
                 </div>
             </div>
             <hr>
-            <div class="row daily-weekly-view" style="display: none">
+            <div class="row daily-weekly-view dailyView" style="display: {{$interface=='weekly'?'none':'inline'}}">
                 <div class="col-md-8">
                     <div class="panel panel-headline">
                         <div class="panel-heading">
@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row daily-weekly-view">
+            <div class="row daily-weekly-view weeklyView" style="display: {{$interface=='daily'?'none':'inline'}}">
                 <div class="panel panel-headline">
                     <div class="input-group">
                         <span class="input-group-btn"><button class="btn btn-primary" type="button"
@@ -232,7 +232,7 @@
                 var br = opt.attr('data-br');
                 var fs = opt.attr('data-fs');
                 var bh = $(this).val();
-                $('#income-estimate').val(bh + 'h  x  $' + br + '/hr  x  ' + ((1 - fs) * 100).toFixed(2) + '% = $' + (bh * br * (1 - fs)).toFixed(2));
+                $('#income-estimate').val(bh + 'h  x  $' + (br * (1 - fs)).toFixed(2) + '/hr' + ' = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
                 if (parseFloat($('#billable-hours').val()+$('#non-billable-hours').val()) > 0) {
@@ -292,7 +292,9 @@
                 orientation: 'bottom'
             }).datepicker('setDate', new Date());
             $('#day-week').on('click', function () {
-                $('.daily-weekly-view').slideToggle();
+                $('.daily-weekly-view').slideToggle(300,function () {
+                    $.get("?interface="+($('.weeklyView').is(":visible")?"weekly":"daily"));
+                });
             });
             $('#hours-roll').slimScroll({
                 height: '450px'
