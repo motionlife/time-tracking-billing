@@ -67,11 +67,11 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-car" aria-hidden="true"></i>&nbsp;Car Rental:$</span>
+                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Car Rental:$</span>
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
                                                step="0.01" min="0">
-                                        <span class="input-group-addon"><i class="fa fa-taxi" aria-hidden="true"></i>&nbsp;Mileage<a
+                                        <span class="input-group-addon"><i class="fa fa-tachometer" aria-hidden="true"></i>&nbsp;Mileage<a
                                                     href="javascript:void(0)"
                                                     title="Mileage cost = number of miles * $0.545"><i
                                                         class="fa fa-info-circle" aria-hidden="true"></i></a>
