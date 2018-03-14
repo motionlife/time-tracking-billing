@@ -133,7 +133,7 @@
                                                         data-live-search="true"
                                                         required disabled>
                                                     @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
-                                                        <option value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
+                                                        <option class="{{$consultant->user->isVerified()?'':'h-consultant'}}" value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -547,6 +547,7 @@
             $('#add-team-member').on('click', function () {
                 var table = $('#members-table');
                 var tr = table.find('tr').first().clone().appendTo(table);
+                tr.find('option.h-consultant').remove();
                 tr.find('a').addClass("deletable-row");
                 tr.find('.bootstrap-select').replaceWith(function () {
                     return $('select', this);
