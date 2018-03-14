@@ -25,10 +25,10 @@ class Consultant extends Model
         return $this->first_name . ' ' . $this->last_name;
     }
 
-    public static function recognized()
+    public static function recognized($strict = false)
     {
-        return self::all()->filter(function ($consultant) {
-            return $consultant->user->isVerified();
+        return self::all()->filter(function ($consultant) use ($strict) {
+            return $strict? $consultant->user->isVerified():!$consultant->user->unRecognized();
         })->sortBy('first_name');
     }
 
