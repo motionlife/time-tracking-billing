@@ -56,6 +56,7 @@ class Client extends Model
             ]);
     }
 
+    //Obsoleted! Based on customer's description, outsider referrer is not a business developer
     public function whoDevelopedMe()
     {
         if ($this->outreferrer->first_name == 'N/A') {

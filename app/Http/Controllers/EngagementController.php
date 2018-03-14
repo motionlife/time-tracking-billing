@@ -52,7 +52,7 @@ class EngagementController extends Controller
         if ($request->ajax()) {
             //return the business development info to the request
             if ($request->get('fetch') == 'business')
-                return Client::find($request->get('cid'))->whoDevelopedMe();
+                return Client::find($request->get('cid'))->dev_by_consultant->fullname();
         }
         $user = Auth::user();
         $consultant = $user->consultant;
