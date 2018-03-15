@@ -395,16 +395,24 @@ class AccountingController extends Controller
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Payroll Overview');
                 $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
-                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'J' => '0.0%', 'K' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate', 'Rate Type', 'Share', 'Income', 'Description', 'Status'])
-                        ->cells('A1:M1', function ($cells) {
+//                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'J' => '0.0%', 'K' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+//                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate', 'Rate Type', 'Share', 'Income', 'Description', 'Status'])
+//                        ->cells('A1:M1', function ($cells) {
+//                    {{--03/05/2018 Diego changed to show only the pay rate--}}
+                      $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'I' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Pay Rate', 'Income', 'Description', 'Status'])
+                        ->cells('A1:K1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
+
                     foreach ($data['hours'] as $i => $hour) {
                         $arr = $hour->arrangement;
                         $eng = $arr->engagement;
-                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
-                            $hour->share, $hour->earned(), $hour->description, $hour->getStatus()[0]]);
+//                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
+//                            $hour->share, $hour->earned(), $hour->description, $hour->getStatus()[0]]);
+                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate*$hour->share,
+                            //$hour->rate_type == 0 ? 'Hourly' : 'Retainer/Flat Fee',
+                            $hour->earned(), $hour->description, $hour->getStatus()[0]]);
                     }
                 });
                 $excel->sheet('Expenses($' . number_format($data['income'][1], 2) . ')', function ($sheet) use ($data) {
