@@ -49,6 +49,15 @@ class Engagement extends Model
         ]);
     }
 
+    //get the closer(consultant) of the engagement
+    public function closer()
+    {
+        return $this->belongsTo(Consultant::class, 'closer_id')->withDefault([
+            'first_name' => 'Deleted',
+            'last_name' => 'Deleted',
+        ]);
+    }
+
     public function isHourlyBilling()
     {
         return $this->paying_cycle == 0;

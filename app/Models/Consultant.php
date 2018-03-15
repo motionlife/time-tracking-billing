@@ -85,6 +85,11 @@ class Consultant extends Model
     {
         return $this->hasMany(Engagement::class, 'leader_id');
     }
+    //all the engagements he has ever served as closer
+    public function close_engagements()
+    {
+        return $this->hasMany(Engagement::class, 'closer_id');
+    }
 
     public function justCreatedHourReports($start = null, $end = null, $amount = null)
     {
