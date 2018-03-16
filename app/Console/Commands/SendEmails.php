@@ -41,11 +41,13 @@ class SendEmails extends Command
     public function handle()
     {
         //
-        Consultant::recognized()->each(function ($consultant) {
-            if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
-                || ($consultant->first_name == 'John' && $consultant->last_name == 'Doe'))
-                $user = $consultant->user;
-                $user->notify(new ConfirmReports($user));
+        Consultant::recognized(true)->each(function ($consultant) {
+            /*   if (($consultant->first_name == 'Hao' && $consultant->last_name == 'Xiong')
+                   || ($consultant->first_name == 'Diego' && $consultant->last_name == 'Li')){
+   
+               }*/
+            $user = $consultant->user;
+            $user->notify(new ConfirmReports($user));
 
         });
 
