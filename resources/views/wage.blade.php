@@ -66,16 +66,14 @@
                                 @if(isset($consultant))
                                     @php $activeTab = Request::get('tab')?:"1"; @endphp
                                     <li class="{{$activeTab=="1"?'active':''}}"><a href="#tab-left1" role="tab"
-                                                                                   data-toggle="tab">Hourly
-                                            Income&nbsp;<span
+                                                                                   data-toggle="tab">Hourly Income&nbsp;<span
                                                     class="badge bg-success">{{$hours->total()}}</span></a></li>
                                     <li class="{{$activeTab=="2"?'active':''}}"><a href="#tab-left2" role="tab"
                                                                                    data-toggle="tab">Expense&nbsp;<span
                                                     class="badge bg-warning">{{$expenses->total()}}</span></a>
                                     </li>
                                     <li class="{{$activeTab=="3"?'active':''}}"><a href="#tab-left3" role="tab"
-                                                                                   data-toggle="tab">Biz Dev
-                                            Income&nbsp;<span
+                                                                                   data-toggle="tab">Biz Dev Income&nbsp;<span
                                                     class="badge bg-danger">{{sizeof($buz_devs['engs'])}}</span></a>
                                     </li>
                                     <li class="{{$activeTab=="4"?'active':''}}"><a href="#tab-left4" role="tab"

@@ -49,7 +49,7 @@ class AccountingController extends Controller
                 })];
                 $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
                 $closings = $this->getCloserIncome($consultant, $start, $end, $eid, $state);
-                if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
+                if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'closings' => $closings, 'income' => $income,
                     //02/20/2018 Diego testing the file name also use to check the versio 03012018
                     'filename' => $this->filename($consultant, $start, $end, $state, $eid, 'PAYROLL')]);
                 return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
@@ -338,32 +338,36 @@ class AccountingController extends Controller
                 $excel->sheet('Consultant Payroll', function ($sheet) use ($data) {
                     $rowNum = 1;
                     $sheet->freezeFirstRow()
-                        ->row($rowNum++, ['Name', 'Engagement Name', 'Engagement Lead', 'Position', 'Billable Hours', 'Non-billable Hours', 'Billing Rate', 'Pay Rate', 'Hourly Pay', 'Expense', 'Biz Dev %', 'Biz Dev Income', 'Grand Total'])
-                        ->cells('A1:M1', function ($cells) {
+                        ->row($rowNum++, ['Name', 'Engagement Name', 'Engagement Lead', 'Position', 'Billable Hours', 'Non-billable Hours', 'Billing Rate', 'Pay Rate', 'Hourly Pay', 'Expense', 'Biz Dev %', 'Biz Dev Income', 'Closer Share', 'Closings', 'Grand Total'])
+                        ->cells('A1:O1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
-                        })->setColumnFormat(['E:F' => '0.00', 'G:J' => self::ACCOUNTING_FORMAT, 'K' => '0.0%', 'L:M' => self::ACCOUNTING_FORMAT]);
+                        })->setColumnFormat(['E:F' => '0.00', 'G:J' => self::ACCOUNTING_FORMAT, 'K' => '0.0%', 'L' => self::ACCOUNTING_FORMAT, 'M' => '0.0%', 'N:O' => self::ACCOUNTING_FORMAT]);
                     $BTotal = 0;
                     $NbTotal = 0;
                     $HpTotal = 0;
                     $ExpTotal = 0;
                     $BizTotal = 0;
+                    $ClosingTotal = 0;
                     $Total = 0;
                     foreach ($data['payroll'] as $id => $payroll) {
                         if ($payroll[1]->count()) {
                             $sheet->row($rowNum++, [$payroll[0]]);
                             $gTotal = 0;
                             foreach ($payroll[1] as $aid => $pay) {
-                                //$rowSum = (isset($pay['hourlyPay']) ? $pay['hourlyPay'] : 0) + (isset($pay['expense']) ? $pay['expense'] : 0) + (isset($pay['bizDevIncome']) ? $pay['bizDevIncome'] : 0);
-                                $rowSum = $pay['hourlyPay'] + $pay['expense'] + $pay['bizDevIncome'];
+                                $rowSum = $pay['hourlyPay'] + $pay['expense'] + $pay['bizDevIncome']+$pay['closings'];
                                 $gTotal += $rowSum;
-                                $sheet->row($rowNum, [null, $pay['ename'], $pay['elead'], $pay['position'], $pay['bhours'], $pay['nbhours'], $pay['brate'], $pay['prate'], $pay['hourlyPay'], $pay['expense'], $pay['bizDevShare'], $pay['bizDevIncome'], $rowSum]);
+                                $sheet->row($rowNum, [null, $pay['ename'], $pay['elead'], $pay['position'], $pay['bhours'], $pay['nbhours'], $pay['brate'], $pay['prate'], $pay['hourlyPay'], $pay['expense'], $pay['bizDevShare'], $pay['bizDevIncome'], $pay['closingShare'], $pay['closings'], $rowSum]);
                                 if ($aid < 0) {
-                                    $sheet->cells('A' . $rowNum . ':M' . $rowNum, function ($cells) {
-                                        $cells->setFontColor('#ff0000');
+                                    $sheet->cells('A' . $rowNum . ':O' . $rowNum, function ($cells) use ($aid) {
+                                        $cells->setFontColor($aid < -9999 ? '#0000ff' : '#ff0000');
                                     });
                                 } else if ($pay['bizDevShare'] > 0 || $pay['bizDevIncome'] > 0) {
                                     $sheet->cells('K' . $rowNum . ':L' . $rowNum, function ($cells) {
                                         $cells->setBackground('##faff02');
+                                    });
+                                } else if ($pay['closingShare'] > 0 || $pay['closings'] > 0) {
+                                    $sheet->cells('M' . $rowNum . ':N' . $rowNum, function ($cells) {
+                                        $cells->setBackground('##faa0ff');
                                     });
                                 }
                                 $rowNum++;
@@ -373,14 +377,16 @@ class AccountingController extends Controller
                             $hourpay = $payroll[1]->sum('hourlyPay');
                             $expense = $payroll[1]->sum('expense');
                             $bizdev = $payroll[1]->sum('bizDevIncome');
+                            $closings = $payroll[1]->sum('closings');
                             $BTotal += $bhours;
                             $NbTotal += $nbhours;
                             $HpTotal += $hourpay;
                             $ExpTotal += $expense;
                             $BizTotal += $bizdev;
+                            $ClosingTotal += $closings;
                             $Total += $gTotal;
-                            $sheet->row($rowNum, [$payroll[0] . ' Total', null, null, null, $bhours, $nbhours, null, null, $hourpay, $expense, null, $bizdev, $gTotal])
-                                ->cells('A' . $rowNum . ':M' . $rowNum, function ($cells) {
+                            $sheet->row($rowNum, [$payroll[0] . ' Total', null, null, null, $bhours, $nbhours, null, null, $hourpay, $expense, null, $bizdev, null, $closings, $gTotal])
+                                ->cells('A' . $rowNum . ':O' . $rowNum, function ($cells) {
                                     $cells->setBackground('#c5cddb')->setFontWeight('bold');
                                 });
                             $rowNum++;
@@ -388,31 +394,23 @@ class AccountingController extends Controller
                     }
                     $rowNum++;
                     $sheet->row($rowNum, ['Hourly Total', null, null, null, $BTotal, $NbTotal])
-                        ->row($rowNum + 1, ['Dollar Total', null, null, null, null, null, null, null, $HpTotal, $ExpTotal, null, $BizTotal, $Total])
-                        ->cells('A' . $rowNum . ':M' . ($rowNum + 1), function ($cells) {
+                        ->row($rowNum + 1, ['Dollar Total', null, null, null, null, null, null, null, $HpTotal, $ExpTotal, null, $BizTotal, null, $ClosingTotal, $Total])
+                        ->cells('A' . $rowNum . ':O' . ($rowNum + 1), function ($cells) {
                             $cells->setBackground('#bfffe8')->setFontWeight('bold')->setFontSize('12');
                         });
                 });
             })->export('xlsx') : Excel::create($data['filename'], function ($excel) use ($data) {
                 $this->setExcelProperties($excel, 'Payroll Overview');
                 $excel->sheet('Hourly Income($' . number_format($data['income'][0], 2) . ')', function ($sheet) use ($data) {
-//                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'J' => '0.0%', 'K' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
-//                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate', 'Rate Type', 'Share', 'Income', 'Description', 'Status'])
-//                        ->cells('A1:M1', function ($cells) {
-//                    {{--03/05/2018 Diego changed to show only the pay rate--}}
-                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'I' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                    $sheet->setColumnFormat(['F:G' => '0.00', 'H:I' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Pay Rate', 'Income', 'Description', 'Status'])
                         ->cells('A1:K1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
-
                     foreach ($data['hours'] as $i => $hour) {
                         $arr = $hour->arrangement;
                         $eng = $arr->engagement;
-//                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
-//                            $hour->share, $hour->earned(), $hour->description, $hour->getStatus()[0]]);
                         $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate * $hour->share,
-                            //$hour->rate_type == 0 ? 'Hourly' : 'Retainer/Flat Fee',
                             $hour->earned(), $hour->description, $hour->getStatus()[0]]);
                     }
                 });
@@ -431,15 +429,23 @@ class AccountingController extends Controller
                 });
                 $excel->sheet('Business Dev($' . number_format($data['buz_devs']['total'], 2) . ')', function ($sheet) use ($data) {
                     $sheet->setColumnFormat(['D' => '0.0%', 'E:F' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
-                        ->row(1, ['Client', 'Engagement', 'Engagement State', 'Buz Dev Share(%)', 'Engagement Bill', 'Earned'])
+                        ->row(1, ['Client', 'Engagement', 'Engagement Status', 'Buz Dev Share(%)', 'Engagement Bill', 'Earned'])
                         ->cells('A1:F1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
                         });
                     foreach ($data['buz_devs']['engs'] as $i => $eng) {
+                        $sheet->appendRow([$eng[0]->client->name, $eng[0]->name, $eng[0]->state(), $eng[0]->buz_dev_share, $eng[2], $eng[1]]);
+                    }
+                });
+                $excel->sheet('Closings($' . number_format($data['closings']['total'], 2) . ')', function ($sheet) use ($data) {
+                    $sheet->setColumnFormat(['D' => '0.0%', 'G:H' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                        ->row(1, ['Client', 'Engagement', 'Engagement Status', 'Closing Share(%)', 'Closing From', 'Closing End', 'Period Billing', 'Commission'])
+                        ->cells('A1:H1', function ($cells) {
+                            $this->setTitleCellsStyle($cells);
+                        });
+                    foreach ($data['closings']['engs'] as $i => $eng) {
                         $sheet->appendRow([
-                            $eng[0]->client->name, $eng[0]->name, $eng[0]->state(),
-                            $eng[0]->buz_dev_share, $eng[1] / $eng[0]->buz_dev_share, $eng[1]
-                        ]);
+                            $eng[0]->client->name, $eng[0]->name, $eng[0]->state(), $eng[0]->closer_share, $eng[0]->closer_from, $eng[0]->closer_end, $eng[2], $eng[1]]);
                     }
                 })->setActiveSheetIndex(0);
             })->export('xlsx');
