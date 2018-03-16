@@ -161,21 +161,18 @@ class Client extends Model
         });
         if (!$billByArrangement->count()) $billByArrangement = collect();//fix Illuminate\Database\Eloquent\Collection bugs
         $billByArrangement = $billByArrangement->groupBy('arrangement_id')->map(function ($group, $aid) {
-            $row = [];
             $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
             $engagement = $arrangement->engagement()->withTrashed()->first();
-            $row['eid'] = $engagement->id;
-            $row['ename'] = $engagement->name;
-            $row['position'] = $arrangement->position->name;
-            $row['consultant'] = $arrangement->consultant->fullname();
-            $row['bhours'] = $group->sum('billable_hours');
-            $row['nbhours'] = $group->sum('non_billable_hours');
-            $row['brate'] = $arrangement->billing_rate;
-            $row['bType'] = $engagement->clientBilledType();
-            $row['engBill'] = $group->sum(function ($hour) {
-                return $hour->billClient();
-            });
-            $row['expBill'] = 0;
+            $row = ['eid' => $engagement->id, 'ename' => $engagement->name,
+                'position' => $arrangement->position->name,
+                'consultant' => $arrangement->consultant->fullname(),
+                'bhours' => $group->sum('billable_hours'),
+                'nbhours' => $group->sum('non_billable_hours'),
+                'brate' => $arrangement->billing_rate,
+                'bType' => $engagement->clientBilledType(),
+                'engBill' => $group->sum(function ($hour) {
+                    return $hour->billClient();
+                }), 'expBill' => 0];
             return $row;
         });
 
@@ -213,19 +210,13 @@ class Client extends Model
             if ($expense) {
                 $billRow = $billByArrangement->get($aid);
                 if (empty($billRow)) {
-                    $billRow = [];
                     $arrangement = Arrangement::withTrashed()->where('id', $aid)->first();
                     $engagement = $arrangement->engagement()->withTrashed()->first();
-                    $billRow['eid'] = $engagement->id;
-                    $billRow['ename'] = $engagement->name;
-                    $billRow['position'] = $arrangement->position->name;
-                    $billRow['consultant'] = $arrangement->consultant->fullname();
-                    $billRow['bhours'] = 0;
-                    $billRow['nbhours'] = 0;
-                    $billRow['brate'] = $engagement->isHourlyBilling() ? $arrangement->billing_rate : 0;
-                    //$billRow['bType'] = $engagement->clientBilledType();
-                    $billRow['bType'] = null;
-                    $billRow['engBill'] = 0;
+                    $billRow = ['eid' => $engagement->id, 'ename' => $engagement->name,
+                        'position' => $arrangement->position->name,
+                        'consultant' => $arrangement->consultant->fullname(),
+                        'bhours' => 0, 'nbhours' => 0, 'brate' => $engagement->isHourlyBilling() ? $arrangement->billing_rate : 0,
+                        'bType' => null, 'engBill' => 0];
                 }
                 $billRow['expBill'] = $expense;
                 $billByArrangement->put($aid, $billRow);
