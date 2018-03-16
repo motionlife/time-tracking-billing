@@ -164,11 +164,16 @@ class Engagement extends Model
         return ($billingDate->day > 28 && $billingDate->month == 1) ? $billingDate->addDays(10)->endOfMonth()->startOfDay() : $billingDate->addMonth()->day($this->billing_day);
     }
 
-    public function incomeForBuzDev($start = null, $end = null, $state = null)
+    public function incomeForBuzDev($start = null, $end = null, $state = null, &$bill = null)
     {
-        return $this->buz_dev_share * ($this->paying_cycle == 0 ?
-                $this->HourBilling($start, $end, $state) :
-                $this->NonHourBilling($start, $end, $state));
+        $bill = $this->paying_cycle == 0 ? $this->HourBilling($start, $end, $state) : $this->NonHourBilling($start, $end, $state);
+        return $this->buz_dev_share * $bill;
+    }
+
+    public function incomeForCloser($start = null, $end = null, $state = null, &$bill = null)
+    {
+        $bill = $this->paying_cycle == 0 ? $this->HourBilling($this->closer_from, $this->closer_end, $state) : $this->NonHourBilling($this->closer_from, $this->closer_end, $state);
+        return $this->closer_share * $bill;
     }
 
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
@@ -186,7 +191,7 @@ class Engagement extends Model
         $aids = collect();
         foreach ($eids as $eid) {
             $engagement = self::find($eid);
-            if($engagement) $aids->push($engagement->arrangements()->withTrashed()->get()->pluck('id'));
+            if ($engagement) $aids->push($engagement->arrangements()->withTrashed()->get()->pluck('id'));
         }
         return $aids->flatten();
     }

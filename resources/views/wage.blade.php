@@ -37,10 +37,16 @@
                         <div class="col-md-3">
                             <div class="metric">
                                 <span class="icon"><i class="fa fa-handshake-o"></i></span>
-                                <p>
-                                    <span class="number">${{number_format($buz_devs['total'],2)}}</span>
-                                    <span class="title">Business Development</span>
-                                </p>
+                                <div class="dev-closings">
+                                    <p>
+                                        <span class="number">${{number_format($buz_devs['total'],2)}}</span>
+                                        <span class="title">Biz Dev Income</span>
+                                    </p>
+                                    <p>
+                                        <span class="number">${{number_format($closings['total'],2)}}</span>
+                                        <span class="title">Closings</span>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -48,7 +54,7 @@
                                 <span class="icon"><i class="fa fa-calculator"></i></span>
                                 <p>
                                         <span class="number"
-                                              id="total-income-tag">${{number_format($income[0]+$income[1]+$buz_devs['total'],2)}}</span>
+                                              id="total-income-tag">${{number_format($income[0]+$income[1]+$buz_devs['total']+$closings['total'],2)}}</span>
                                     <span class="title">Total Payroll</span>
                                 </p>
                             </div>
@@ -71,6 +77,10 @@
                                                                                    data-toggle="tab">Biz Dev
                                             Income&nbsp;<span
                                                     class="badge bg-danger">{{sizeof($buz_devs['engs'])}}</span></a>
+                                    </li>
+                                    <li class="{{$activeTab=="4"?'active':''}}"><a href="#tab-left4" role="tab"
+                                                                                   data-toggle="tab">Engagement Closing&nbsp;<span
+                                                    class="badge bg-info">{{sizeof($closings['engs'])}}</span></a>
                                     </li>
                                 @else
                                     <li class="active"><a href="#tab-left1" role="tab"
@@ -97,8 +107,11 @@
                                                                 class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
                                                 <th>Billable Hours</th>
-                                                <th>Rate</th>
-                                                <th>Share</th>
+                                                <th>Non-billable Hours</th>
+                                                <th>Pay Rate</th>
+                                                {{--03/05/2018 Diego changed to show only the pay rate--}}
+                                                {{--<th>Rate</th>--}}
+                                                {{--<th>Share</th>--}}
                                                 <th>Income</th>
                                                 <th>Status</th>
                                             </tr>
@@ -117,10 +130,12 @@
                                                     </td>
                                                     <td>{{$hour->report_date}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
+                                                    <td>{{number_format($hour->non_billable_hours,2)}}</td>
+                                                    {{--03/05/2018 Diego changed to show only the pay rate--}}
                                                     <td>
-                                                        <span class="badge bg-{{$hour->rate_type==0?'success':'danger'}}">{{$hour->rate_type==0?'B':'P'}}</span>${{number_format($hour->rate,2)}}
+                                                        ${{number_format($hour->rate * $hour->share,2)}}
                                                     </td>
-                                                    <td>{{number_format($hour->share*100,1)}}%</td>
+                                                    {{--<td>{{number_format($hour->share*100,1)}}%</td>--}}
                                                     <td>
                                                         ${{number_format($hour->earned(),2)}}</td>
                                                     <td>
@@ -135,7 +150,6 @@
                                         {{$hours->appends(Request::except('page','tab'))->withPath('payroll')->links()}}
                                     </div>
                                 </div>
-
                                 <div class="tab-pane fade {{$activeTab=="2"?' in active':''}}" id="tab-left2">
                                     <div class="table-responsive">
                                         <table class="table project-table">
@@ -177,7 +191,6 @@
                                         {{$expenses->appends(array_add(Request::except('page'),'tab',2))->withPath('payroll')->links()}}
                                     </div>
                                 </div>
-
                                 <div class="tab-pane fade {{$activeTab=="3"?' in active':''}}" id="tab-left3">
                                     <div class="table-responsive">
                                         <table class="table project-table">
@@ -217,8 +230,51 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td><a class="label label-info" data-toggle="popover" data-content="{{$eng[0]->summaryForBuzDev($eng[1]/$eng[0]->buz_dev_share)}}">
-                                                            ${{number_format($eng[1]/$eng[0]->buz_dev_share,2)}}</a> </td>
+                                                    <td><a class="label label-info" data-toggle="popover"
+                                                           data-content="{{$eng[0]->summaryForBuzDev($eng[2])}}">
+                                                            ${{number_format($eng[2],2)}}</a></td>
+                                                    <td>${{number_format($eng[1],2)}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade {{$activeTab=="4"?' in active':''}}" id="tab-left4">
+                                    <div class="table-responsive">
+                                        <table class="table project-table">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Client</th>
+                                                <th>Engagement<a
+                                                            href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
+                                                                class="fa fa-refresh" aria-hidden="true"></i></a></th>
+                                                <th>ENG. Status</th>
+                                                <th>Closing Share</th>
+                                                <th>Effective Period</th>
+                                                <th>Period Billing</th>
+                                                <th>Commission</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach($closings['engs'] as $eng)
+                                                <tr>
+                                                    <td>{{$loop->index+1}}</td>
+                                                    <td>{{str_limit($eng[0]->client->name,32)}}</td>
+                                                    <td>
+                                                        <span class="badge bg-{{$eng[0]->paying_cycle==0?'default':($eng[0]->paying_cycle==1?'warning':'danger')}}">{{$eng[0]->paying_cycle==0?'H':($eng[0]->paying_cycle==1?'M':'Fixed')}}</span>
+                                                        <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng[0]->id),false)).'&tab=4'}}">{{str_limit($eng[0]->name,32)}}</a>
+                                                    </td>
+                                                    <td>
+                                                        <span class="label label-{{$eng[0]->getStatusLabel()}}">{{$eng[0]->state()}} </span>
+                                                    </td>
+                                                    <td>{{number_format($eng[0]->closer_share*100,1)}}%</td>
+                                                    <td>{{\Carbon\Carbon::parse($eng[0]->closer_from)->format('M d, Y')}}
+                                                        - {{\Carbon\Carbon::parse($eng[0]->closer_end)->format('M d, Y')}}</td>
+                                                    <td><a class="label label-info" data-toggle="popover"
+                                                           data-content="{{$eng[0]->summaryForBuzDev($eng[2])}}">${{number_format($eng[2],2)}}</a>
+                                                    </td>
                                                     <td>${{number_format($eng[1],2)}}</td>
                                                 </tr>
                                             @endforeach
@@ -238,6 +294,7 @@
                                     <th>Hourly Income</th>
                                     <th>Expense</th>
                                     <th>Biz Dev Income</th>
+                                    <th>Closings</th>
                                     <th>Total</th>
                                 </tr>
                                 </thead>
@@ -253,9 +310,11 @@
                                             </td>
                                             <td>{{$hrs[$conid][0]}}</td>
                                             <td>{{$hrs[$conid][1]}}</td>
-                                            <td>${{number_format($salary[0],2)}}</td>
-                                            <td>${{number_format($salary[1],2)}}</td>
-                                            <td>${{number_format($buzIncomes[$conid],2)}}</td>
+                                            <td>{{$salary[0]?'$'.number_format($salary[0],2):'-'}}</td>
+                                            <td>{{$salary[1]?'$'.number_format($salary[1],2):'-'}}</td>
+                                            <td>{{$buzIncomes[$conid]?'$'.number_format($buzIncomes[$conid],2):'-'}}</td>
+                                            <td>
+                                                {{$closerIncomes[$conid]?'$'.number_format($closerIncomes[$conid],2):'-'}}</td>
                                             <td>${{number_format($total,2)}}</td>
                                         </tr>
                                     @endif
@@ -312,14 +371,36 @@
             font-weight: bold;
         }
 
-        #summary tr td:nth-last-child(-n+4) {
+        #tab-left4 tr td:last-child {
+            font-weight: bold;
+        }
+
+        #summary tr td:nth-last-child(-n+5) {
             font-weight: 600;
             font-size: 1.1em;
+            text-align: center;
         }
 
         .excel-button:hover {
             opacity: 0.5;
             filter: alpha(opacity=50);
+        }
+
+        .metric span.number {
+            font-size: 1.6em;
+        }
+
+        .metric .dev-closings .number {
+            font-size: 1.3em;
+        }
+
+        .metric .dev-closings .title {
+            font-size: 0.8em;
+        }
+
+        .metric .dev-closings {
+            margin-top: -1.2em;
+            margin-bottom: -1.2em;
         }
     </style>
 @endsection

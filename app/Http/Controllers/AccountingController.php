@@ -48,20 +48,18 @@ class AccountingController extends Controller
                     return $exp->payConsultant();
                 })];
                 $buz_devs = $this->getBuzDev($consultant, $start, $end, $eid, $state);
-
+                $closings = $this->getCloserIncome($consultant, $start, $end, $eid, $state);
                 if ($file == 'excel') return $this->exportExcel(['hours' => $hourReports, 'expenses' => $expenseReports, 'buz_devs' => $buz_devs, 'income' => $income,
                     //02/20/2018 Diego testing the file name also use to check the versio 03012018
                     'filename' => $this->filename($consultant, $start, $end, $state, $eid, 'PAYROLL')]);
-//                    'filename' => 'Diego Testing']);
-
                 return view('wage', ['clientIds' => Engagement::groupedByClient($consultant),
                         'hours' => $pg_hours, 'expenses' => $pg_expenses,
                         'income' => $income,
                         'buz_devs' => $buz_devs,
+                        'closings' => $closings,
                         'admin' => $isAdmin,
                         'consultant' => $consultant]
                 );
-
             } else {
                 if ($file == 'excel') {
                     $data = [];
@@ -70,12 +68,11 @@ class AccountingController extends Controller
                         $id = $consultant->id;
                         $data['payroll'][$id] = [$consultant->fullname(), $consultant->getPayroll($start, $end, $state, $eid)];
                     }
-                    //02/20/2018 Diego testing the file name
                     return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'PAYROLL')), true);
-//                    return $this->exportExcel(array_add($data, 'filename', 'Diego Testing 2'), true);
                 } else {
                     $incomes = [];
                     $buz_dev_incomes = [];
+                    $closer_incomes = [];
                     $hourNumbers = [];
                     $consultants = Consultant::recognized();
                     foreach ($consultants as $consultant) {
@@ -83,15 +80,18 @@ class AccountingController extends Controller
                         $hourNumbers[$id] = [0, 0];
                         $incomes[$id] = $this->getIncome($consultant, $start, $end, $eid, $state, $hourNumbers[$id]);
                         $buz_dev_incomes[$id] = $this->getBuzDev($consultant, $start, $end, $eid, $state)['total'];
+                        $closer_incomes[$id] = $this->getCloserIncome($consultant, $start, $end, $eid, $state)['total'];
                     }
-                    $sum = $this->sumIncome($incomes, $buz_dev_incomes);
                     $data = ['admin' => $isAdmin,
                         'consultants' => $consultants,
                         'incomes' => $incomes,
                         'buzIncomes' => $buz_dev_incomes,
+                        'closerIncomes' => $closer_incomes,
                         'hrs' => $hourNumbers,
-                        'income' => [$sum[0], $sum[1]],
-                        'buz_devs' => ['total' => $sum[2]]];
+                        'income' => [array_sum(array_column($incomes, 0)), array_sum(array_column($incomes, 1))],
+                        'buz_devs' => ['total' => array_sum($buz_dev_incomes)],
+                        'closings' => ['total' => array_sum($closer_incomes)]
+                    ];
                     return view('wage', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
                 }
             }
@@ -128,21 +128,19 @@ class AccountingController extends Controller
                     return $this->exportExcel(array_add($data, 'filename', $this->filename(null, $start, $end, $state, $eid, 'Bill')), true, true);
                 } else {
                     //all client bill review
-                    $bills = [];
+                    $engbills = [];
                     $hourNumbers = [];
                     $clients = Client::all();
                     foreach ($clients as $client) {
                         $id = $client->id;
                         $hourNumbers[$id] = [0, 0];
-                        $bills[$id] = $this->getBills($client, $start, $end, $eid, $state, $hourNumbers[$id]);
+                        $engbills[$id] = $this->getBills($client, $start, $end, $eid, $state, $hourNumbers[$id]);
                     }
-                    $sum = $this->sumIncome($bills, null);
-
                     $data = ['admin' => $isAdmin,
                         'clients' => $clients,
-                        'bills' => $bills,
+                        'bills' => $engbills,
                         'hrs' => $hourNumbers,
-                        'bill' => [$sum[0], $sum[1]]];
+                        'bill' => [array_sum(array_column($engbills, 0)), array_sum(array_column($engbills, 1))]];
                     return view('bill', array_add($data, 'clientIds', Engagement::groupedByClient(null)));
                 }
             }
@@ -156,22 +154,6 @@ class AccountingController extends Controller
         $hrs[0] = $engagementBill[2];//hours only in the hourly-engagement
         $hrs[1] = $engagementBill[3];
         return [$engagementBill[0], $expenseBill[0]];
-    }
-
-    private function sumIncome($incomes, $buz_dev_incomes)
-    {
-        $sum_bh = 0;
-        $sum_ex = 0;
-        $sum_dev = 0;
-        foreach ($incomes as $income) {
-            $sum_bh += $income[0];
-            $sum_ex += $income[1];
-        }
-        if ($buz_dev_incomes)
-            foreach ($buz_dev_incomes as $dev) {
-                $sum_dev += $dev;
-            }
-        return [$sum_bh, $sum_ex, $sum_dev];
     }
 
     private function getIncome(Consultant $consultant, $start, $end, $eid, $state, &$hrs = null)
@@ -196,7 +178,8 @@ class AccountingController extends Controller
             foreach ($dev_client->engagements()->withTrashed()->get() as $engagement) {
                 if (!$eid[0] || in_array($engagement->id, $eid)) {
                     if ($engagement->buz_dev_share == 0) continue;
-                    $devs = $engagement->incomeForBuzDev($start, $end, $state);
+                    $engBill = 0;
+                    $devs = $engagement->incomeForBuzDev($start, $end, $state, $engBill);
                     if ($devs) {
 //                        $tbh = 0;
 //                        foreach ($engagement->arrangements()->withTrashed()->get() as $arrangement) {
@@ -205,9 +188,27 @@ class AccountingController extends Controller
 //                            }
 //                        }
 //                        array_push($engs, [$engagement, $devs, $tbh]);
-                        array_push($engs, [$engagement, $devs]);
+                        array_push($engs, [$engagement, $devs, $engBill]);
                         $total += $devs;
                     }
+                }
+            }
+        }
+        return ['total' => $total, 'engs' => $engs];
+    }
+
+    private function getCloserIncome(Consultant $consultant, $start, $end, $eid, $state)
+    {
+        $total = 0;
+        $engs = [];
+        foreach ($consultant->close_engagements()->withTrashed()->get() as $engagement) {
+            if (!$eid[0] || in_array($engagement->id, $eid)) {
+                if ($engagement->closer_share == 0) continue;
+                $engBill = 0;
+                $closings = $engagement->incomeForCloser($start, $end, $state, $engBill);
+                if ($closings) {
+                    array_push($engs, [$engagement, $closings, $engBill]);
+                    $total += $closings;
                 }
             }
         }
@@ -250,7 +251,7 @@ class AccountingController extends Controller
                                         $billedType = $bill['bType'];
                                         if ($billedType && $billedType != 'Hourly') {
                                             $sheet->cells('C' . $rowNum . ':H' . $rowNum, function ($cells) use ($billedType) {
-                                                $cells->setFontColor($billedType == 'Monthly Retainer' ? '#ff0000':'##0000ff')->setFontWeight('bold');
+                                                $cells->setFontColor($billedType == 'Monthly Retainer' ? '#ff0000' : '##0000ff')->setFontWeight('bold');
                                             });
                                         }
                                         $rowNum++;
@@ -399,7 +400,7 @@ class AccountingController extends Controller
 //                        ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Rate', 'Rate Type', 'Share', 'Income', 'Description', 'Status'])
 //                        ->cells('A1:M1', function ($cells) {
 //                    {{--03/05/2018 Diego changed to show only the pay rate--}}
-                      $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'I' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
+                    $sheet->setColumnFormat(['F:G' => '0.00', 'H' => self::ACCOUNTING_FORMAT, 'I' => self::ACCOUNTING_FORMAT])->freezeFirstRow()
                         ->row(1, ['Client', 'Engagement', 'Report Date', 'Position', 'Task', 'Billable Hours', 'Non-billable Hours', 'Pay Rate', 'Income', 'Description', 'Status'])
                         ->cells('A1:K1', function ($cells) {
                             $this->setTitleCellsStyle($cells);
@@ -410,7 +411,7 @@ class AccountingController extends Controller
                         $eng = $arr->engagement;
 //                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate, $hour->rate_type == 0 ? 'Billing' : 'Pay',
 //                            $hour->share, $hour->earned(), $hour->description, $hour->getStatus()[0]]);
-                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate*$hour->share,
+                        $sheet->appendRow([$hour->client->name, $eng->name, $hour->report_date, $arr->position->name, $hour->task->description, $hour->billable_hours, $hour->non_billable_hours, $hour->rate * $hour->share,
                             //$hour->rate_type == 0 ? 'Hourly' : 'Retainer/Flat Fee',
                             $hour->earned(), $hour->description, $hour->getStatus()[0]]);
                     }
