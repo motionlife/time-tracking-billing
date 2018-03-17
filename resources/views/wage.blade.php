@@ -376,7 +376,6 @@
         #summary tr td:nth-last-child(-n+5) {
             font-weight: 600;
             font-size: 1.1em;
-            text-align: center;
         }
 
         .excel-button:hover {
