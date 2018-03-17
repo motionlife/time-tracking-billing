@@ -79,7 +79,7 @@
                     </form>
                 </div>
             @else
-                @php $clients = \newlifecfo\Models\Client::all(); @endphp
+                @php $clients = \newlifecfo\Models\Client::all()->sortBy('name'); @endphp
                 <div class="panel panel-headline">
                     <div class="panel-title row" style="margin-left: 1em">
                         <div class="col-md-3">
@@ -119,8 +119,8 @@
                                     <td>
                                         @foreach($client->revenues as $revenue)
                                             <a class="label label-info" data-toggle="popover" data-content=
-                                            "<strong>Revenue: </strong>${{number_format($revenue->revenue,2)}}<br>
-                                            <strong>EBIT: </strong>${{number_format($revenue->ebit,2)}}">{{$revenue->year}}</a>
+                                            "<strong>Revenue: </strong>${{number_format($revenue->revenue,0)}}<br>
+                                            <strong>EBIT: </strong>${{number_format($revenue->ebit,0)}}">{{$revenue->year}}</a>
                                         @endforeach
                                     </td>
                                     <td><a href="?edit=1&cid={{$client->id}}"><i class="fa fa-pencil-square-o"
