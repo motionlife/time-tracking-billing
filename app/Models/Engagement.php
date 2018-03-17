@@ -5,7 +5,6 @@ namespace newlifecfo\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use newlifecfo\User;
 
 class Engagement extends Model
 {
@@ -172,10 +171,20 @@ class Engagement extends Model
 
     public function incomeForCloser($start = null, $end = null, $state = null, &$bill = null)
     {
-        $bill = $this->paying_cycle == 0 ? $this->HourBilling($this->closer_from, $this->closer_end, $state) : $this->NonHourBilling($this->closer_from, $this->closer_end, $state);
+        $start = !$start || (Carbon::parse($start)->diffInDays(Carbon::parse($this->closer_from), false) > 0) ? $this->closer_from : $start;
+        $end = !$end || (Carbon::parse($end)->diffInDays(Carbon::parse($this->closer_end), false) < 0) ? $this->closer_end : $end;
+        $bill = $this->paying_cycle == 0 ? $this->HourBilling($start, $end, $state) : $this->NonHourBilling($start, $end, $state);
         return $this->closer_share * $bill;
     }
 
+    /**
+     * @param null $start
+     * @param null $cid
+     * @param null $leader
+     * @param null $consultant
+     * @param null $status
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public static function getBySCLS($start = null, $cid = null, $leader = null, $consultant = null, $status = null)
     {
         $collection1 = (isset($leader) ? $leader->lead_engagements : self::all())

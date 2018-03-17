@@ -299,7 +299,7 @@
                                 <tbody id="summary">
                                 @php $index =0; @endphp
                                 @foreach($consultants as $consultant)
-                                    @php $conid=$consultant->id;$salary = $incomes[$conid];$total = $salary[0]+$salary[1]+$buzIncomes[$conid];@endphp
+                                    @php $conid=$consultant->id;$salary = $incomes[$conid];$total = $salary[0]+$salary[1]+$buzIncomes[$conid]+$closerIncomes[$conid];@endphp
                                     @if($total>0.01)
                                         <tr>
                                             <td>{{++$index}}</td>

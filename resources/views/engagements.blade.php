@@ -8,7 +8,8 @@
         <div class="alert alert-danger">
             <i class="fa fa-exclamation-triangle"></i>
             <strong>Can't Create Engagement!</strong><br>
-            In order to create an engagement, you must be set as <strong>'Leader Candidate'</strong> first, please contact the administrator.
+            In order to create an engagement, you must be set as <strong>'Leader Candidate'</strong> first, please
+            contact the administrator.
         </div>
     </div>
 @endsection
@@ -70,8 +71,8 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                            <span class="input-group-addon"><i
-                                                        class="fa fa-calendar"></i>&nbsp; Start Date</span>
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-calendar"></i>&nbsp; Start Date</span>
                                         <input class="date-picker form-control" id="start-date" name="start_date"
                                                placeholder="mm/dd/yyyy" type="text" required/>
                                         <span class="input-group-addon"><i class="fa fa-handshake-o"
@@ -91,8 +92,8 @@
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                            <span class="input-group-addon"><i class="fa fa-hourglass-half"
-                                                                               aria-hidden="true"></i>&nbsp;Client Billing Type:</span>{{--02/19/2018 Diego changed typo--}}
+                                        <span class="input-group-addon"><i class="fa fa-hourglass-half"
+                                                                           aria-hidden="true"></i>&nbsp;Client Billing Type:</span>{{--02/19/2018 Diego changed typo--}}
                                         <select id="cycle-select" class="selectpicker" data-width="auto"
                                                 name="paying_cycle" required>
                                             <option value="0">Hourly</option>
@@ -109,6 +110,32 @@
                                                placeholder="dd" type="number" min="1" max="31" step="1" required/>
                                     </div>
                                     <br>
+                                    <div class="input-group" style="border: dotted #c0c6d1;">
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-user-o"></i>&nbsp; Closer:</span>
+                                        <select id="closer-select" class="selectpicker" data-width="15%"
+                                                data-live-search="true"
+                                                name="closer_id" title="select closer">
+                                            @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
+                                                <option value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
+                                            @endforeach
+                                        </select>
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-calendar-o"></i>&nbsp;From</span>
+                                        <input class="date-picker form-control" id="closer-from" name="closer_from"
+                                               placeholder="mm/dd/yyyy" type="text"/>
+                                        <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i>&nbsp;End</span>
+                                        <input class="date-picker form-control" id="closer-end" name="closer_end"
+                                               placeholder="mm/dd/yyyy" type="text"/>
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-circle-o-notch"></i>&nbsp;Share:</span>
+                                        <input class="form-control" id="closer-share" name="closer_share"
+                                               type="number"
+                                               placeholder="pct."
+                                               step="0.1" min="0"
+                                               max="100">
+                                        <span class="input-group-addon">%</span>
+                                    </div>
                                 </div>
                                 <a id="add-team-member" href="javascript:void(0)" class="label label-info"><i
                                             class="fa fa-user-plus" aria-hidden="true"></i>Add members
@@ -133,7 +160,8 @@
                                                         data-live-search="true"
                                                         required disabled>
                                                     @foreach(\newlifecfo\Models\Consultant::recognized() as $consultant)
-                                                        <option class="{{$consultant->user->isVerified()?'':'h-consultant'}}" value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
+                                                        <option class="{{$consultant->user->isVerified()?'':'h-consultant'}}"
+                                                                value="{{$consultant->id}}">{{$consultant->fullname()}}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -276,7 +304,8 @@
                                         <tr>
                                             <th>Leader</th>
                                             <th>Started</th>
-                                            @if($manage||$admin)<th>Biz Dev Share</th>@endif
+                                            @if($manage||$admin)
+                                                <th>Biz Dev Share</th>@endif
                                             <th>Billed Type</th>
                                             <th>Status</th>
                                         </tr>
@@ -285,7 +314,8 @@
                                         <tr>
                                             <td>{{$engagement->leader->fullname()}}</td>
                                             <td>{{$engagement->start_date}}</td>
-                                            @if($manage||$admin)<td>{{number_format($engagement->buz_dev_share*100,1).'%'}}</td>@endif
+                                            @if($manage||$admin)
+                                                <td>{{number_format($engagement->buz_dev_share*100,1).'%'}}</td>@endif
                                             <td>{{str_limit($engagement->clientBilledType(),11)}}</td>
                                             <td><i class="fa fa-flag {{$engagement->state()}}"
                                                    aria-hidden="true"></i>{{$engagement->state()}}</td>
@@ -306,7 +336,7 @@
                                                     <th>Billing Rate</th>
                                                     <th>Firm Share</th>
                                                 @endif
-                                                    <th>Pay Rate</th>
+                                                <th>Pay Rate</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -326,11 +356,11 @@
                                                             @endcan
                                                         </td>
                                                     @endif
-                                                        <td>
-                                                            @can('view',$arrangement)
-                                                                ${{number_format($hourly?$arrangement->billing_rate*(1-$arrangement->firm_share):$arrangement->pay_rate,2)}}
-                                                            @endcan
-                                                        </td>
+                                                    <td>
+                                                        @can('view',$arrangement)
+                                                            ${{number_format($hourly?$arrangement->billing_rate*(1-$arrangement->firm_share):$arrangement->pay_rate,2)}}
+                                                        @endcan
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                             </tbody>
@@ -423,7 +453,7 @@
             $('#build-engagement').on('click', function () {
                 update = false;
                 initModal(false);
-                curFormatter = new AutoNumeric('#billing_amount',{'currencySymbol':'$','unformatOnSubmit':true});
+                curFormatter = new AutoNumeric('#billing_amount', {'currencySymbol': '$', 'unformatOnSubmit': true});
                 $('#engagementModal').modal('toggle');
             });
             $('.eng-delete').on('click', function () {
@@ -469,9 +499,16 @@
                         $('#client-select').selectpicker('val', data.client_id).trigger('change');
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
-                        $('#buz_dev_share').val(parseFloat(data.buz_dev_share * 100).toFixed(2));
+                        $('#buz_dev_share').val(data.buz_dev_share == 0 ? '' : parseFloat(data.buz_dev_share * 100).toFixed(2));
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
-                        curFormatter = new AutoNumeric('#billing_amount',{'currencySymbol':'$','unformatOnSubmit':true});
+                        $('#closer-select').selectpicker('val', data.closer_id);
+                        $('#closer-from').val(data.closer_from);
+                        $('#closer-end').val(data.closer_end);
+                        $('#closer-share').val(data.closer_share == 0 ? '' : parseFloat(data.closer_share * 100).toFixed(2));
+                        curFormatter = new AutoNumeric('#billing_amount', {
+                            'currencySymbol': '$',
+                            'unformatOnSubmit': true
+                        });
                         var queryDate = '2022-12-' + data.billing_day + ' 00:00', dateParts = queryDate.match(/(\d+)/g);
                         $('#billing-day').datepicker('setDate', data.paying_cycle == 1 ? new Date(dateParts[0], dateParts[1] - 1, dateParts[2]) : null);
                         $('#submit-modal').attr('disabled', @if($admin) false
@@ -507,6 +544,7 @@
             });
             $('#engagement-form').on('submit', function (e) {
                 e.preventDefault();
+                if (!checkCloser()) return false;
                 curFormatter.unformat();
                 formdata = $(this).serializeArray();
                 formdata.push({name: '_token', value: "{{csrf_token()}}"}, {
@@ -581,6 +619,24 @@
             });
         });
 
+        function checkCloser() {
+            var closerid = $('#closer-select').val();
+            var cfrom = $('#closer-from').val();
+            var cend = $('#closer-end').val();
+            var cshare = $('#closer-share').val();
+            if ((closerid == null || closerid == "") && cfrom == "" && cend == "" && cshare == "") {
+                return true;
+            } else if ((closerid == null || closerid == "") || cfrom == "" || cend == "" || cshare == "") {
+                toastr.warning('Closer information not complete!');
+                return false;
+            }
+            if (new Date(cfrom)>new Date(cend)) {
+                toastr.warning('The closer from date cannot be greater than end date!');
+                return false;
+            }
+            return true;
+        }
+
         function initModal(update) {
             var tb = $("#members-table");
             tb.find("tr:not(:first-child)").remove();
@@ -590,6 +646,14 @@
                 $('#engagement-name').val('');
                 $('#submit-modal').text('Build').attr('disabled', false);
                 $('#engagementModalLabel').find('span').text('Set Up a New Engagement');
+                $('#client-select').val('default').selectpicker('refresh');
+                $('#closer-select').val('default').selectpicker('refresh');
+                $('#start-date').val('');
+                $('#buz_dev_person').val('');
+                $('#buz_dev_share').val('');
+                $('#closer-from').val('');
+                $('#closer-end').val('');
+                $('#closer-share').val('');
                 tb.find('select').first().selectpicker('val', $('#leader_id').val());
                 tb.find('select').last().selectpicker('val', 8);
             } else {
@@ -653,12 +717,15 @@
         .fancy-radio .label {
             font-size: small;
         }
+
         input.us-currency {
-            text-align:right;
+            text-align: right;
         }
+
         #members-table tr td input[type='number'] {
             text-align: center;
         }
+
         #billing-day-container div.datepicker-days thead {
             display: none;
         }

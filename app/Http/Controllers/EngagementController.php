@@ -83,15 +83,15 @@ class EngagementController extends Controller
             $lid = $request->get('leader_id');
             if ($consultant->id == $lid) {
                 $eng = new Engagement(['client_id' => $request->get('client_id'), 'leader_id' => $lid,
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'), 'billing_day' => $request->get('billing_day'),
+                    'name' => $request->get('name'), 'start_date' => Carbon::parse($request->get('start_date')), 'billing_day' => $request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
+                    'closer_share' => $request->get('closer_share') / 100 ?: 0, 'closer_id' => $request->get('closer_id'), 'closer_from' => $request->get('closer_from') ? Carbon::parse($request->get('closer_from')) : null, 'closer_end' => $request->get('closer_end') ? Carbon::parse($request->get('closer_end')) : null,
                     'cycle_billing' => $request->get('cycle_billing') ?: 0, 'status' => 0
                 ]);
                 //only supervisor can touch the status(no need to apply policy here)
                 /* if ($this->authorize('activate', $eng) || $this->authorize('close', $eng))
                      $eng->status = $request->get('status');
                  else  $eng->status = 1;//indicate the engagement shall be pending once it created*/
-
                 if ($eng->save()) {
                     if ($this->saveArrangements($request, $eng->id)) {
                         $feedback['code'] = 7;
@@ -101,7 +101,6 @@ class EngagementController extends Controller
                         $feedback['code'] = 2;
                         $feedback['message'] = 'Saving engagement failed, unsupported data encountered!';
                     }
-
                 } else {
                     $feedback['code'] = 1;
                     $feedback['message'] = 'Saving engagement failed, there may be some unsupported data';
@@ -111,7 +110,6 @@ class EngagementController extends Controller
                 $feedback['message'] = 'Unauthorized Operation';
             }
         }
-
         return json_encode($feedback);
     }
 
@@ -171,8 +169,9 @@ class EngagementController extends Controller
             $eng = Engagement::find($id);
             if ($user->can('update', $eng)) {
                 if ($eng->update(['client_id' => $request->get('client_id'),
-                    'name' => $request->get('name'), 'start_date' => $request->get('start_date'), 'billing_day' => $request->get('billing_day'),
+                    'name' => $request->get('name'), 'start_date' => Carbon::parse($request->get('start_date')), 'billing_day' => $request->get('billing_day'),
                     'buz_dev_share' => $request->get('buz_dev_share') / 100 ?: 0, 'paying_cycle' => $request->get('paying_cycle'),
+                    'closer_share' => $request->get('closer_share') / 100 ?: 0, 'closer_id' => $request->get('closer_id'), 'closer_from' => $request->get('closer_from') ? Carbon::parse($request->get('closer_from')) : null, 'closer_end' => $request->get('closer_end') ? Carbon::parse($request->get('closer_end')) : null,
                     'cycle_billing' => $request->get('cycle_billing') ?: 0
                 ])) {
                     if ($this->updateArrangements($request, $eng)) {
