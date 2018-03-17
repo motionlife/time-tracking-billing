@@ -499,12 +499,14 @@
                         $('#client-select').selectpicker('val', data.client_id).trigger('change');
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
-                        $('#buz_dev_share').val(data.buz_dev_share == 0 ? '' : parseFloat(data.buz_dev_share * 100).toFixed(2));
+                        var buz_dev_share = parseFloat(data.buz_dev_share * 100).toFixed(2);
+                        $('#buz_dev_share').val(buz_dev_share>0?buz_dev_share:"");
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
                         $('#closer-select').selectpicker('val', data.closer_id);
                         $('#closer-from').val(data.closer_from);
                         $('#closer-end').val(data.closer_end);
-                        $('#closer-share').val(data.closer_share == 0 ? '' : parseFloat(data.closer_share * 100).toFixed(2));
+                        var closer_share = parseFloat(data.closer_share * 100).toFixed(2);
+                        $('#closer-share').val(closer_share > 0 ? closer_share:"");
                         curFormatter = new AutoNumeric('#billing_amount', {
                             'currencySymbol': '$',
                             'unformatOnSubmit': true
