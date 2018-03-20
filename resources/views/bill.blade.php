@@ -103,7 +103,8 @@
                                                     <th scope="row">{{$loop->index+$offset}}</th>
                                                     <td>{{str_limit($hour->consultant->fullname(),23)}}</td>
                                                     <td>
-                                                        <span class="badge bg-{{$eng->paying_cycle==0?'default':($eng->paying_cycle==1?'warning':'danger')}}">{{$eng->paying_cycle==0?'H':($eng->paying_cycle==1?'M':'Fixed')}}</span>
+                                                        {{--<span class="badge bg-{{$eng->paying_cycle==0?'default':($eng->paying_cycle==1?'warning':'danger')}}">{{$eng->paying_cycle==0?'H':($eng->paying_cycle==1?'M':'Fixed')}}</span>--}}
+                                                        <span class="badge bg">H</span>
                                                         <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,23)}}</a>
                                                     </td>
                                                     <td>{{$hour->report_date}}</td>

@@ -124,7 +124,7 @@ class Client extends Model
         foreach ($this->engagements()->withTrashed()->get() as $engagement) {
             if (!$eid[0] || in_array($engagement->id, $eid)) {
                 $billed = $engagement->NonHourBilling($start, $end, $state);
-                if ($billed) {
+                if (!$engagement->isHourlyBilling()) {
                     $sumHours[2] += $billed;
                     $NonHourlyEngagements->push([$engagement, $billed]);
                 }
@@ -169,7 +169,7 @@ class Client extends Model
                 'bhours' => $group->sum('billable_hours'),
                 'nbhours' => $group->sum('non_billable_hours'),
                 'brate' => $arrangement->billing_rate,
-                'bType' => $engagement->clientBilledType(),
+                'bType' => 'Hourly',
                 'engBill' => $group->sum(function ($hour) {
                     return $hour->billClient();
                 }), 'expBill' => 0];
@@ -181,7 +181,7 @@ class Client extends Model
         foreach ($this->engagements()->withTrashed()->get() as $engagement) {
             if (!$eid[0] || in_array($engagement->id, $eid)) {
                 $billed = $engagement->NonHourBilling($start, $end, $state);
-                if ($billed) {
+                if (!$engagement->isHourlyBilling()) {
                     $NonHourlyEngagements->push([
                         'eid' => $engagement->id,
                         'ename' => $engagement->name,
