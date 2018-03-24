@@ -500,7 +500,7 @@
                         $('#leader_id').selectpicker('val', data.leader_id);
                         $('#start-date').val(data.start_date);
                         var buz_dev_share = parseFloat(data.buz_dev_share * 100).toFixed(2);
-                        $('#buz_dev_share').val(buz_dev_share>0?buz_dev_share:"");
+                        $('#buz_dev_share').val(buz_dev_share);
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
                         $('#closer-select').selectpicker('val', data.closer_id);
                         $('#closer-from').val(data.closer_from);
