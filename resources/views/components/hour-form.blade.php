@@ -6,7 +6,7 @@
 <br>
 <div class="input-group">
     <span class="input-group-addon"><i class="fa fa-cogs" aria-hidden="true"></i>&nbsp;Job Position:</span>
-    <select class="selectpicker" id="position" name="pid" data-width="auto"
+    <select class="selectpicker" id="position" name="pid" data-width="30%"
             required></select>
     <span class="input-group-addon"><i class="fa fa-calendar"></i>&nbsp; Report Date</span>
     <input class="date-picker form-control" id="report-date" placeholder="mm/dd/yyyy"
