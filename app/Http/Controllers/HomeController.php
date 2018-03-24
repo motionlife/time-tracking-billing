@@ -3,9 +3,7 @@
 namespace newlifecfo\Http\Controllers;
 
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Expense;
 use newlifecfo\Models\Hour;
 
@@ -32,8 +30,7 @@ class HomeController extends Controller
         $data = ['dates' => $this->getDays(),
             'last_b' => [], 'last_nb' => [], 'last_earn' => [], 'eids' => [], 'total_last_b' => 0, 'total_last_earn' => 0, 'total_last2_earn' => 0, 'last_expense' => 0, 'last2_expense' => 0,
             'total_last_nb' => 0, 'last_buz_dev' => 0, 'last2_buz_dev' => 0, 'last_closings' => 0, 'last2_closings' => 0];
-        //$consultant = Auth::user()->consultant;
-        $consultant=Consultant::all()->last();
+        $consultant = Auth::user()->consultant;
 
         $lastSum = Hour::dailyHoursAndIncome($consultant, $data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
         foreach ($lastSum as $day => $amounts) {
