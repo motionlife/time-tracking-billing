@@ -126,7 +126,7 @@
                                                     <td>
                                                         <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,20)}}</a>
                                                     </td>
-                                                    <td>{{$hour->report_date}}</td>
+                                                    <td>{{(new DateTime($hour->report_date))->format('m/d/Y')}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
                                                     <td>{{number_format($hour->non_billable_hours,2)}}</td>
                                                     {{--03/05/2018 Diego changed to show only the pay rate--}}
@@ -175,7 +175,7 @@
                                                     <td>
                                                         <a href="{{str_replace_first('/','',route('payroll',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=2'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
-                                                    <td>{{$expense->report_date}}</td>
+                                                    <td>{{(new DateTime($expense->report_date))->format('m/d/Y')}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
                                                     <td>
                                                         <span class="label label-{{$expense->getStatus()[1]}}">{{$expense->getStatus()[0]}}</span>

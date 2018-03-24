@@ -107,7 +107,7 @@
                                                         <span class="badge bg">H</span>
                                                         <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,23)}}</a>
                                                     </td>
-                                                    <td>{{$hour->report_date}}</td>
+                                                    <td>{{(new DateTime($hour->report_date))->format('m/d/Y')}}</td>
                                                     <td>{{number_format($hour->billable_hours,2)}}</td>
                                                     <td>
                                                         <span class="badge bg-{{$hour->rate_type==0?'success':'danger'}}">{{$hour->rate_type==0?'B':'P'}}</span>${{number_format($hour->rate,2)}}
@@ -181,7 +181,7 @@
                                                             href="{{url()->current().'?'.http_build_query(Request::except('eid','page'))}}">&nbsp;<i
                                                                 class="fa fa-refresh" aria-hidden="true"></i></a></th>
                                                 <th>Report Date</th>
-                                                <td>Company Paid</td>
+                                                <th>Company Paid</th>
                                                 <th>Amount</th>
                                                 <th>Status</th>
                                             </tr>
@@ -198,7 +198,7 @@
                                                     <td>
                                                         <a href="{{str_replace_first('/','',route('bill',array_add(Request::except('eid','tab','page'),'eid',$eng->id),false)).'&tab=3'}}">{{str_limit($eng->name,30)}}</a>
                                                     </td>
-                                                    <td>{{$expense->report_date}}</td>
+                                                    <td>{{(new DateTime($expense->report_date))->format('m/d/Y')}}</td>
                                                     <td>{{$expense->company_paid?'Yes':'No'}}</td>
                                                     <td>${{number_format($expense->total(),2)}}</td>
                                                     <td>
@@ -270,9 +270,6 @@
 @endsection
 @section('special-css')
     <style>
-        .tab-content tr td:nth-child(5) {
-            font-weight: bold;
-        }
         #tab-left3 tr td:nth-child(6){
             font-weight: bold;
          }
