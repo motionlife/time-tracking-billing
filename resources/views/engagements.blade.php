@@ -124,7 +124,7 @@
                                                     class="fa fa-calendar-o"></i>&nbsp;From</span>
                                         <input class="date-picker form-control" id="closer-from" name="closer_from"
                                                placeholder="mm/dd/yyyy" type="text"/>
-                                        <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i>&nbsp;End</span>
+                                        <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i>&nbsp;To</span>
                                         <input class="date-picker form-control" id="closer-end" name="closer_end"
                                                placeholder="mm/dd/yyyy" type="text"/>
                                         <span class="input-group-addon"><i

@@ -33,8 +33,12 @@
     <select class="selectpicker show-tick form-control form-control-sm" data-width="fit"
             id="state-select" title="&#xf024; Status"
             data-live-search="true">
-        <option value="1" {{Request('state')=="1"?'selected':''}}>Approved</option>
-        <option value="7" {{Request('state')=="7"?'selected':''}}>Unapproved</option>
+        <option value="1" {{Request('state')=="1"?'selected':''}} style="font-size: 1.1em">Approved</option>
+        <option value="7" {{Request('state')=="7"?'selected':''}} style="font-size: 1.1em">Unapproved</option>
+        <option value="0" {{Request('state')=="0"?'selected':''}}>Pending</option>
+        <option value="3" {{Request('state')=="3"?'selected':''}}>Self_confirmed</option>
+        <option value="4" {{Request('state')=="4"?'selected':''}}>Leader_confirmed</option>
+
     </select>
     <i>&nbsp;</i>
     <input class="date-picker form-control" id="start-date" size="10"
