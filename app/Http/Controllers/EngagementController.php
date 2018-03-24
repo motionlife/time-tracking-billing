@@ -45,14 +45,15 @@ class EngagementController extends Controller
     /**
      * Show the form for creating a new resources
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return array
      */
     public function create(Request $request)
     {
         if ($request->ajax()) {
             //return the business development info to the request
             if ($request->get('fetch') == 'business')
-                return Client::find($request->get('cid'))->dev_by_consultant->fullname();
+                $client = Client::find($request->get('cid'));
+                return ['consul'=>$client->dev_by_consultant->fullname(),'share'=>$client->default_buz_dev_share];
         }
         $user = Auth::user();
         $consultant = $user->consultant;

@@ -100,8 +100,8 @@ class AdminController extends Controller
             $fo = $request->get('fo');
             $lo = $request->get('lo');
             $default = !isset($fo) && !isset($lo);
-            $allUsers = User::query()->orderBy($default ? "created_at" : (isset($fo)?"first_name":"last_name"), $fo=="1"||$lo=="0"?"asc":"desc")->get();
-            $users = $this->paginate($allUsers,40);
+            $allUsers = User::query()->orderBy($default ? "created_at" : (isset($fo) ? "first_name" : "last_name"), $fo == "1" || $lo == "0" ? "asc" : "desc")->get();
+            $users = $this->paginate($allUsers, 40);
             return view('admin.users', ['users' => $users]);
         }
 
@@ -131,7 +131,7 @@ class AdminController extends Controller
                 }
             } else if ($request->get('action') == 'update') {
                 $client = Client::find($request->get('cid'));
-                if ($client->update(['industry_id' => $request->get('industry_id'), 'buz_dev_person_id' => $request->get('buz_dev_person_id'), 'outreferrer_id' => $request->get('outreferrer_id'), 'name' => $request->get('name'),
+                if ($client->update(['industry_id' => $request->get('industry_id'), 'buz_dev_person_id' => $request->get('buz_dev_person_id'), 'default_buz_dev_share'=>$request->get('default_buz_dev_share'), 'outreferrer_id' => $request->get('outreferrer_id'), 'name' => $request->get('name'),
                     'complex_structure' => $request->get('complex_structure'), 'messy_accounting_at_begin' => $request->get('messy_accounting_at_begin')
                 ])) {
                     $client->setRevenue(2015, $request->get('revenue2015'), $request->get('ebit2015'));

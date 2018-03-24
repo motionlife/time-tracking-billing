@@ -428,7 +428,8 @@
                 $.get({
                     url: '/engagement/create?fetch=business&cid=' + $(this).selectpicker('val'),
                     success: function (dev) {
-                        $('#buz_dev_person').empty().val(dev);
+                        $('#buz_dev_person').empty().val(dev.consul);
+                        $('#buz_dev_share').empty().val(dev.share);
                     }
                 })
             });
