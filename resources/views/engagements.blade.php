@@ -124,7 +124,8 @@
                                                     class="fa fa-calendar-o"></i>&nbsp;From</span>
                                         <input class="date-picker form-control" id="closer-from" name="closer_from"
                                                placeholder="mm/dd/yyyy" type="text"/>
-                                        <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i>&nbsp;To</span>
+                                        <span class="input-group-addon"><i
+                                                    class="fa fa-calendar-minus-o"></i>&nbsp;To</span>
                                         <input class="date-picker form-control" id="closer-end" name="closer_end"
                                                placeholder="mm/dd/yyyy" type="text"/>
                                         <span class="input-group-addon"><i
@@ -313,7 +314,7 @@
                                         <tbody>
                                         <tr>
                                             <td>{{$engagement->leader->fullname()}}</td>
-                                            <td>{{$engagement->start_date}}</td>
+                                            <td>{{(new DateTime($engagement->start_date))->format('m/d/Y')}}</td>
                                             @if($manage||$admin)
                                                 <td>{{number_format($engagement->buz_dev_share*100,1).'%'}}</td>@endif
                                             <td>{{str_limit($engagement->clientBilledType(),11)}}</td>
@@ -404,7 +405,7 @@
                 autoclose: true,
                 orientation: 'bottom'
             });
-            $('#start-date').datepicker('setDate', new Date());
+
             $('#filter-button').on('click', function () {
                 var query = '?cid=' + $('#client-filter').selectpicker('val')
                     + '&start=' + $('#start-date-filter').val()
@@ -498,15 +499,15 @@
                         $('#engagement-name').val(data.name);
                         $('#client-select').selectpicker('val', data.client_id).trigger('change');
                         $('#leader_id').selectpicker('val', data.leader_id);
-                        $('#start-date').val(data.start_date);
+                        $('#start-date').datepicker('setDate', new Date(data.start_date + 'T00:00:00'));
                         var buz_dev_share = parseFloat(data.buz_dev_share * 100).toFixed(2);
                         $('#buz_dev_share').val(buz_dev_share);
                         $('#billing_amount').val(parseFloat(data.cycle_billing).toFixed(2));
                         $('#closer-select').selectpicker('val', data.closer_id);
-                        $('#closer-from').val(data.closer_from);
-                        $('#closer-end').val(data.closer_end);
+                        $('#closer-from').datepicker('setDate', new Date(data.closer_from + 'T00:00:00'));
+                        $('#closer-end').datepicker('setDate', new Date(data.closer_end + 'T00:00:00'));
                         var closer_share = parseFloat(data.closer_share * 100).toFixed(2);
-                        $('#closer-share').val(closer_share > 0 ? closer_share:"");
+                        $('#closer-share').val(closer_share > 0 ? closer_share : "");
                         curFormatter = new AutoNumeric('#billing_amount', {
                             'currencySymbol': '$',
                             'unformatOnSubmit': true
@@ -632,7 +633,7 @@
                 toastr.warning('Closer information not complete!');
                 return false;
             }
-            if (new Date(cfrom)>new Date(cend)) {
+            if (new Date(cfrom) > new Date(cend)) {
                 toastr.warning('The closer from date cannot be greater than end date!');
                 return false;
             }
