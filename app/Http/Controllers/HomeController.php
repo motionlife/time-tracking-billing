@@ -5,6 +5,7 @@ namespace newlifecfo\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use newlifecfo\Models\Consultant;
 use newlifecfo\Models\Expense;
 use newlifecfo\Models\Hour;
 
@@ -30,8 +31,9 @@ class HomeController extends Controller
     {
         $data = ['dates' => $this->getDays(),
             'last_b' => [], 'last_nb' => [], 'last_earn' => [], 'eids' => [], 'total_last_b' => 0, 'total_last_earn' => 0, 'total_last2_earn' => 0, 'last_expense' => 0, 'last2_expense' => 0,
-            'total_last_nb' => 0, 'last_buz_dev' => 0, 'last2_buz_dev' => 0,];
-        $consultant = Auth::user()->consultant;
+            'total_last_nb' => 0, 'last_buz_dev' => 0, 'last2_buz_dev' => 0, 'last_closings' => 0, 'last2_closings' => 0];
+        //$consultant = Auth::user()->consultant;
+        $consultant=Consultant::all()->last();
 
         $lastSum = Hour::dailyHoursAndIncome($consultant, $data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
         foreach ($lastSum as $day => $amounts) {
@@ -74,12 +76,17 @@ class HomeController extends Controller
                 if ($engagement->buz_dev_share == 0) continue;
                 $data['last_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
                 $data['last2_buz_dev'] += $engagement->incomeForBuzDev($data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
-                //todo:: should also calculation last 12 months write buz_dev=>incomeForBuzDev(12 month)
+                //todo:: should also calculate last 12 months write buz_dev=>incomeForBuzDev(12 month)
             }
-            foreach (Hour::monthlyHoursAndIncome(null, $startMon, $endMon, 1, $dev_client, $engagements->pluck('id')->toArray())
-                     as $mon => $amounts) {
-                $data['dates']['mon'][$mon][1] += $amounts[1] * $engagement->buz_dev_share;
-            }
+//            foreach (Hour::monthlyHoursAndIncome(null, $startMon, $endMon, 1, $dev_client, $engagements->pluck('id')->toArray())
+//                     as $mon => $amounts) {
+//                $data['dates']['mon'][$mon][1] += $amounts[1] * $engagement->buz_dev_share;
+//            }
+        }
+        foreach ($consultant->close_engagements()->withTrashed()->get() as $engagement) {
+            if ($engagement->closer_share == 0) continue;
+            $data['last_closings'] += $engagement->incomeForCloser($data['dates']['startOfLast'], $data['dates']['endOfLast'], 1);
+            $data['last2_closings'] += $engagement->incomeForCloser($data['dates']['startOfLast2'], $data['dates']['endOfLast2'], 1);
         }
 
         $data['total_last_b'] = array_sum($data['last_b']);
