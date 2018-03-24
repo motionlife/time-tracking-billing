@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('content')
-    @php $mcMode = $admin||Request::get('reporter')=='team'; @endphp
+    @php $mcMode = $admin||Request::get('reporter')=='team';
+    $isTeamPage=Request::get('reporter');
+    @endphp
     <div class="main-content">
         <div class="container-fluid">
             <div class="modal fade" id="hourModal" tabindex="-1" role="dialog" aria-labelledby="hourModalLabel"
@@ -60,12 +62,18 @@
                             <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
                                             class="fa fa-refresh" aria-hidden="true"></i></a></th>
                             @if($confirm)
-                                <th>Paid</th>
-                                <th>Billing</th>
+                                <th>Pay</th>
+                            {{--03/14/2018 Diego changed: only team lead can see the billing--}}
+                                @if($isTeamPage == 'team')
+                                    <th>Billing</th>
+                                @endif
                             @else
                                 <th>Task</th>
                             @endif
                             <th>Billable Hours</th>
+                            {{--02/21/2018 Diego added nonbilllable hours--}}
+                            <th>Non-billable Hours</th>
+
                             <th>Report Date</th>
                             <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
                             <th>Status</th>
@@ -88,12 +96,17 @@
                                 </td>
                                 @if($confirm)
                                     <td>${{number_format($hour->earned(),2)}}</td>
-                                    <td>${{number_format($hour->billClient(),2)}}</td>
+                                    {{--03/14/2018 Diego changed: only team lead can see the billing--}}
+                                    @if($isTeamPage == 'team')
+                                        <td>${{number_format($hour->billClient(),2)}}</td>
+                                    @endif
                                 @else
                                     <td>{{str_limit($hour->task->getDesc(),23)}}</td>
                                 @endif
                                 <td>{{number_format($hour->billable_hours,2)}}</td>
-                                <td>{{$hour->report_date}}</td>
+                                {{--02/21/2018 Diego added nonbilllable hours--}}
+                                <td>{{number_format($hour->non_billable_hours,2)}}</td>
+                                <td>{{(new DateTime($hour->report_date))->format('m/d/Y')}}</td>
                                 <td>
                                     @if($mcMode)
                                         <a href="{{url()->current().'?'.http_build_query(Request::except('conid','page')).'&conid='.$hour->consultant_id}}">{{str_limit($cname,25)}}</a>
@@ -239,11 +252,12 @@
                                 toastr.success('Success! Report has been updated!');
                                 tr.find('td:nth-child(4)').html(feedback.record.task);
                                 tr.find('td:nth-child(5)').html(feedback.record.billable_hours);
-                                tr.find('td:nth-child(6)').html(feedback.record.report_date);
-                                @if(!$mcMode) tr.find('td:nth-child(7)').html(feedback.record.description);
+                                tr.find('td:nth-child(6)').html(feedback.record.non_billable_hours);
+                                tr.find('td:nth-child(7)').html(feedback.record.report_date);
+                                @if(!$mcMode) tr.find('td:nth-child(8)').html(feedback.record.description);
                                 @endif
-                                tr.find('td:nth-child(8) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
-                                tr.find('td:nth-child(9)').attr('data-id', feedback.record.id);
+                                tr.find('td:nth-child(9) span').removeClass().addClass('label label-' + feedback.record.status[1]).html(feedback.record.status[0]);
+                                tr.find('td:nth-child(10)').attr('data-id', feedback.record.id);
                                 var flash = tr;
                                 flash.addClass('update-highlight');
                                 setTimeout(function () {

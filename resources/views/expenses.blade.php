@@ -171,7 +171,7 @@
                                     <a href="{{str_replace_first('/','',route('expense.index',array_add(Request::except('eid','page'),'eid',$eng->id),false))}}">{{str_limit($eng->name,22)}}</a>
                                 </td>
                                 <td>{{$expense->company_paid?"Yes":"No"}}</td>
-                                <td>{{$expense->report_date}}</td>
+                                <td>{{(new DateTime($expense->report_date))->format('m/d/Y')}}</td>
                                 <td>${{number_format($expense->total(),2)}}</td>
                                 <td>
                                     @foreach($expense->receipts as $receipt)

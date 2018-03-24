@@ -234,6 +234,7 @@ class HoursController extends Controller
                         'report_date' => $hour->report_date,
                         'task' => str_limit($hour->task->getDesc(), 23),
                         'billable_hours' => number_format($hour->billable_hours, 1),
+                        'non_billable_hours' => number_format($hour->non_billable_hours, 1),
                         'id' => $hour->id,
                         'description' => $hour->description,
                         'status' => $hour->getStatus()
