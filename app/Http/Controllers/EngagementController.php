@@ -29,13 +29,16 @@ class EngagementController extends Controller
     public function index(Request $request, $isAdmin = false)
     {
         $consultant = $isAdmin ? null : Auth::user()->consultant;
-        $engs = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status'));
+        $engs = Engagement::getBySCLS($request->get('start'), $request->get('cid'), Consultant::find($request->get('lid')), $consultant, $request->get('status'))
+            ->sortBy(function ($eng) {
+                return $eng->client->name;
+            });
         $engagements = $this->paginate($engs, 20);
         return view('engagements', ['engagements' => $engagements,
             'clients' => $engs->map(function ($item) {
                 return $item->client;
             })->sortBy('name')->unique(),
-            'leaders' => Engagement::all()->map(function ($item, $key) {
+            'leaders' => Engagement::all()->map(function ($item) {
                 return $item->leader;
             })->sortBy('first_name')->unique(),
             'admin' => $isAdmin
@@ -53,13 +56,15 @@ class EngagementController extends Controller
             //return the business development info to the request
             if ($request->get('fetch') == 'business')
                 $client = Client::find($request->get('cid'));
-                return ['consul'=>$client->dev_by_consultant->fullname(),'share'=>$client->default_buz_dev_share];
+            return ['consul' => $client->dev_by_consultant->fullname(), 'share' => $client->default_buz_dev_share];
         }
         $user = Auth::user();
         $consultant = $user->consultant;
         if ($user->isLeaderCandidate() || $user->isSupervisor()) {
             return view('engagements', [
-                'engagements' => $this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status')), 20),
+                'engagements' => $this->paginate(Engagement::getBySCLS($request->get('start'), $request->get('cid'), $consultant, null, $request->get('status'))->sortBy(function ($eng) {
+                    return $eng->client->name;
+                }), 20),
                 'leader' => $consultant,
                 'clients' => $consultant->lead_engagements->map(function ($item) {
                     return $item->client;
