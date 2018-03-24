@@ -30,12 +30,20 @@ class ExpenseController extends Controller
     public function index(Request $request, $isAdmin = false, $confirm = false)
     {
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
-        $expenses = $this->paginate($confirm ? $confirm['reports'] : Expense::reported($request->get('start'),
-            $request->get('end'), explode(',', $request->get('eid')), $consultant, $request->get('state')), 25);
         if ($request->ajax() && $confirm && $request->get('submit') == 'confirm') {
             return Report::confirmReport($confirm);
         }
-        return view('expenses', ['expenses' => $expenses,
+        $expenses = $confirm ? $confirm['reports'] : Expense::reported($request->get('start'), $request->get('end'), explode(',', $request->get('eid')), $consultant, $request->get('state'));
+        $corder = $request->get('corder');
+        $dorder = $request->get('dorder');
+        if (isset($corder)) {
+            $expenses = $expenses->sortBy(function ($rep) {
+                return $rep->client->name;
+            }, 0, $corder);
+        } else if (isset($dorder) && $dorder) {
+            $expenses = $expenses->reverse();
+        }
+        return view('expenses', ['expenses' => $this->paginate( $expenses, 30),
             'clientIds' => Engagement::groupedByClient($consultant),
             'admin' => $isAdmin,
             'confirm' => $confirm
@@ -128,7 +136,7 @@ class ExpenseController extends Controller
             if ($user->can('view', $expense)) {
                 $arr = $expense->arrangement;
                 $expense->report_date = Carbon::parse($expense->report_date)->format('m/d/Y');
-                return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name,'client'=>$expense->client->name, 'report_date' => $expense->report_date, 'company_paid'=>$expense->company_paid,'description' => $expense->description,
+                return json_encode(['receipts' => $expense->receipts, 'ename' => $arr->engagement->name, 'client' => $expense->client->name, 'report_date' => $expense->report_date, 'company_paid' => $expense->company_paid, 'description' => $expense->description,
                     'review_state' => $expense->review_state, 'hotel' => $expense->hotel, 'flight' => $expense->flight, 'meal' => $expense->meal,
                     'office_supply' => $expense->office_supply, 'car_rental' => $expense->car_rental, 'mileage_cost' => $expense->mileage_cost, 'other' => $expense->other, 'total' => number_format($expense->total(), 2, '.', ''),
                     'cname' => $arr->consultant->fullname(), 'feedback' => $expense->feedback

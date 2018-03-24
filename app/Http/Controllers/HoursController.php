@@ -27,11 +27,19 @@ class HoursController extends Controller
     public function index(Request $request, $isAdmin = false, $confirm = false)
     {
         $consultant = $isAdmin ? ($request->get('conid') ? Consultant::find($request->get('conid')) : null) : Auth::user()->consultant;
-        $eid = explode(',', $request->get('eid'));
-        $reported = $confirm ? $confirm['reports'] : Hour::reported($request->get('start'), $request->get('end'), $eid, $consultant, $request->get('state'));
-
         if ($request->ajax() && $confirm && $request->get('submit') == 'confirm') {
             return Report::confirmReport($confirm);
+        }
+        $eid = explode(',', $request->get('eid'));
+        $reported = $confirm ? $confirm['reports'] : Hour::reported($request->get('start'), $request->get('end'), $eid, $consultant, $request->get('state'));
+        $corder = $request->get('corder');
+        $dorder = $request->get('dorder');
+        if (isset($corder)) {
+            $reported = $reported->sortBy(function ($rep) {
+                return $rep->client->name;
+            }, 0, $corder);
+        } else if (isset($dorder) && $dorder) {
+            $reported = $reported->reverse();
         }
         return view('hours', ['hours' => $this->paginate($reported, 30),
             'clientIds' => Engagement::groupedByClient($confirm ? null : $consultant),
@@ -58,7 +66,7 @@ class HoursController extends Controller
                 $pid = $request->get('pid');
                 $tid = $request->get('tid');
                 return ['code' => $this->updateSettings($consultant, 'fav_task', $eid . '-' . $pid . '-' . $tid) ? 7 : 0];
-            }else if($request->get('interface')){
+            } else if ($request->get('interface')) {
                 Setting::updateOrCreate(
                     ['consultant_id' => $consultant->id, 'key' => 'hour_input_interface'],
                     ['value' => $request->get('interface')]
@@ -77,13 +85,13 @@ class HoursController extends Controller
                 $recentTasks = $consultant->getRecentInputTask(0)->keys();
                 $fav = false;
             }
-            $interfaceSetting = $consultant->settings()->where('key','hour_input_interface')->first();
+            $interfaceSetting = $consultant->settings()->where('key', 'hour_input_interface')->first();
             return view('new-hour', [
                 'hours' => $hours,
                 'clientIds' => Engagement::groupedByClient($consultant),
                 'defaultTasks' => $recentTasks,
                 'fav' => $fav,
-                'interface'=>$interfaceSetting?$interfaceSetting->value:'weekly'
+                'interface' => $interfaceSetting ? $interfaceSetting->value : 'weekly'
             ]);
         }
     }
@@ -141,7 +149,7 @@ class HoursController extends Controller
                         $feedback['code'] = 2;
                         $feedback['message'] = 'You are not in this engagement';
                     } else {
-                        if(!$request->get('billable_hours')) $request->merge(['billable_hours'=>0]);
+                        if (!$request->get('billable_hours')) $request->merge(['billable_hours' => 0]);
                         $hour = (new Hour(['arrangement_id' => $arr->id, 'consultant_id' => $arr->consultant_id]))->fill($request->except(['eid', 'pid', 'review_state']));
                         $hour->rate = $eng->isHourlyBilling() ? $arr->billing_rate : $arr->pay_rate;
                         $hour->rate_type = $eng->isHourlyBilling() ? 0 : 1;
@@ -201,7 +209,7 @@ class HoursController extends Controller
                 $arr = $hour->arrangement;
                 $eng = $arr->engagement;
                 $hour->report_date = Carbon::parse($hour->report_date)->format('m/d/Y');
-                return json_encode(['ename' => $eng->name,'client'=>$hour->client->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
+                return json_encode(['ename' => $eng->name, 'client' => $hour->client->name, 'task_id' => $hour->task_id, 'report_date' => $hour->report_date,
                     'billable_hours' => number_format($hour->billable_hours, 1), 'non_billable_hours' => number_format($hour->non_billable_hours, 1),
                     'description' => $hour->description, 'review_state' => $hour->review_state, 'position' => $arr->position->name, 'feedback' => $hour->feedback,
                     'rate' => $eng->paying_cycle == 0 ? $arr->billing_rate : $arr->pay_rate, 'share' => $eng->paying_cycle == 0 ? $arr->firm_share : 0, 'cname' => $arr->consultant->fullname()

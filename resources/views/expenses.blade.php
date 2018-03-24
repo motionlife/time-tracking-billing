@@ -144,11 +144,11 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Client</th>
+                            <th>Client <a href="?corder={{Request::get('corder')=="0"?"1":"0"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
                                             class="fa fa-refresh" aria-hidden="true"></i></a></th>
                             <th>Company Paid</th>
-                            <th>Report Date</th>
+                            <th>Report Date <a href="?dorder={{Request::get('dorder')=="1"?"0":"1"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Total</th>
                             <th>Receipts</th>
                             <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
