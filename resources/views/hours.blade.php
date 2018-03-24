@@ -58,12 +58,14 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Client <a href="?corder={{Request::get('corder')=="0"?"1":"0"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
+                            <th>Client <a
+                                        href="?corder={{(Request::get('corder')=="0"?"1":"0").($confirm?'&reporter='.Request::get('reporter'):'')}}"><i
+                                            class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
                                             class="fa fa-refresh" aria-hidden="true"></i></a></th>
                             @if($confirm)
                                 <th>Pay</th>
-                            {{--03/14/2018 Diego changed: only team lead can see the billing--}}
+                                {{--03/14/2018 Diego changed: only team lead can see the billing--}}
                                 @if($isTeamPage == 'team')
                                     <th>Billing</th>
                                 @endif
@@ -74,7 +76,9 @@
                             {{--02/21/2018 Diego added nonbilllable hours--}}
                             <th>Non-billable Hours</th>
 
-                            <th>Report Date <a href="?dorder={{Request::get('dorder')=="1"?"0":"1"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
+                            <th>Report Date <a
+                                        href="?dorder={{(Request::get('dorder')=="1"?"0":"1").($confirm?'&reporter='.Request::get('reporter'):'')}}"><i
+                                            class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
                             <th>Status</th>
                             <th>Operate</th>
@@ -118,7 +122,8 @@
                                 </td>
                                 <td data-id="{{$hour->id}}"><a href="javascript:void(0)"><i
                                                 class="fa fa-pencil-square-o"></i></a><a href="javascript:void(0)"
-                                                                                         data-del="{{($admin||!$hour->isApproved())&&!$confirm?1:0}}">{!!Request::get('reporter')?'':'<i class="fa fa-times"></i>' !!}</a></td>
+                                                                                         data-del="{{($admin||!$hour->isApproved())&&!$confirm?1:0}}">{!!Request::get('reporter')?'':'<i class="fa fa-times"></i>' !!}</a>
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

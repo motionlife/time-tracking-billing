@@ -37,8 +37,8 @@ class ExpenseController extends Controller
         $corder = $request->get('corder');
         $dorder = $request->get('dorder');
         if (isset($corder)) {
-            $expenses = $expenses->sortBy(function ($rep) {
-                return $rep->client->name;
+            $expenses = $expenses->sortBy(function ($rep) use ($corder) {
+                return $rep->client->name . ($corder ? $rep->report_date : (2147493600 - strtotime($rep->report_date)));
             }, 0, $corder);
         } else if (isset($dorder) && $dorder) {
             $expenses = $expenses->reverse();

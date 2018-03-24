@@ -71,7 +71,8 @@
                                         <input class="form-control input-numbers" id="input-car-rental"
                                                name="car_rental" type="number" placeholder="numbers only"
                                                step="0.01" min="0">
-                                        <span class="input-group-addon"><i class="fa fa-tachometer" aria-hidden="true"></i>&nbsp;Mileage<a
+                                        <span class="input-group-addon"><i class="fa fa-tachometer"
+                                                                           aria-hidden="true"></i>&nbsp;Mileage<a
                                                     href="javascript:void(0)"
                                                     title="Mileage cost = number of miles * $0.545"><i
                                                         class="fa fa-info-circle" aria-hidden="true"></i></a>
@@ -144,11 +145,15 @@
                         <thead>
                         <tr>
                             <th>#</th>
-                            <th>Client <a href="?corder={{Request::get('corder')=="0"?"1":"0"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
+                            <th>Client <a
+                                        href="?corder={{(Request::get('corder')=="0"?"1":"0").($confirm?'&reporter='.Request::get('reporter'):'')}}"><i
+                                            class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Engagement<a href="{{url()->current().'?'.http_build_query(Request::except('eid'))}}">&nbsp;<i
                                             class="fa fa-refresh" aria-hidden="true"></i></a></th>
                             <th>Company Paid</th>
-                            <th>Report Date <a href="?dorder={{Request::get('dorder')=="1"?"0":"1"}}"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
+                            <th>Report Date <a
+                                        href="?dorder={{(Request::get('dorder')=="1"?"0":"1").($confirm?'&reporter='.Request::get('reporter'):'')}}"><i
+                                            class="fa fa-sort" aria-hidden="true"></i></a></th>
                             <th>Total</th>
                             <th>Receipts</th>
                             <th>{!!$mcMode?'Consultant<a href="'.url()->current().'?'.http_build_query(Request::except('conid')).'">&nbsp;<i class="fa fa-refresh" aria-hidden="true"></i></a>':'Description'!!}</th>
@@ -197,7 +202,7 @@
                                 </td>
                                 <td><a href=" javascript:editExpense({{$expense->id}})"><i
                                                 class="fa fa-pencil-square-o"></i></a>
-                                   {!!Request::get('reporter')?'':'<a href="javascript:deleteExpense('.$expense->id.')"><i class="fa fa-times"></i></a>'!!}
+                                    {!!Request::get('reporter')?'':'<a href="javascript:deleteExpense('.$expense->id.')"><i class="fa fa-times"></i></a>'!!}
                                 </td>
                             </tr>
                         @endforeach
@@ -313,7 +318,7 @@
                 success: function (data) {
                     $('#client-engagement').html('<option selected>' + data.client + '/' + data.ename + '</option>').selectpicker('refresh');
                     $('#input-report-date').datepicker('setDate', data.report_date);
-                    $('#input-company-paid').selectpicker('val',data.company_paid);
+                    $('#input-company-paid').selectpicker('val', data.company_paid);
                     $('#input-hotel').val(data.hotel);
                     $('#input-flight').val(data.flight);
                     $('#input-meal').val(data.meal);
