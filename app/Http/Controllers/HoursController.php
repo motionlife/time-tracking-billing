@@ -71,6 +71,7 @@ class HoursController extends Controller
                     ['consultant_id' => $consultant->id, 'key' => 'hour_input_interface'],
                     ['value' => $request->get('interface')]
                 );
+                return ['code'=>7];
             }
         } else {
             $favTasks = [''];
@@ -78,18 +79,23 @@ class HoursController extends Controller
             if ($taskSetting) $favTasks = explode(',', $taskSetting->value);
             if (!$favTasks[0]) array_shift($favTasks);
             if (sizeof($favTasks)) {
-                $recentTasks = $favTasks;
+                $defaultTasks = $favTasks;
                 $fav = true;
             } else {
                 //02/20/2018 Diego turn off the default 5 tasks
-                $recentTasks = $consultant->getRecentInputTask(0)->keys();
+                $defaultTasks = $consultant->getRecentInputTask(0)->keys();
                 $fav = false;
             }
+            $defaultTasks = collect($defaultTasks)->sortBy(function ($ids) {
+                $id = explode('-', $ids);
+                $eng = Engagement::find($id[0]);
+                return $eng ? $eng->client->name : 'Deleted';
+            });
             $interfaceSetting = $consultant->settings()->where('key', 'hour_input_interface')->first();
             return view('new-hour', [
                 'hours' => $hours,
                 'clientIds' => Engagement::groupedByClient($consultant),
-                'defaultTasks' => $recentTasks,
+                'defaultTasks' => $defaultTasks,
                 'fav' => $fav,
                 'interface' => $interfaceSetting ? $interfaceSetting->value : 'weekly'
             ]);

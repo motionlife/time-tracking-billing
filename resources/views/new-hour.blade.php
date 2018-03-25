@@ -79,7 +79,7 @@
                                         class="fa fa-calendar-minus-o">&nbsp;Select Week</i></button></span>
                         <div class="form-control" id="week-info" style="border: dashed #5fdbff 0.1em;">
                             Week
-                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->subDay()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->subDay()->format('m/d/Y')}}</strong><i
+                            <span class="badge bg-success">{{\Carbon\Carbon::now()->weekOfYear}}</span>&nbsp;<strong>{{\Carbon\Carbon::now()->startOfWeek()->format('m/d/Y').' - '.\Carbon\Carbon::now()->endOfWeek()->format('m/d/Y')}}</strong><i
                                     class="pull-right">Input <strong>Billable</strong> Hours</i>
                         </div>
                     </div>
@@ -90,17 +90,17 @@
                                 <tr>
                                     <th>[<span>Client</span>]Engagement<br><i>Task description</i></th>
                                     @for($i=0;$i<7;$i++)
-                                        @php $date = \Carbon\Carbon::now()->startOfWeek()->subDay(); @endphp
-                                        <th>{{substr($date->addDay($i)->format('l'),0,3)}}
+                                        @php $date = \Carbon\Carbon::now()->startOfWeek(); @endphp
+                                        <th>{{$date->addDay($i)->format('l')}}
                                             <br><span class="week-date"
                                                       data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
                                         </th>
                                     @endfor
-                                    <th></th>
+                                    <th>DEL</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($defaultTasks as $key=>$ids)
+                                @foreach($defaultTasks as $ids)
                                     @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
                                     <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
                                         <th scope="row"><span
@@ -302,7 +302,8 @@
             $('#week-picker').datepicker({
                 todayHighlight: true,
                 autoclose: true,
-                calendarWeeks: true
+                calendarWeeks: true,
+                weekStart: 1
             }).datepicker('setDate', new Date()).on('show', function () {
                 $('.datepicker tr td.cw').parent().hover(function (e) {
                     $(this).css("background-color", e.type === "mouseenter" ? "#47cef7" : "transparent");
@@ -310,13 +311,14 @@
             }).on('changeDate', function (e) {
                 var weekinfo = $('#week-info');
                 var md = moment(e.date);
-                var spans = $('#hours-roll').find('span.week-date');
-                var firstDate = md.day(0).format("MM/DD/YYYY");
-                var lastDate = md.day(6).format("MM/DD/YYYY");
-                weekinfo.find('strong').empty().text(firstDate + " - " + lastDate);
                 weekinfo.find('span').empty().text(md.week());
+                var firstDate = md.day(1).format("MM/DD/YYYY");
+                var lastDate = md.day(7).format("MM/DD/YYYY");
+                weekinfo.find('strong').empty().text(firstDate + " - " + lastDate);
+                var spans = $('#hours-roll').find('span.week-date');
+                md.day(-1);
                 for (var i = 0; i < 7; i++) {
-                    var weekday = md.day(i);
+                    var weekday = md.day(i+1);
                     spans.eq(i).empty().text(weekday.format("MMM DD"));
                     spans.eq(i).data('date', weekday.format('YYYY-MM-DD'));
                 }
