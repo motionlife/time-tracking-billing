@@ -120,7 +120,7 @@
                                             @for($i=0;$i<7;$i++)
                                                 <td class="wds"><input class='form-control input-sm' type='number'
                                                                        min="0"
-                                                                       step="0.1" max="24"/>
+                                                                       step="0.01" max="24"/>
                                                     <a href="javascript:void(0);" title="Add description" ref="popover"
                                                        data-desc="">
                                                         <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
@@ -158,7 +158,7 @@
                                 aria-hidden="true"></i></a>
                 </th>
                 @for($i=0;$i<7;$i++)
-                    <td><input class='form-control input-sm' type='number' min="0" step="0.1" max="24"/>
+                    <td><input class='form-control input-sm' type='number' min="0" step="0.01" max="24"/>
                         <a href="javascript:void(0);" title="Add description" ref="popover"><i
                                     class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
                 @endfor
@@ -446,6 +446,8 @@
                     var content = focuseda.data("desc") === undefined ? '' : focuseda.data("desc");
                     return '<textarea class="notebook" id="notebook" rows="8" cols="70">' + content + '</textarea>';
                 }
+            }).on('shown.bs.popover', function() {
+                $('.popover').find("#notebook").focus();
             }).on('click', function (e) {
                 $('[ref="popover"]').each(function () {
                     if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
