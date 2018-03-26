@@ -505,7 +505,14 @@
                 success: function (data) {
                     $('#hours-roll').find('thead th.wds').each(function (i, d) {
                         var date = $(d).find('.week-date').data('date');
-                        $(d).find('i').text((data[date] ? parseFloat(data[date]).toFixed(2) : '0.00') + ' h');
+                        var it=  $(d).find('i');
+                        if(data[date]){
+                            it.text(parseFloat(data[date]).toFixed(2) + ' h');
+                            it.attr('class','badge bg-danger');
+                        }else{
+                            it.text('0.00 h');
+                            it.attr('class','badge bg-warning');
+                        }
                     });
                 }
             });
