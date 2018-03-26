@@ -85,44 +85,53 @@
                     </div>
                     <form id="matrix">
                         <div class="panel-body" id="hours-roll">
-                            <table class="table table-responsive">
+                            <table class="table table-responsive" style="margin-bottom: 0">
                                 <thead>
                                 <tr>
-                                    <th>[<span>Client</span>]Engagement<br><i>Task description</i></th>
+                                    <th class="cet">[<span>Client</span>]Engagement<br><i>Task description</i></th>
+                                    @php $date = \Carbon\Carbon::now()->startOfWeek(); @endphp
                                     @for($i=0;$i<7;$i++)
-                                        @php $date = \Carbon\Carbon::now()->startOfWeek(); @endphp
-                                        <th>{{$date->addDay($i)->format('l')}}
-                                            <br><span class="week-date"
-                                                      data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
+                                        <th class="wds"><span class="week-date"
+                                                              data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
+                                            {{substr($date->format('l'),0,3)}}
                                         </th>
+                                        @php $date->addDay();@endphp
                                     @endfor
-                                    <th>DEL</th>
+                                    <th class="del"><a href="javascript:void(0)" class="deletable-row"
+                                                       style="visibility: hidden;"><i
+                                                    class="fa fa-times" aria-hidden="true"></i></a></th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                @foreach($defaultTasks as $ids)
-                                    @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
-                                    <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
-                                        <th scope="row"><span
-                                                    class="label label-success">{{$eng->client->name}}</span><span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span><a
-                                                    href="javascript:void(0);" class="mark-fav-task"
-                                                    title="Mark as your favorite task for automatic display."
-                                                    data-state="{{$fav?'on':'off'}}"><i
-                                                        class="fa fa-star{{$fav?'':'-o'}}" aria-hidden="true"></i></a>
-                                        </th>
-                                        @for($i=0;$i<7;$i++)
-                                            <td><input class='form-control input-sm' type='number' min="0"
-                                                       step="0.1" max="24"/>
-                                                <a href="javascript:void(0);" title="Add description" ref="popover"
-                                                   data-desc="">
-                                                    <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
-                                        @endfor
-                                        <td><a href="javascript:void(0)" class="deletable-row"><i
-                                                        class="fa fa-times" aria-hidden="true"></i></a></td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
                             </table>
+                            <div class="scroll-me">
+                                <table class="table table-responsive">
+                                    <tbody>
+                                    @foreach($defaultTasks as $ids)
+                                        @php $id = explode('-',$ids); $eng=\newlifecfo\Models\Engagement::find($id[0]); @endphp
+                                        <tr data-eid="{{$id[0]}}" data-pid="{{$id[1]}}" data-tid="{{$id[2]}}">
+                                            <th scope="row" class="cet"><span
+                                                        class="label label-success">{{$eng->client->name}}</span><span>{{$eng->name}}</span><br><span>{{\newlifecfo\Models\Templates\Task::find($id[2])->description}}</span><a
+                                                        href="javascript:void(0);" class="mark-fav-task"
+                                                        title="Mark as your favorite task for automatic display."
+                                                        data-state="{{$fav?'on':'off'}}"><i
+                                                            class="fa fa-star{{$fav?'':'-o'}}"
+                                                            aria-hidden="true"></i></a>
+                                            </th>
+                                            @for($i=0;$i<7;$i++)
+                                                <td class="wds"><input class='form-control input-sm' type='number'
+                                                                       min="0"
+                                                                       step="0.1" max="24"/>
+                                                    <a href="javascript:void(0);" title="Add description" ref="popover"
+                                                       data-desc="">
+                                                        <i class="fa fa-sticky-note-o" aria-hidden="true"></i></a></td>
+                                            @endfor
+                                            <td class="del"><a href="javascript:void(0)" class="deletable-row"><i
+                                                            class="fa fa-times" aria-hidden="true"></i></a></td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                         <div class="panel-footer">
                             <a href="javascript:void(0)" id="show-row-modal" class="btn btn-info"><i class="fa fa-plus"
@@ -235,7 +244,7 @@
                 $('#income-estimate').val(bh + 'h  x  $' + (br * (1 - fs)).toFixed(2) + '/hr' + ' = $' + (bh * br * (1 - fs)).toFixed(2));
             });
             $('#hour-form').on('submit', function (e) {
-                if (parseFloat($('#billable-hours').val()+$('#non-billable-hours').val()) > 0) {
+                if (parseFloat($('#billable-hours').val() + $('#non-billable-hours').val()) > 0) {
                     var eid = $('#client-engagement').selectpicker('val');
                     var token = "{{ csrf_token() }}";
                     $.ajax({
@@ -292,12 +301,9 @@
                 orientation: 'bottom'
             }).datepicker('setDate', new Date());
             $('#day-week').on('click', function () {
-                $('.daily-weekly-view').slideToggle(300,function () {
-                    $.get("?interface="+($('.weeklyView').is(":visible")?"weekly":"daily"));
+                $('.daily-weekly-view').slideToggle(300, function () {
+                    $.get("?interface=" + ($('.weeklyView').is(":visible") ? "weekly" : "daily"));
                 });
-            });
-            $('#hours-roll').slimScroll({
-                height: '450px'
             });
             $('#week-picker').datepicker({
                 todayHighlight: true,
@@ -318,7 +324,7 @@
                 var spans = $('#hours-roll').find('span.week-date');
                 md.day(-1);
                 for (var i = 0; i < 7; i++) {
-                    var weekday = md.day(i+1);
+                    var weekday = md.day(i + 1);
                     spans.eq(i).empty().text(weekday.format("MMM DD"));
                     spans.eq(i).data('date', weekday.format('YYYY-MM-DD'));
                 }
@@ -424,6 +430,9 @@
                     }
                 });
             });
+            $('#hours-roll div.scroll-me').slimScroll({
+                height: 520, distance: 0
+            });
             var focuseda;
             $('.main-content').popover({
                 placement: 'bottom',
@@ -451,6 +460,7 @@
                 }
             });
         });
+
         @yield('task_selector')
         function deleteTodaysReport(hid) {
             var li = $('a[href*="deleteTodaysReport(' + hid + ')"]').parent().parent().parent();
@@ -485,6 +495,18 @@
 @endsection
 @section('special-css')
     <style>
+        #hours-roll .cet {
+            width: 26%;
+        }
+
+        #hours-roll .wds {
+            width: 10%;
+        }
+
+        #hours-roll .del {
+            width: 4%;
+        }
+
         #hours-roll thead span {
             color: #4bb3ff;
             font-weight: normal;
@@ -515,7 +537,7 @@
             font-weight: bold;
         }
 
-        #hours-roll tbody tr a {
+        #hours-roll tr a {
             width: 18%;
             display: inline-block;
             margin-left: .1em;
