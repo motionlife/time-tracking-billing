@@ -71,7 +71,12 @@ class HoursController extends Controller
                     ['consultant_id' => $consultant->id, 'key' => 'hour_input_interface'],
                     ['value' => $request->get('interface')]
                 );
-                return ['code'=>7];
+                return ['code' => 7];
+            } else if ($request->get('weekhours')) {
+                $dates = $request->get('dates');
+                return $dayhours = $consultant->hours->whereIn('report_date', $dates)->groupBy('report_date')->transform(function ($g) {
+                    return $g->sum('billable_hours');
+                });
             }
         } else {
             $favTasks = [''];

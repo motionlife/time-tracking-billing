@@ -93,7 +93,7 @@
                                     @for($i=0;$i<7;$i++)
                                         <th class="wds"><span class="week-date"
                                                               data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
-                                            {{substr($date->format('l'),0,3)}}<br> <i class="badge bg-warning">2.50</i>
+                                            {{substr($date->format('l'),0,3)}}<br><i class="badge bg-warning">0.00 h</i>
                                         </th>
                                         @php $date->addDay();@endphp
                                     @endfor
@@ -328,6 +328,7 @@
                     spans.eq(i).empty().text(weekday.format("MMM DD"));
                     spans.eq(i).data('date', weekday.format('YYYY-MM-DD'));
                 }
+                fetchDayHours();
             });
             $('#show-row-modal').on('click', function () {
                 $('#engtaskModal').modal('toggle');
@@ -385,6 +386,7 @@
                                 var td = $('#hours-roll').find('tbody tr td');
                                 td.find('input').val('');
                                 td.find('a[ref="popover"]').data('desc', '').find('i').removeClass("fa-sticky-note").addClass("fa-sticky-note-o");
+                                fetchDayHours();
                             } else {
                                 toastr.error('Error! Saving record failed, code: ' + feedback.code +
                                     ', message: ' + feedback.message);
@@ -431,7 +433,7 @@
                 });
             });
             $('#hours-roll div.scroll-me').slimScroll({
-                height: Math.max(300, $(window).height() - 400), distance: 0
+                height: Math.max(300, $(window).height() - 380), distance: 0
             });
             var focuseda;
             $('.main-content').popover({
@@ -459,6 +461,7 @@
                     focuseda.find('i').removeClass("fa-sticky-note").addClass("fa-sticky-note-o");
                 }
             });
+            fetchDayHours();
         });
 
         @yield('task_selector')
@@ -490,6 +493,22 @@
                         dataType: 'json'
                     });
                 });
+        }
+
+        function fetchDayHours() {
+            var dates = '';
+            $('.week-date').each(function (i, d) {
+                dates += '&dates[]=' + $(d).data('date');
+            });
+            $.get({
+                url: '?weekhours=1' + dates,
+                success: function (data) {
+                    $('#hours-roll').find('thead th.wds').each(function (i, d) {
+                        var date = $(d).find('.week-date').data('date');
+                        $(d).find('i').text((data[date] ? parseFloat(data[date]).toFixed(2) : '0.00') + ' h');
+                    });
+                }
+            });
         }
     </script>
 @endsection
