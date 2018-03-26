@@ -93,7 +93,7 @@
                                     @for($i=0;$i<7;$i++)
                                         <th class="wds"><span class="week-date"
                                                               data-date="{{$date->format('Y-m-d')}}">{{$date->format('M d')}}</span>
-                                            {{substr($date->format('l'),0,3)}}
+                                            {{substr($date->format('l'),0,3)}}<br> <i class="badge bg-warning">2.50</i>
                                         </th>
                                         @php $date->addDay();@endphp
                                     @endfor
@@ -431,7 +431,7 @@
                 });
             });
             $('#hours-roll div.scroll-me').slimScroll({
-                height: 520, distance: 0
+                height: $(window).height() - 400, distance: 0
             });
             var focuseda;
             $('.main-content').popover({
@@ -495,6 +495,10 @@
 @endsection
 @section('special-css')
     <style>
+        #hours-roll thead .wds {
+            text-align: center;
+        }
+
         #hours-roll .cet {
             width: 26%;
         }
