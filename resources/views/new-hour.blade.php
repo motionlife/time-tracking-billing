@@ -431,7 +431,7 @@
                 });
             });
             $('#hours-roll div.scroll-me').slimScroll({
-                height: $(window).height() - 400, distance: 0
+                height: Math.max(300, $(window).height() - 400), distance: 0
             });
             var focuseda;
             $('.main-content').popover({
