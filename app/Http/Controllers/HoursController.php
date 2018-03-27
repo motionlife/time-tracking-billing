@@ -35,9 +35,13 @@ class HoursController extends Controller
         $corder = $request->get('corder');
         $dorder = $request->get('dorder');
         if (isset($corder)) {
-            $reported = $reported->sortBy(function ($rep) use ($corder) {
-                return $rep->client->name . ($corder ? $rep->report_date : (2147493600 - strtotime($rep->report_date)));
-            }, 0, $corder);
+            $a = function ($r) {
+                return $r->client->name . $r->report_date;
+            };
+            $b = function ($r) {
+                return $r->client->name . (2147493600 - strtotime($r->report_date));
+            };
+            $reported = $reported->sortBy($corder ? $a : $b, 0, $corder);
         } else if (isset($dorder) && $dorder) {
             $reported = $reported->reverse();
         }
